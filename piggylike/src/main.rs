@@ -4,26 +4,34 @@ use engine::macroquad_tiled;
 
 #[macroquad::main("BasicShapes")]
 async fn main() {
-    
-    let map_json = load_string("assets/maps/basicbig.json").await.unwrap();
-    let tileset_json = load_string("assets/tilesets/basictiles.json").await.unwrap();
-    let basictiles_texture = load_texture("assets/textures/basictiles.png").await.unwrap();
-    basictiles_texture.set_filter(FilterMode::Nearest);
-    let texture_map = [("../textures/basictiles.png", basictiles_texture.clone())];
-    let tileset_map = [("../tilesets/basictiles.json", tileset_json.as_str())];
+    let map_json = load_string("assets/maps/test.tmj").await.unwrap();
+
+    let tiles_tileset_json = load_string("assets/tilesets/tiles.tsj").await.unwrap();
+    let entities_tileset_json = load_string("assets/tilesets/entities.tsj").await.unwrap();
+
+    let tiles_texture = load_texture("assets/textures/tiles.png").await.unwrap();
+    tiles_texture.set_filter(FilterMode::Nearest);
+    let entities_texture = load_texture("assets/textures/entities.png").await.unwrap();
+    entities_texture.set_filter(FilterMode::Nearest);
+
+    let texture_map = [("../textures/tiles.png", tiles_texture.clone()), ("../textures/entities.png", entities_texture.clone())];
+    let tileset_map = [("../tilesets/tiles.tsj", tiles_tileset_json.as_str()), ("../tilesets/entities.tsj", entities_tileset_json.as_str())];
 
     let map = macroquad_tiled::load_map(&map_json, &texture_map, &tileset_map).unwrap();
     
     
-    let texture: Texture2D = load_texture("assets/textures/piggy.png").await.unwrap();
 
     loop {
         clear_background(WHITE);
         let s = if screen_width() < screen_height() { screen_width()} else {screen_height()};
         let dest_rect = Rect::new(0., 0., s,  s);
         let source_rect = Rect::new(0.0, 0.0, 16.0, 16.0);
-        map.draw_tiles("1", dest_rect, None);
-        map.draw_tiles("2", dest_rect, None);
+
+
+        
+        map.draw_tiles("tiles", dest_rect, None);
+        let entities = map.layers.get("entities").unwrap();
+
        /* let size = 32.0;
         for y in 0..256 {
             for x in 0..256 {
@@ -52,7 +60,7 @@ async fn main() {
 
         draw_text("IT WORKS! 123", 20.0, 20.0, 30.0, DARKGRAY);
 */
-        println!("fps:{}", get_fps());
+        draw_text(&format!("fps:{}", get_fps()), 16.0, 16.0, 16.0, BLACK);
         next_frame().await
     }
 }
