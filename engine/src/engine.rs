@@ -40,15 +40,15 @@ impl Engine {
     pub async fn load_map(&mut self, map_path:&str) {
         let map_json = load_string(map_path).await.unwrap();
         let tiles_tileset_json = load_string("assets/tilesets/tiles.tsj").await.unwrap();
-        let entities_tileset_json = load_string("assets/tilesets/entities.tsj").await.unwrap();
+        let things_tileset_json = load_string("assets/tilesets/things.tsj").await.unwrap();
 
         let tiles_texture = load_texture("assets/textures/tiles.png").await.unwrap();
         tiles_texture.set_filter(FilterMode::Nearest);
-        let entities_texture = load_texture("assets/textures/entities.png").await.unwrap();
-        entities_texture.set_filter(FilterMode::Nearest);
+        let things_texture = load_texture("assets/textures/things.png").await.unwrap();
+        things_texture.set_filter(FilterMode::Nearest);
 
-        let texture_map = [("../textures/tiles.png", tiles_texture.clone()), ("../textures/entities.png", entities_texture.clone())];
-        let tileset_map = [("../tilesets/tiles.tsj", tiles_tileset_json.as_str()), ("../tilesets/entities.tsj", entities_tileset_json.as_str())];
+        let texture_map = [("../textures/tiles.png", tiles_texture.clone()), ("../textures/things.png", things_texture.clone())];
+        let tileset_map = [("../tilesets/tiles.tsj", tiles_tileset_json.as_str()), ("../tilesets/things.tsj", things_tileset_json.as_str())];
 
         let map = macroquad_tiled::load_map(&map_json, &texture_map, &tileset_map).unwrap();
         self.world.map = Some(map);

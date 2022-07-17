@@ -48,7 +48,7 @@
         {
          "draworder":"topdown",
          "id":3,
-         "name":"entities",
+         "name":"things",
          "objects":[
                 {
                  "class":"",
@@ -149,7 +149,7 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"..\/tilesets\/entities.tsj"
+         "source":"..\/tilesets\/things.tsj"
         }, 
         {
          "firstgid":257,
