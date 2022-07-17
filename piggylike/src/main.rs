@@ -5,7 +5,6 @@ use engine::macroquad_tiled;
 #[macroquad::main("BasicShapes")]
 async fn main() {
     let mut engine = Engine::default();
-    //engine.load_map("assets/maps/test.tmj").await;
     engine.execute_file("assets/scripts/autoexec.rhai").await;
     
 
