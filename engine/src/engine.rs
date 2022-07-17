@@ -1,14 +1,15 @@
 pub use macroquad;
 use macroquad::prelude::{load_string, load_texture, FilterMode};
 pub use macroquad_tiled;
+use macroquad_tiled::Map;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::World;
+use crate::Snapshot;
 
 
 pub struct Engine {
-    pub world:World,
+    pub world:Snapshot,
     pub script_engine:rhai::Engine,
     pub commands:Rc<RefCell<Vec<ScriptCommand>>>
 }
@@ -51,7 +52,7 @@ impl Engine {
         let tileset_map = [("../tilesets/tiles.tsj", tiles_tileset_json.as_str()), ("../tilesets/things.tsj", things_tileset_json.as_str())];
 
         let map = macroquad_tiled::load_map(&map_json, &texture_map, &tileset_map).unwrap();
-        self.world.map = Some(map);
+        //self.world.map = Some(map);
     }
 
     pub async fn eval(&mut self, script:&str) {

@@ -13,11 +13,11 @@ async fn main() {
     loop {
         clear_background(WHITE);
 
-        if let Some(map) = &engine.world.map {
+       /* if let Some(map) = &engine.world.map {
             let s = if screen_width() < screen_height() { screen_width()} else {screen_height()};
             let dest_rect = Rect::new(0., 0., s,  s);
             map.draw_tiles("tiles", dest_rect, None);
-        }
+        }*/
     
         if show_console {
             
