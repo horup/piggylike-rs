@@ -41,17 +41,22 @@ impl Tilemap {
                 
             }
 
-            let mut layer = Layer {
+            let layer = Layer {
                 tiles
             };
 
             layers.push(layer);
         }
 
+
         Self {
             width:map.raw_tiled_map.width,
             height:map.raw_tiled_map.height,
             layers
         }
+    }
+
+    pub fn get(&self, x:u32, y:u32) {
+        
     }
 }

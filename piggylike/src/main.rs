@@ -1,8 +1,7 @@
 use engine::{macroquad, Engine};
 use macroquad::prelude::*;
-use engine::macroquad_tiled;
 
-#[macroquad::main("BasicShapes")]
+#[macroquad::main("PiggyLike")]
 async fn main() {
     let mut engine = Engine::default();
     engine.eval_file("assets/scripts/autoexec.rhai").await;
@@ -18,6 +17,16 @@ async fn main() {
             let dest_rect = Rect::new(0., 0., s,  s);
             map.draw_tiles("tiles", dest_rect, None);
         }*/
+
+        let tilemap = &engine.world.tilemap;
+        for layer in tilemap.layers.iter() {
+            for y in 0..tilemap.height {
+                for x in 0..tilemap.width {
+                   
+                }
+            }
+        }
+
     
         if show_console {
             

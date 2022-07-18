@@ -86,8 +86,9 @@ impl Engine {
         let map = macroquad_tiled::load_map(&map_json, &texture_map, &tileset_map).unwrap();
         //self.world.map = Some(map);
 
-        let mut snapshot = World::default();
-        snapshot.tilemap = Tilemap::new(&map, self.tile_prototypes.clone());
+        let mut world = World::default();
+        world.tilemap = Tilemap::new(&map, self.tile_prototypes.clone());
+        self.world = world;
     }
 
     pub async fn process_commands(&mut self) {
