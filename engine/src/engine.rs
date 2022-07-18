@@ -1,17 +1,17 @@
 pub use macroquad;
 use macroquad::prelude::{load_string, load_texture, FilterMode};
 pub use macroquad_tiled;
-use macroquad_tiled::Map;
-use std::cell::RefCell;
+use std::borrow::BorrowMut;
+use std::{cell::RefCell, collections::HashMap};
 use std::rc::Rc;
 
-use crate::Snapshot;
-
+use crate::{Snapshot, Tilemap, Tile};
 
 pub struct Engine {
+    pub tile_prototypes:HashMap<u32, Tile>,
     pub world:Snapshot,
     pub script_engine:rhai::Engine,
-    pub commands:Rc<RefCell<Vec<ScriptCommand>>>
+    pub commands: Rc<RefCell<Vec<ScriptCommand>>>
 }
 
 impl Default for Engine {
@@ -19,22 +19,30 @@ impl Default for Engine {
         let mut engine = rhai::Engine::new();
         let commands:Rc<RefCell<Vec<ScriptCommand>>> = Rc::new(RefCell::new(Vec::new()));
         let cmd = commands.clone();
-        
         engine.register_fn("load_map", move |path:&str| {
-            cmd.borrow_mut().push(ScriptCommand::LoadMap { path: path.into() });
+            cmd.as_ref().borrow_mut().push(ScriptCommand::LoadMap { path: path.into() });
         });
 
+        let mut cmd = commands.clone();
+        engine.register_fn("define_tile", move |index:i64, solid:bool| {
+            cmd.as_ref().borrow_mut().push(ScriptCommand::DefineTile { tile: Tile {
+                index:index as u32,
+                solid
+            } });
+        });
 
         Self { 
+            tile_prototypes:HashMap::new(),
             world: Default::default(),
             script_engine:engine,
-            commands:commands
+            commands
         }
     }
 }
 
 pub enum ScriptCommand {
-    LoadMap { path:String }
+    LoadMap { path:String },
+    DefineTile { tile:Tile }
 }
 
 impl Engine {
@@ -53,6 +61,22 @@ impl Engine {
 
         let map = macroquad_tiled::load_map(&map_json, &texture_map, &tileset_map).unwrap();
         //self.world.map = Some(map);
+
+        let mut snapshot = Snapshot::default();
+        snapshot.tilemap = Tilemap::new(&map, self.tile_prototypes.clone());
+    }
+
+    pub async fn process_commands(&mut self) {
+        for cmd in self.commands.clone().as_ref().borrow_mut().drain(..) {
+            match cmd {
+                ScriptCommand::LoadMap { path } => {
+                    self.load_map(&path).await;
+                },
+                ScriptCommand::DefineTile { tile } => {
+
+                },
+            }
+        }
     }
 
     pub async fn eval(&mut self, script:&str) {
@@ -65,13 +89,7 @@ impl Engine {
             },
         }
 
-        for cmd in self.commands.clone().borrow_mut().drain(..) {
-            match cmd {
-                ScriptCommand::LoadMap { path } => {
-                    self.load_map(&path).await;
-                },
-            }
-        }
+        self.process_commands();
     }
     pub async fn eval_file(&mut self, path:&str) {
         match self.script_engine.eval_file::<()>(path.into()) {
@@ -83,13 +101,6 @@ impl Engine {
             },
         }
 
-        for cmd in self.commands.clone().borrow_mut().drain(..) {
-            match cmd {
-                ScriptCommand::LoadMap { path } => {
-                    self.load_map(&path).await;
-                },
-            }
-        }
-        
+        self.process_commands();
     }
 }
