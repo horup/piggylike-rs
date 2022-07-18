@@ -1,8 +1,8 @@
 mod engine;
 pub use engine::*;
 
-mod snapshot;
-pub use snapshot::*;
+mod world;
+pub use world::*;
 
 mod tilemap;
 pub use tilemap::*;

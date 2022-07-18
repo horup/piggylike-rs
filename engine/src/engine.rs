@@ -1,15 +1,14 @@
 pub use macroquad;
 use macroquad::prelude::{load_string, load_texture, FilterMode};
 pub use macroquad_tiled;
-use std::borrow::BorrowMut;
 use std::{cell::RefCell, collections::HashMap};
 use std::rc::Rc;
 
-use crate::{Snapshot, Tilemap, Tile};
+use crate::{World, Tilemap, Tile};
 
 pub struct Engine {
     pub tile_prototypes:HashMap<u32, Tile>,
-    pub world:Snapshot,
+    pub world:World,
     pub script_engine:rhai::Engine,
     pub commands: Rc<RefCell<Vec<ScriptCommand>>>
 }
@@ -23,10 +22,35 @@ impl Default for Engine {
             cmd.as_ref().borrow_mut().push(ScriptCommand::LoadMap { path: path.into() });
         });
 
-        let mut cmd = commands.clone();
-        engine.register_fn("define_tile", move |index:i64, solid:bool| {
-            cmd.as_ref().borrow_mut().push(ScriptCommand::DefineTile { tile: Tile {
-                index:index as u32,
+        let cmd = commands.clone();
+        engine.register_fn("define_tile", move |tile:rhai::Map| {
+            
+            fn get_i64(tile:&rhai::Map, key:&str) -> i64 {
+                let v = tile.get(key);
+                if let Some(v) = v {
+                    if let Ok(v) = v.as_int() {
+                        return v;
+                    }
+                }
+
+                return i64::default();
+            }
+            fn get_bool(tile:&rhai::Map, key:&str) -> bool {
+                let v = tile.get(key);
+                if let Some(v) = v {
+                    if let Ok(v) = v.as_bool() {
+                        return v;
+                    }
+                }
+
+                return bool::default();
+            }
+
+            let index:u32 = get_i64(&tile, "index") as u32;
+            let solid = get_bool(&tile, "solid");
+
+            cmd.as_ref().borrow_mut().push(ScriptCommand::DefineTile { tile:Tile {
+                index,
                 solid
             } });
         });
@@ -62,7 +86,7 @@ impl Engine {
         let map = macroquad_tiled::load_map(&map_json, &texture_map, &tileset_map).unwrap();
         //self.world.map = Some(map);
 
-        let mut snapshot = Snapshot::default();
+        let mut snapshot = World::default();
         snapshot.tilemap = Tilemap::new(&map, self.tile_prototypes.clone());
     }
 
@@ -73,7 +97,7 @@ impl Engine {
                     self.load_map(&path).await;
                 },
                 ScriptCommand::DefineTile { tile } => {
-
+                    self.tile_prototypes.insert(tile.index, tile);
                 },
             }
         }
@@ -89,7 +113,7 @@ impl Engine {
             },
         }
 
-        self.process_commands();
+        self.process_commands().await;
     }
     pub async fn eval_file(&mut self, path:&str) {
         match self.script_engine.eval_file::<()>(path.into()) {
@@ -101,6 +125,6 @@ impl Engine {
             },
         }
 
-        self.process_commands();
+        self.process_commands().await;
     }
 }
