@@ -1,4 +1,4 @@
-use engine::{macroquad, Engine};
+use engine::{macroquad, Engine, TextureAtlas};
 use macroquad::prelude::*;
 
 #[macroquad::main("PiggyLike")]
@@ -8,6 +8,8 @@ async fn main() {
     
     let mut console = String::new();
     let mut show_console = true;
+
+    let atlas = TextureAtlas::new(load_texture("assets/textures/tiles.png").await.unwrap(), 16, 16);
 
     loop {
         clear_background(WHITE);
@@ -23,10 +25,22 @@ async fn main() {
             for y in 0..tilemap.height {
                 for x in 0..tilemap.width {
                    
+                    if let Some(tile) = tilemap.get(0, x, y) {
+                        let x = x as f32 * 16.0;
+                        let y = y as f32 * 16.0;
+                        atlas.draw(tile.index, x, y);
+                    }
                 }
             }
         }
 
+        for i in 0..4 {
+            atlas.draw(i + 32, i as f32 * 16.0, 0.0);
+        }
+
+
+
+        //atlas.draw(0, 16.0, 32.0);
     
         if show_console {
             

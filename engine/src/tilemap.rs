@@ -7,7 +7,7 @@ pub struct Layer {
     pub tiles:Vec<Option<Tile>>
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Copy)]
 pub struct Tile {
     pub index:u32,
     pub solid:bool
@@ -56,7 +56,14 @@ impl Tilemap {
         }
     }
 
-    pub fn get(&self, x:u32, y:u32) {
-        
+    pub fn get(&self, layer:usize, x:u32, y:u32) -> Option<Tile> {
+        let index = y * self.width + x;
+        if let Some(layer) = self.layers.get(layer) {
+            if let Some(tile) = layer.tiles.get(index as usize) {
+                return *tile;
+            }
+        }
+
+        return None; 
     }
 }
