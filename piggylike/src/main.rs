@@ -14,12 +14,16 @@ async fn main() {
 
     loop {
         clear_background(WHITE);
+        let aspect = screen_width() / screen_height();
+        let offset = Vec2::new(0.0, 0.0);
+        let zoom = 1.0/16.0;
+        let camera = Camera2D {
+            zoom:Vec2::new(zoom, -zoom * aspect),
+            target:offset,
+            ..Default::default()
+        };
 
-       /* if let Some(map) = &engine.world.map {
-            let s = if screen_width() < sc&reen_height() { screen_width()} else {screen_height()};
-            let dest_rect = Rect::new(0., 0., s,  s);
-            map.draw_tiles("tiles", dest_rect, None);
-        }*/
+        set_camera(&camera);
 
         let tilemap = &engine.world.tilemap;
         for layer in tilemap.layers.iter() {
@@ -27,8 +31,8 @@ async fn main() {
                 for x in 0..tilemap.width {
                    
                     if let Some(tile) = tilemap.get(0, x, y) {
-                        let x = x as f32 * 16.0;
-                        let y = y as f32 * 16.0;
+                        let x = x as f32;
+                        let y = y as f32;
                         if let Some(atlas) = engine.texture_atlases.get(&tile.atlas) {
                             atlas.draw(tile.atlas_index, x, y);
                         }
@@ -40,6 +44,9 @@ async fn main() {
         for i in 0..4 {
             //atlas.draw(i + 32, i as f32 * 16.0, 0.0);
         }
+
+
+        set_default_camera();
 
 
 

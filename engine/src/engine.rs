@@ -142,6 +142,7 @@ impl Engine {
                     texture_path,
                 } => {
                     let texture = load_texture(&texture_path).await.unwrap();
+                    texture.set_filter(FilterMode::Nearest);
                     self.texture_atlases.insert(
                         id,
                         Atlas {
