@@ -1,3 +1,5 @@
+#![allow(warnings, unused)]
+
 use engine::{macroquad, Engine, TextureAtlas};
 use macroquad::prelude::*;
 
@@ -5,17 +7,16 @@ use macroquad::prelude::*;
 async fn main() {
     let mut engine = Engine::default();
     engine.eval_file("assets/scripts/autoexec.rhai").await;
-    
-    let mut console = String::new();
-    let mut show_console = true;
 
-    let atlas = TextureAtlas::new(load_texture("assets/textures/tiles.png").await.unwrap(), 16, 16);
+    let mut console = String::new();
+    let show_console = true;
+
 
     loop {
         clear_background(WHITE);
 
        /* if let Some(map) = &engine.world.map {
-            let s = if screen_width() < screen_height() { screen_width()} else {screen_height()};
+            let s = if screen_width() < sc&reen_height() { screen_width()} else {screen_height()};
             let dest_rect = Rect::new(0., 0., s,  s);
             map.draw_tiles("tiles", dest_rect, None);
         }*/
@@ -28,14 +29,16 @@ async fn main() {
                     if let Some(tile) = tilemap.get(0, x, y) {
                         let x = x as f32 * 16.0;
                         let y = y as f32 * 16.0;
-                        atlas.draw(tile.index, x, y);
+                        if let Some(atlas) = engine.texture_atlases.get(&tile.atlas) {
+                            atlas.draw(tile.atlas_index, x, y);
+                        }
                     }
                 }
             }
         }
 
         for i in 0..4 {
-            atlas.draw(i + 32, i as f32 * 16.0, 0.0);
+            //atlas.draw(i + 32, i as f32 * 16.0, 0.0);
         }
 
 
