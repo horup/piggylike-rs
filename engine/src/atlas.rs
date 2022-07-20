@@ -1,12 +1,12 @@
 use macroquad::prelude::{Texture2D, draw_texture_ex, Color, DrawTextureParams, draw_texture, WHITE, Rect};
 
-pub struct TextureAtlas {
+pub struct Atlas {
     pub texture:Texture2D,
     pub columns:u16,
     pub rows:u16
 }
 
-impl TextureAtlas {
+impl Atlas {
     pub fn new(texture:Texture2D, columns:u16, rows:u16) -> Self {
         Self { texture, columns, rows }
     }

@@ -1,6 +1,6 @@
 #![allow(warnings, unused)]
 
-use engine::{macroquad, Engine, TextureAtlas};
+use engine::{macroquad, Engine, Atlas};
 use macroquad::prelude::*;
 
 #[macroquad::main("PiggyLike")]

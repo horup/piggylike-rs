@@ -4,10 +4,10 @@ pub use macroquad_tiled;
 use std::rc::Rc;
 use std::{cell::RefCell, collections::HashMap};
 
-use crate::{TextureAtlas, Tile, Tilemap, World};
+use crate::{Atlas, Tile, Tilemap, World};
 
 pub struct Engine {
-    pub texture_atlases: HashMap<u32, TextureAtlas>,
+    pub texture_atlases: HashMap<u32, Atlas>,
     pub tile_prototypes: HashMap<u32, Tile>,
     pub world: World,
     pub script_engine: rhai::Engine,
@@ -144,7 +144,7 @@ impl Engine {
                     let texture = load_texture(&texture_path).await.unwrap();
                     self.texture_atlases.insert(
                         id,
-                        TextureAtlas {
+                        Atlas {
                             texture,
                             columns,
                             rows,

@@ -9,5 +9,5 @@ pub use world::*;
 mod tilemap;
 pub use tilemap::*;
 
-mod texture_atlas;
-pub use texture_atlas::*;
+mod atlas;
+pub use atlas::*;
