@@ -15,7 +15,7 @@ async fn main() {
     loop {
         clear_background(WHITE);
         let aspect = screen_width() / screen_height();
-        let offset = Vec2::new(0.0, 0.0);
+        let offset = Vec2::new(16.0, 16.0);
         let zoom = 1.0/16.0;
         let camera = Camera2D {
             zoom:Vec2::new(zoom, -zoom * aspect),
