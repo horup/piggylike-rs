@@ -40,7 +40,7 @@ async fn main() {
         }
 
 
-        let visible_tiles = 16.0;
+        let visible_tiles = 24.0;
         let scale = (screen_width() / visible_tiles).floor();
         let offset = Vec2::new((offset.x * scale).floor() / scale, (offset.y * scale).floor() / scale);
         let mut r = Rect::new(offset.x, offset.y, screen_width() / scale, screen_height() / scale);
