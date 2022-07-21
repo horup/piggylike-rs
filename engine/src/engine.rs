@@ -69,11 +69,12 @@ impl Default for Engine {
         engine.register_fn("define_thing", move |id: i64, thing: rhai::Map| {
             let atlas = get_i64(&thing, "atlas");
             let atlas_index = get_i64(&thing, "atlas_index");
-
+            let player = get_bool(&thing, "player");
             cmd.as_ref().borrow_mut().push(ScriptCommand::DefineThing {
                 id: id as u32,
                 thing: Thing {
                     atlas: atlas as u32,
+                    player: player,
                     atlas_index: atlas_index as u16,
                     ..Default::default()
                 },

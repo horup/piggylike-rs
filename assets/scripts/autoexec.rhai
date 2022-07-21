@@ -10,7 +10,8 @@ define_atlas(THINGS_ATLAS, 16, 16, "assets/textures/things.png");
 const PLAYER_THING = 0;
 define_thing(PLAYER_THING, #{
     atlas:THINGS_ATLAS,
-    atlas_index:0
+    atlas_index:0,
+    player:true
 });
 
 const PIGGY_THING = 1;

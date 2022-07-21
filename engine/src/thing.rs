@@ -7,6 +7,7 @@ pub struct Thing {
     pub atlas: u32,
     pub atlas_index: u16,
     pub pos: Vec2,
+    pub player:bool
 }
 
 impl Default for Thing {
@@ -16,6 +17,7 @@ impl Default for Thing {
             atlas: Default::default(),
             atlas_index: Default::default(),
             pos: Default::default(),
+            player: false,
         }
     }
 }
