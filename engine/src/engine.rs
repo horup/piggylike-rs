@@ -5,7 +5,7 @@ use std::borrow::BorrowMut;
 use std::rc::Rc;
 use std::{cell::RefCell, collections::HashMap};
 
-use crate::{Atlas, Sprite, Thing, Tile, Tilemap, World};
+use crate::{Atlas, Sprite, Thing, Tile, Tilemap, World, ScriptCommand};
 
 pub struct Engine {
     pub thing_prototypes: HashMap<u32, Thing>,
@@ -17,114 +17,22 @@ pub struct Engine {
     pub commands: Rc<RefCell<Vec<ScriptCommand>>>,
 }
 
-fn get_i64(map: &rhai::Map, key: &str) -> i64 {
-    let v = map.get(key);
-    if let Some(v) = v {
-        if let Ok(v) = v.as_int() {
-            return v;
-        }
-    }
-
-    return i64::default();
-}
-fn get_bool(map: &rhai::Map, key: &str) -> bool {
-    let v = map.get(key);
-    if let Some(v) = v {
-        if let Ok(v) = v.as_bool() {
-            return v;
-        }
-    }
-
-    return bool::default();
-}
 
 impl Default for Engine {
     fn default() -> Self {
-        let mut engine = rhai::Engine::new();
-        let commands: Rc<RefCell<Vec<ScriptCommand>>> = Rc::new(RefCell::new(Vec::new()));
-        let cmd = commands.clone();
-        engine.register_fn("load_map", move |path: &str| {
-            cmd.as_ref()
-                .borrow_mut()
-                .push(ScriptCommand::LoadMap { path: path.into() });
-        });
-
-        let cmd = commands.clone();
-        engine.register_fn("define_tile", move |id: i64, tile: rhai::Map| {
-            let atlas = get_i64(&tile, "atlas");
-            let atlas_index = get_i64(&tile, "atlas_index");
-            let solid = get_bool(&tile, "solid");
-
-            cmd.as_ref().borrow_mut().push(ScriptCommand::DefineTile {
-                id: id as u32,
-                tile: Tile {
-                    solid,
-                    atlas: atlas as u32,
-                    atlas_index: atlas_index as u16,
-                },
-            });
-        });
-
-        let cmd = commands.clone();
-        engine.register_fn("define_thing", move |id: i64, thing: rhai::Map| {
-            let atlas = get_i64(&thing, "atlas");
-            let atlas_index = get_i64(&thing, "atlas_index");
-            let player = get_bool(&thing, "player");
-            cmd.as_ref().borrow_mut().push(ScriptCommand::DefineThing {
-                id: id as u32,
-                thing: Thing {
-                    atlas: atlas as u32,
-                    player: player,
-                    atlas_index: atlas_index as u16,
-                    ..Default::default()
-                },
-            });
-        });
-
-        let cmd = commands.clone();
-        engine.register_fn(
-            "define_atlas",
-            move |id: i64, columns: i64, rows: i64, texture_path: String| {
-                cmd.as_ref().borrow_mut().push(ScriptCommand::DefineAtlas {
-                    id: id as u32,
-                    columns: columns as u16,
-                    rows: rows as u16,
-                    texture_path: texture_path,
-                })
-            },
-        );
-
+        let commands = Rc::new(RefCell::new(Vec::new()));
         Self {
             thing_prototypes: HashMap::new(),
             sprite_prototypes: HashMap::new(),
             atlases: HashMap::new(),
             tile_prototypes: HashMap::new(),
             world: Default::default(),
-            script_engine: engine,
-            commands,
+            script_engine: Self::new_script_engine(commands.clone()),
+            commands:commands.clone(),
         }
     }
 }
 
-pub enum ScriptCommand {
-    LoadMap {
-        path: String,
-    },
-    DefineTile {
-        id: u32,
-        tile: Tile,
-    },
-    DefineAtlas {
-        id: u32,
-        columns: u16,
-        rows: u16,
-        texture_path: String,
-    },
-    DefineThing {
-        id: u32,
-        thing: Thing,
-    },
-}
 
 impl Engine {
     pub fn warn(&mut self, warn:&str) {
@@ -177,6 +85,7 @@ impl Engine {
     }
 
     pub async fn process_commands(&mut self) {
+        
         for cmd in self.commands.clone().as_ref().borrow_mut().drain(..) {
             match cmd {
                 ScriptCommand::LoadMap { path } => {

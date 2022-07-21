@@ -17,3 +17,9 @@ pub use thing::*;
 
 mod sprite;
 pub use sprite::*;
+
+mod draw;
+pub use draw::*;
+
+mod script;
+pub use script::*;
