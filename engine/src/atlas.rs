@@ -19,8 +19,8 @@ impl Atlas {
         let sx = sx as f32 / self.columns as f32 * self.texture.width();
         let sy = sy as f32 / self.rows as f32 * self.texture.height();
 
-        let alpha_w = 1.0 / self.texture.width() * 2.0;
-        let alpha_h = 1.0 / self.texture.height() * 2.0;
+        let alpha_w = 0.0;
+        let alpha_h = 0.0;
         let src = Rect::new(sx + alpha_w, sy + alpha_h, sw - alpha_w * 2.0, sh - alpha_h * 2.0);
         let dist_size = Vec2::new(1.0, 1.0);
         draw_texture_ex(self.texture, x, y, WHITE, DrawTextureParams {

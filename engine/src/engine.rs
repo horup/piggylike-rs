@@ -1,13 +1,16 @@
 pub use macroquad;
-use macroquad::prelude::{load_string, load_texture, FilterMode};
+use macroquad::prelude::{load_string, load_texture, FilterMode, Vec2};
 pub use macroquad_tiled;
+use std::borrow::BorrowMut;
 use std::rc::Rc;
 use std::{cell::RefCell, collections::HashMap};
 
-use crate::{Atlas, Tile, Tilemap, World};
+use crate::{Atlas, Sprite, Thing, Tile, Tilemap, World};
 
 pub struct Engine {
-    pub texture_atlases: HashMap<u32, Atlas>,
+    pub thing_prototypes: HashMap<u32, Thing>,
+    pub sprite_prototypes: HashMap<u32, Sprite>,
+    pub atlases: HashMap<u32, Atlas>,
     pub tile_prototypes: HashMap<u32, Tile>,
     pub world: World,
     pub script_engine: rhai::Engine,
@@ -47,14 +50,33 @@ impl Default for Engine {
         });
 
         let cmd = commands.clone();
-        engine.register_fn("define_tile", move |id:i64, tile:rhai::Map| {
+        engine.register_fn("define_tile", move |id: i64, tile: rhai::Map| {
             let atlas = get_i64(&tile, "atlas");
             let atlas_index = get_i64(&tile, "atlas_index");
             let solid = get_bool(&tile, "solid");
 
             cmd.as_ref().borrow_mut().push(ScriptCommand::DefineTile {
                 id: id as u32,
-                tile: Tile {  solid, atlas:atlas as u32, atlas_index:atlas_index as u16 },
+                tile: Tile {
+                    solid,
+                    atlas: atlas as u32,
+                    atlas_index: atlas_index as u16,
+                },
+            });
+        });
+
+        let cmd = commands.clone();
+        engine.register_fn("define_thing", move |id: i64, thing: rhai::Map| {
+            let atlas = get_i64(&thing, "atlas");
+            let atlas_index = get_i64(&thing, "atlas_index");
+
+            cmd.as_ref().borrow_mut().push(ScriptCommand::DefineThing {
+                id: id as u32,
+                thing: Thing {
+                    atlas: atlas as u32,
+                    atlas_index: atlas_index as u16,
+                    ..Default::default()
+                },
             });
         });
 
@@ -62,7 +84,7 @@ impl Default for Engine {
         engine.register_fn(
             "define_atlas",
             move |id: i64, columns: i64, rows: i64, texture_path: String| {
-                cmd.borrow_mut().push(ScriptCommand::DefineAtlas {
+                cmd.as_ref().borrow_mut().push(ScriptCommand::DefineAtlas {
                     id: id as u32,
                     columns: columns as u16,
                     rows: rows as u16,
@@ -72,7 +94,9 @@ impl Default for Engine {
         );
 
         Self {
-            texture_atlases: HashMap::new(),
+            thing_prototypes: HashMap::new(),
+            sprite_prototypes: HashMap::new(),
+            atlases: HashMap::new(),
             tile_prototypes: HashMap::new(),
             world: Default::default(),
             script_engine: engine,
@@ -86,7 +110,7 @@ pub enum ScriptCommand {
         path: String,
     },
     DefineTile {
-        id:u32,
+        id: u32,
         tile: Tile,
     },
     DefineAtlas {
@@ -95,9 +119,16 @@ pub enum ScriptCommand {
         rows: u16,
         texture_path: String,
     },
+    DefineThing {
+        id: u32,
+        thing: Thing,
+    },
 }
 
 impl Engine {
+    pub fn warn(&mut self, warn:&str) {
+        println!("warning: {}", warn);
+    }
     pub async fn load_map(&mut self, map_path: &str) {
         let map_json = load_string(map_path).await.unwrap();
         let tiles_tileset_json = load_string("assets/tilesets/tiles.tsj").await.unwrap();
@@ -120,10 +151,28 @@ impl Engine {
         let map = macroquad_tiled::load_map(&map_json, &texture_map, &tileset_map).unwrap();
         //self.world.map = Some(map);
 
-        let mut world = World::default();
-        world.tilemap = Tilemap::new(&map, self.tile_prototypes.clone());
-        self.world = world;
-        println!("{:?}", self.world.tilemap.width);
+        self.world = World::default();
+        self.world.tilemap = Tilemap::new(&map, self.tile_prototypes.clone());
+
+        // load things
+        if let Some(layer) = map.layers.get("things") {
+            for object in layer.objects.iter() {
+                if let Some(gid) = object.gid {
+                    let id = gid - 1; // hack assuming things is first tileset
+                    if let Some(&thing_prototype) = self.thing_prototypes.get(&id) {
+                        let mut thing = thing_prototype.clone();
+                        thing.pos = Vec2::new(object.world_x / object.world_w, object.world_y / object.world_h);
+                        self.world.things.insert_with(|index| {
+                            thing.id = index;
+                            thing
+                        });
+
+                    } else {
+                        self.warn(&format!("thing {} not defined", id));
+                    }
+                }
+            }
+        }
     }
 
     pub async fn process_commands(&mut self) {
@@ -143,7 +192,7 @@ impl Engine {
                 } => {
                     let texture = load_texture(&texture_path).await.unwrap();
                     texture.set_filter(FilterMode::Nearest);
-                    self.texture_atlases.insert(
+                    self.atlases.insert(
                         id,
                         Atlas {
                             texture,
@@ -151,6 +200,9 @@ impl Engine {
                             rows,
                         },
                     );
+                }
+                ScriptCommand::DefineThing { id, thing } => {
+                    self.thing_prototypes.insert(id, thing);
                 }
             }
         }

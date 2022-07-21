@@ -24,30 +24,6 @@ pub struct Tilemap {
 impl Tilemap {
     pub fn new(map:&Map, tile_prototypes:HashMap<u32, Tile>) -> Self {
         let mut layers = Vec::new();
-        /*for (_, map_layer) in &map.layers {
-            let mut tiles = Vec::new();
-            for t in &map_layer.data {
-                if let Some(t) = t {
-                    if let Some(t) = tile_prototypes.get(&t.id) {
-                        tiles.push(Some(t.clone()));
-                    } else {
-                        println!("missing tile defintion for {}", t.id);
-                    }
-                } else {
-                    tiles.push(None);
-                }
-            }
-
-            for o in &map_layer.objects {
-                
-            }
-
-            let layer = Layer {
-                tiles
-            };
-
-            layers.push(layer);
-        }*/
 
         if let Some(map_tiles) = map.layers.get("tiles") {
             let mut tiles = Vec::new();
@@ -69,11 +45,6 @@ impl Tilemap {
 
             layers.push(layer);
         }
-
-        if let Some(things) = map.layers.get("things") {
-            
-        }
-
 
         Self {
             width:map.raw_tiled_map.width,

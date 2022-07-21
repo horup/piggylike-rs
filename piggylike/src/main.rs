@@ -9,13 +9,13 @@ async fn main() {
     engine.eval_file("assets/scripts/autoexec.rhai").await;
 
     let mut console = String::new();
-    let show_console = true;
+    let show_console = false;
 
 
     loop {
         clear_background(WHITE);
         let aspect = screen_width() / screen_height();
-        let offset = Vec2::new(16.0, 16.0);
+        let offset = Vec2::new(0.0, 0.0);
         let zoom = 1.0/16.0;
         let camera = Camera2D {
             zoom:Vec2::new(zoom, -zoom * aspect),
@@ -33,7 +33,7 @@ async fn main() {
                     if let Some(tile) = tilemap.get(0, x, y) {
                         let x = x as f32;
                         let y = y as f32;
-                        if let Some(atlas) = engine.texture_atlases.get(&tile.atlas) {
+                        if let Some(atlas) = engine.atlases.get(&tile.atlas) {
                             atlas.draw(tile.atlas_index, x, y);
                         }
                     }
@@ -41,8 +41,10 @@ async fn main() {
             }
         }
 
-        for i in 0..4 {
-            //atlas.draw(i + 32, i as f32 * 16.0, 0.0);
+        for (_, thing) in engine.world.things.iter() {
+            if let Some(atlas) = engine.atlases.get(&thing.atlas) {
+                atlas.draw(thing.atlas_index, thing.pos.x, thing.pos.y);
+            }
         }
 
 
@@ -53,7 +55,6 @@ async fn main() {
         //atlas.draw(0, 16.0, 32.0);
     
         if show_console {
-            
             if let Some(char) = get_char_pressed() {
                 if char.is_ascii_control() == false {
                     console = format!("{}{}", console, char);

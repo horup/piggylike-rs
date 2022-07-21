@@ -11,3 +11,9 @@ pub use tilemap::*;
 
 mod atlas;
 pub use atlas::*;
+
+mod thing;
+pub use thing::*;
+
+mod sprite;
+pub use sprite::*;
