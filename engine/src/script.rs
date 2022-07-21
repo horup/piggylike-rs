@@ -5,7 +5,7 @@ use std::borrow::BorrowMut;
 use std::rc::Rc;
 use std::{cell::RefCell, collections::HashMap};
 
-use crate::{Engine, Atlas, Sprite, Thing, Tile, Tilemap, World};
+use crate::{Atlas, Engine, Sprite, Thing, Tile, Tilemap, World};
 
 pub enum ScriptCommand {
     LoadMap {
@@ -28,7 +28,7 @@ pub enum ScriptCommand {
 }
 
 impl Engine {
-    pub fn new_script_engine(commands:Rc<RefCell<Vec<ScriptCommand>>>) -> rhai::Engine {
+    pub fn new_script_engine(commands: Rc<RefCell<Vec<ScriptCommand>>>) -> rhai::Engine {
         fn get_i64(map: &rhai::Map, key: &str) -> i64 {
             let v = map.get(key);
             if let Some(v) = v {
@@ -104,5 +104,59 @@ impl Engine {
         );
 
         engine
+    }
+
+    pub async fn process_commands(&mut self) {
+        for cmd in self.commands.clone().as_ref().borrow_mut().drain(..) {
+            match cmd {
+                ScriptCommand::LoadMap { path } => {
+                    self.load_map(&path).await;
+                }
+                ScriptCommand::DefineTile { id, tile } => {
+                    self.tile_prototypes.insert(id, tile);
+                }
+                ScriptCommand::DefineAtlas {
+                    id,
+                    columns,
+                    rows,
+                    texture_path,
+                } => {
+                    let texture = load_texture(&texture_path).await.unwrap();
+                    texture.set_filter(FilterMode::Nearest);
+                    self.atlases.insert(
+                        id,
+                        Atlas {
+                            texture,
+                            columns,
+                            rows,
+                        },
+                    );
+                }
+                ScriptCommand::DefineThing { id, thing } => {
+                    self.thing_prototypes.insert(id, thing);
+                }
+            }
+        }
+    }
+
+    pub async fn eval(&mut self, script: &str) {
+        match self.script_engine.eval::<()>(script) {
+            Ok(_) => {}
+            Err(err) => {
+                println!("error executing script: {}", err);
+            }
+        }
+
+        self.process_commands().await;
+    }
+    pub async fn eval_file(&mut self, path: &str) {
+        match self.script_engine.eval_file::<()>(path.into()) {
+            Ok(_) => {}
+            Err(err) => {
+                println!("error executing script: {}", err);
+            }
+        }
+
+        self.process_commands().await;
     }
 }

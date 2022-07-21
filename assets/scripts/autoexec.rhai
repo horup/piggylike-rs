@@ -21,21 +21,6 @@ define_thing(PIGGY_THING, #{
 });
 
 
-
-// sprites
-/*const PLAYER_SPRITE = 0;
-define_sprite(PLAYER_SPRITE, #{
-    atlas:THINGS_ATLAS,
-    atlas_index:0
-});
-
-const PIGGY_SPRITE = 1;
-define_sprite(PIGGY_SPRITE, #{
-    atlas:THINGS_ATLAS,
-    atlas_index:1
-});*/
-
-
 // floors
 const GRASS_TILE = 0;
 define_tile(GRASS_TILE, #{
