@@ -15,7 +15,7 @@ impl Engine {
         let visible_tiles = camera.visible_tiles;
         let scale = self.get_scale();
         let offset = Vec2::new((offset.x * scale).floor() / scale, (offset.y * scale).floor() / scale);
-        let mut r = Rect::new(camera.pos.x, camera.pos.y, screen_width() / scale, screen_height() / scale);
+        let mut r = Rect::new(offset.x, offset.y, screen_width() / scale, screen_height() / scale);
         r.x -= r.w / 2.0;
         r.y -= r.h / 2.0;
         let camera = Camera2D::from_display_rect(r);
