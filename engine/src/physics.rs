@@ -22,7 +22,6 @@ impl Engine {
                 if vel.length() > 0.0 {
                     let new_pos = thing.pos + vel;
                     let tiles = Thing::get_tiles_in_front(new_pos, [if vel.x > 0.0 {1} else if vel.x < 0.0 {-1} else {0}, if vel.y > 0.0 {1} else if vel.y < 0.0 {-1} else {0}].into());
-                    println!("{:?}, {:?}", new_pos, tiles);
                     let size = 0.5;
                     let thing_aabb = AABB::new([new_pos.x - size, new_pos.y - size].into(), [new_pos.x + size, new_pos.y + size].into());
                     let mut collided = false;
@@ -60,38 +59,9 @@ impl Engine {
                 }
             }
 
-
-          /*  if (thing.vel.y != 0.0) {
-                let mut collision = false;
-                if thing.vel.y < 0.0 {
-                    let tiles = thing.get_tiles_top();
-                    
-                    for tile in tiles {
-                        let p1 = Vec2::new(tile.x as f32, tile.y as f32);
-                        let p2 = thing.pos - Vec2::new(0.5, 0.5);
-                        if let Some(tile) = self.world.tilemap.get(0, tile.x as u32, tile.y as u32) {
-                            if tile.solid {
-                                if Self::collision_test(p1, 1.0, p2, 1.0) {
-                                    collision = true;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if collision == false {
-                    thing.pos.y += thing.vel.y;
-                }
-            }*/
-
-//            thing.pos += thing.vel;
-
             if thing.player {
                 self.world.camera.pos = thing.pos;
             }
         }
-
-        
-        
     }
 }
