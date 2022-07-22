@@ -42,7 +42,7 @@ impl Engine {
     pub fn draw_things(&self) {
         for (_, thing) in self.world.things.iter() {
             if let Some(atlas) = self.atlases.get(&thing.atlas) {
-                atlas.draw(thing.atlas_index, (thing.pos.x * self.get_scale()).floor() / self.get_scale(), (thing.pos.y * self.get_scale()).floor() / self.get_scale());
+                atlas.draw(thing.atlas_index, (thing.pos.x * self.get_scale()).floor() / self.get_scale() - 0.5, (thing.pos.y * self.get_scale()).floor() / self.get_scale() - 0.5);
             }
         }
     }
