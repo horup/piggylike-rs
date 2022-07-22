@@ -1,5 +1,6 @@
 use generational_arena::Index;
-use macroquad::prelude::Vec2;
+use macroquad::prelude::{Vec2, IVec2, Vec3};
+use parry2d::bounding_volume::AABB;
 
 #[derive(Clone, Copy)]
 pub struct Thing {
@@ -22,4 +23,39 @@ impl Default for Thing {
             vel: Vec2::default()
         }
     }
+
+   
+}
+
+impl Thing {
+    pub fn get_center_tile(pos:Vec2) -> IVec2 {
+        return IVec2::new(pos.x as i32, pos.y as i32);
+    } 
+
+    pub fn get_aabb(&self) -> AABB {
+        AABB::from_points([&[self.pos.x - 0.5, self.pos.y - 0.5].into(), &[self.pos.x + 0.5, self.pos.y + 0.5].into()])
+    }
+
+    pub fn get_tiles_in_front(pos:Vec2, dir:IVec2) -> [IVec2; 3] {
+        let center = Self::get_center_tile(pos);
+        let mut tiles = [IVec2::new(0, 0);3];
+        let mut i = 0;
+        println!("{:?}", dir);
+        if dir.x != 0 {
+            // vertical
+            for y in [-1, 0, 1] {
+                tiles[i] = IVec2::new(center.x + dir.x, center.y + y);
+                i += 1;
+            }
+        } else if dir.y != 0 {
+            // horizontal
+            for x in [-1, 0, 1] {
+                tiles[i] = IVec2::new(center.x + x, center.y + dir.y);
+                i += 1;
+            }
+        }
+
+        return tiles;
+    }
+
 }
