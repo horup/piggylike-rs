@@ -1,5 +1,5 @@
 use macroquad::prelude::*;
-use parry2d::{bounding_volume::{AABB, BoundingVolume}, shape::Cuboid};
+use parry2d::{bounding_volume::{AABB, BoundingVolume}, shape::Cuboid, query, na::{Isometry2, ComplexField}};
 
 use crate::{Engine, Thing};
 
@@ -22,22 +22,39 @@ impl Engine {
                 if vel.length() > 0.0 {
                     let new_pos = thing.pos + vel;
                     let tiles = Thing::get_tiles_in_front(new_pos, [if vel.x > 0.0 {1} else if vel.x < 0.0 {-1} else {0}, if vel.y > 0.0 {1} else if vel.y < 0.0 {-1} else {0}].into());
+                    println!("{:?}, {:?}", new_pos, tiles);
                     let size = 0.5;
                     let thing_aabb = AABB::new([new_pos.x - size, new_pos.y - size].into(), [new_pos.x + size, new_pos.y + size].into());
                     let mut collided = false;
+                    let cube1 = Cuboid::new([size, size].into());
+                    let cube2 = Cuboid::new([size, size].into());
+                    let mut contact:Option<query::Contact> = None;
                     for tile in tiles {
-                        let tile_aabb = AABB::new([tile.x as f32, tile.y as f32].into(), [tile.x as f32 + 1.0, tile.y as f32 + 1.0].into());
-                        if let Some(tile) = self.world.tilemap.get(0, tile.x as u32, tile.y as u32) {
+                        let tile_pos = Vec2::new(tile.x as f32 + 0.5, tile.y as f32 + 0.5);
+                        if let Some(tile) = self.world.tilemap.get(0, tile.x as i32, tile.y as i32) {
                             if tile.solid {
-                                if thing_aabb.intersects(&tile_aabb) {
-                                    collided = true;
-                                    break;
+                                let res = query::contact(&Isometry2::translation(new_pos.x, new_pos.y), 
+                                &cube1, &Isometry2::translation(tile_pos.x, tile_pos.y), &cube1, 1.0);
+
+                                if let Ok(Some(res)) = res {
+                                    if res.dist < 0.0 {
+                                        if let Some(c) = contact {
+                                            if res.dist < c.dist {
+                                                contact = Some(res);
+                                            }
+                                        } else {
+                                            contact = Some(res);
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
 
-                    if collided == false {
+                    if let Some(contact) = contact {
+                        let v = vel.normalize() * contact.dist;
+                        thing.pos = new_pos + v;
+                    } else {
                         thing.pos = new_pos;
                     }
                 }

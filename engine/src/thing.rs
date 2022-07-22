@@ -40,7 +40,6 @@ impl Thing {
         let center = Self::get_center_tile(pos);
         let mut tiles = [IVec2::new(0, 0);3];
         let mut i = 0;
-        println!("{:?}", dir);
         if dir.x != 0 {
             // vertical
             for y in [-1, 0, 1] {

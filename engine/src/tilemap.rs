@@ -17,8 +17,8 @@ pub struct Tile {
 #[derive(Clone, Default)]
 pub struct Tilemap {
     pub layers:Vec<Layer>,
-    pub width:u32,
-    pub height:u32
+    pub width:i32,
+    pub height:i32
 }
 
 impl Tilemap {
@@ -47,13 +47,13 @@ impl Tilemap {
         }
 
         Self {
-            width:map.raw_tiled_map.width,
-            height:map.raw_tiled_map.height,
+            width:map.raw_tiled_map.width as i32,
+            height:map.raw_tiled_map.height as i32,
             layers
         }
     }
 
-    pub fn get(&self, layer:usize, x:u32, y:u32) -> Option<Tile> {
+    pub fn get(&self, layer:usize, x:i32, y:i32) -> Option<Tile> {
         let index = y * self.width + x;
         if let Some(layer) = self.layers.get(layer) {
             if let Some(tile) = layer.tiles.get(index as usize) {
