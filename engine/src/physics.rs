@@ -25,7 +25,7 @@ impl Engine {
                     let size = 0.5;
                     let thing_aabb = AABB::new([new_pos.x - size, new_pos.y - size].into(), [new_pos.x + size, new_pos.y + size].into());
                     let mut collided = false;
-                    let cube1 = Cuboid::new([size, size].into());
+                    let cube1 = Cuboid::new([size * 0.9, size * 0.9].into());
                     let cube2 = Cuboid::new([size, size].into());
                     let mut contact:Option<query::Contact> = None;
                     for tile in tiles {
