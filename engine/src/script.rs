@@ -25,6 +25,9 @@ pub enum ScriptCommand {
         id: u32,
         thing: Thing,
     },
+    LoadWorld {
+        file_name: String
+    }
 }
 
 impl Engine {
@@ -103,6 +106,14 @@ impl Engine {
             },
         );
 
+        let cmd = commands.clone();
+        engine.register_fn(
+            "load_world",
+            move |file_name:String| {
+                cmd.as_ref().borrow_mut().push(ScriptCommand::LoadWorld { file_name: file_name });
+            },
+        );
+
         engine
     }
 
@@ -135,6 +146,7 @@ impl Engine {
                 ScriptCommand::DefineThing { id, thing } => {
                     self.thing_prototypes.insert(id, thing);
                 }
+                ScriptCommand::LoadWorld { file_name } => self.load_world(&file_name),
             }
         }
     }
