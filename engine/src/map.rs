@@ -37,7 +37,7 @@ impl Engine {
                         let mut thing = thing_prototype.clone();
                         thing.pos = Vec2::new(object.world_x / object.world_w + 0.5, object.world_y / object.world_h - 0.5);
                         self.world.things.insert_with(|index| {
-                            thing.id = index;
+                            //thing.id = index;
                             thing
                         });
 

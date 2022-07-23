@@ -16,10 +16,23 @@ impl Engine {
             y:if is_key_down(KeyCode::W) {-1.0} else if is_key_down(KeyCode::S) {1.0} else {0.0},
         };
 
-        if let Some((_, player)) = self.world.things.iter_mut().find(|(_, thing)| thing.player) {
-            let acc = 10.0;
-            player.vel.x += self.input.x * acc * dt;
-            player.vel.y += self.input.y * acc * dt;
+       
+
+        if let Some((_, thing)) = self.world.things.iter_mut().find(|(_, thing)| thing.player) {
+            let wish_dir = Vec2::new(self.input.x, self.input.y).normalize();
+            thing.walking = wish_dir.length() > 0.0;
+            let wish_speed = 5.0;
+            let accel = 10.00;
+            let current_speed = wish_dir.dot(thing.vel);
+            println!("{:?}", current_speed);
+            let add_speed = wish_speed - current_speed;
+
+
+            if add_speed > 0.0 {
+                let accel_speed = accel * wish_speed * dt;
+                let accel_speed = if accel_speed > add_speed {add_speed} else {accel_speed};
+                thing.vel += wish_dir * accel_speed;
+            }
         }
     }
 }

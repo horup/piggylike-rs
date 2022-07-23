@@ -11,12 +11,18 @@ impl Engine {
         // https://www.youtube.com/watch?v=v3zT3Z5apaM
         let alpha = 0.001;
         for (_, thing) in self.world.things.iter_mut() {
-            thing.vel = thing.vel * ground_friction; // missing dt
+            let ground_friction = 10.0;
+            let mut total_friction = 0.0;
+            
+            total_friction += ground_friction;
+            thing.vel = thing.vel - thing.vel * total_friction * dt;
+
+          
             if (thing.vel.length() < 0.01) {
                 thing.vel = Vec2::new(0.0, 0.0);
             }
 
-            let vels = [Vec2::new(thing.vel.x, 0.0), Vec2::new(0.0, thing.vel.y)];
+            let vels = [Vec2::new(thing.vel.x, 0.0) * dt, Vec2::new(0.0, thing.vel.y) * dt];
 
             for vel in vels {
                 if vel.length() > 0.0 {
