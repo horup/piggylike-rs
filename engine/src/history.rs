@@ -1,15 +1,26 @@
-use crate::Engine;
+use std::{fs::{read_to_string, create_dir_all}, path::Path};
+
+use crate::{Engine, World};
 
 
 
 impl Engine {
-    pub fn save_world(&self, path:&str) {
-
-        
+    pub fn save_world(&self, file_name:&str) {
+        if let Ok(s) = serde_json::to_string(&self.world) {
+            if Path::new("saves").exists() == false {
+                create_dir_all("saves");
+            }
+            
+            std::fs::write(&format!("saves/{}", file_name), s);
+        }
     }
 
-    pub fn load_world(&mut self, path:&str) {
-
+    pub fn load_world(&mut self, file_name:&str) {
+        if let Ok(s) = read_to_string(&format!("saves/{}", file_name)) {
+            if let Ok(world) = serde_json::from_str::<World>(&s) {
+                self.world = world;
+            }
+        }
     }
 
     pub fn push_timeline(&mut self) {

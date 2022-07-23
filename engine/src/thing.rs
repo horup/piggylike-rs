@@ -1,9 +1,9 @@
 use generational_arena::Index;
 use macroquad::prelude::{Vec2, IVec2, Vec3};
-use nanoserde::{DeJson, SerJson};
 use parry2d::bounding_volume::AABB;
+use serde::{Serialize, Deserialize};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct Thing {
     pub atlas: u32,
     pub atlas_index: u16,

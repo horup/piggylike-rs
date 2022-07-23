@@ -1,7 +1,7 @@
-use macroquad::prelude::Vec2;
-use nanoserde::{DeJson, SerJson};
+use glam::Vec2;
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Camera {
     pub pos:Vec2,
     pub visible_tiles:f32
