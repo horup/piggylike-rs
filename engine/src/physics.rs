@@ -44,7 +44,7 @@ impl Engine {
                                 if let Ok(Some(res)) = res {
                                     if res.dist < 0.0 {
                                         if let Some(c) = contact {
-                                            if res.dist > c.dist {
+                                            if res.dist < c.dist {
                                                 contact = Some(res);
                                             }
                                         } else {

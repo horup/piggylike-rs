@@ -51,8 +51,6 @@ impl Thing {
             }
         }
         
-
-        println!("{:?}", tiles);
         return tiles;
     }
 

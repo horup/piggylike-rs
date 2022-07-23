@@ -24,7 +24,6 @@ impl Engine {
             let wish_speed = 5.0;
             let accel = 10.00;
             let current_speed = wish_dir.dot(thing.vel);
-            println!("{:?}", current_speed);
             let add_speed = wish_speed - current_speed;
 
 
