@@ -36,6 +36,26 @@ impl Thing {
         AABB::from_points([&[self.pos.x - 0.5, self.pos.y - 0.5].into(), &[self.pos.x + 0.5, self.pos.y + 0.5].into()])
     }
 
+    pub fn get_tiles(pos:Vec2) -> [IVec2;8] {
+        let mut tiles = [IVec2::new(0, 0); 8];
+        let center = Self::get_center_tile(pos);
+
+        let r = [-1, 0, 1];
+        let mut i = 0;
+        for y in r {
+            for x in r {
+                if (x == 0  && y == 0) == false {
+                    tiles[i] = IVec2::new(x + center.x, y + center.y);
+                    i += 1;
+                }
+            }
+        }
+        
+
+        println!("{:?}", tiles);
+        return tiles;
+    }
+
     pub fn get_tiles_in_front(pos:Vec2, dir:IVec2) -> [IVec2; 3] {
         let center = Self::get_center_tile(pos);
         let mut tiles = [IVec2::new(0, 0);3];

@@ -1,5 +1,5 @@
 use macroquad::prelude::*;
-use parry2d::{bounding_volume::{AABB, BoundingVolume}, shape::Cuboid, query, na::{Isometry2, ComplexField}};
+use parry2d::{bounding_volume::{AABB, BoundingVolume}, shape::{Cuboid, Ball}, query, na::{Isometry2, ComplexField}};
 
 use crate::{Engine, Thing};
 
@@ -31,20 +31,20 @@ impl Engine {
                     let size = 0.5;
                     let thing_aabb = AABB::new([new_pos.x - size, new_pos.y - size].into(), [new_pos.x + size, new_pos.y + size].into());
                     let mut collided = false;
-                    let cube1 = Cuboid::new([size * 0.9, size * 0.9].into());
-                    let cube2 = Cuboid::new([size, size].into());
+                    let player_shape = Cuboid::new([size * 0.9, size * 0.9].into());
+                    let tile_shape = Cuboid::new([size, size].into());
                     let mut contact:Option<query::Contact> = None;
                     for tile in tiles {
                         let tile_pos = Vec2::new(tile.x as f32 + 0.5, tile.y as f32 + 0.5);
                         if let Some(tile) = self.world.tilemap.get(0, tile.x as i32, tile.y as i32) {
                             if tile.solid {
                                 let res = query::contact(&Isometry2::translation(new_pos.x, new_pos.y), 
-                                &cube1, &Isometry2::translation(tile_pos.x, tile_pos.y), &cube1, 1.0);
+                                &player_shape, &Isometry2::translation(tile_pos.x, tile_pos.y), &player_shape, 1.0);
 
                                 if let Ok(Some(res)) = res {
                                     if res.dist < 0.0 {
                                         if let Some(c) = contact {
-                                            if res.dist < c.dist {
+                                            if res.dist > c.dist {
                                                 contact = Some(res);
                                             }
                                         } else {
