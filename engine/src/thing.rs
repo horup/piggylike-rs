@@ -1,5 +1,6 @@
 use generational_arena::Index;
 use macroquad::prelude::{Vec2, IVec2, Vec3};
+use nanoserde::{DeJson, SerJson};
 use parry2d::bounding_volume::AABB;
 
 #[derive(Clone, Copy)]

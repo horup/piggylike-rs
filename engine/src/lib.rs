@@ -33,6 +33,9 @@ pub use physics::*;
 mod map;
 pub use map::*;
 
+mod  history;
+pub use history::*;
+
 pub use macroquad;
 use macroquad::prelude::{load_string, load_texture, FilterMode, Vec2, get_frame_time};
 pub use macroquad_tiled;
@@ -41,6 +44,7 @@ use std::rc::Rc;
 use std::{cell::RefCell, collections::HashMap};
 
 pub struct Engine {
+    pub timeline:Vec<World>,
     pub input:Input,
     pub thing_prototypes: HashMap<u32, Thing>,
     pub sprite_prototypes: HashMap<u32, Sprite>,
@@ -56,6 +60,7 @@ impl Default for Engine {
     fn default() -> Self {
         let commands = Rc::new(RefCell::new(Vec::new()));
         Self {
+            timeline:Default::default(),
             input:Input::default(),
             thing_prototypes: HashMap::new(),
             sprite_prototypes: HashMap::new(),
@@ -78,6 +83,9 @@ impl Engine {
         self.update_input();
         self.update_movement();
         self.draw();
+        self.world.iterations += 1;
+
+        self.update_history();
     }
 
     pub fn get_delta_time(&self) -> f32 {

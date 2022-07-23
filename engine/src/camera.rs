@@ -1,4 +1,5 @@
 use macroquad::prelude::Vec2;
+use nanoserde::{DeJson, SerJson};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Camera {

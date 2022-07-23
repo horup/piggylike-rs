@@ -159,6 +159,7 @@ dependencies = [
  "generational-arena",
  "macroquad",
  "macroquad-tiled",
+ "nanoserde",
  "notify",
  "parry2d",
  "rhai",

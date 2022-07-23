@@ -1,20 +1,21 @@
 use std::collections::HashMap;
 
 use macroquad_tiled::Map;
+use nanoserde::{DeJson, SerJson};
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, DeJson, SerJson)]
 pub struct Layer {
     pub tiles:Vec<Option<Tile>>
 }
 
-#[derive(Default, Clone, Copy)]
+#[derive(Default, Clone, Copy, DeJson, SerJson)]
 pub struct Tile {
     pub atlas_index:u16,
     pub atlas:u32,
     pub solid:bool
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, DeJson, SerJson)]
 pub struct Tilemap {
     pub layers:Vec<Layer>,
     pub width:i32,
