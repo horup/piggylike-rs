@@ -1,8 +1,5 @@
 use std::{fs::{read_to_string, create_dir_all}, path::Path};
-
 use crate::{Engine, World};
-
-
 
 impl Engine {
     pub fn save_world(&self, file_name:&str) {
@@ -17,8 +14,9 @@ impl Engine {
 
     pub fn load_world(&mut self, file_name:&str) {
         if let Ok(s) = read_to_string(&format!("saves/{}", file_name)) {
-            if let Ok(world) = serde_json::from_str::<World>(&s) {
-                self.world = world;
+            match serde_json::from_str::<World>(&s) {
+                Ok(world) => self.world = world,
+                Err(err) => println!("{:?}", err),
             }
         }
     }

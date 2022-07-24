@@ -1,3 +1,4 @@
+use generational_arena::Index;
 use macroquad::prelude::*;
 use parry2d::{bounding_volume::{AABB, BoundingVolume}, shape::{Cuboid, Ball}, query, na::{Isometry2, ComplexField}};
 
@@ -25,8 +26,8 @@ impl Engine {
             let size = 0.5;
             let thing_shape = Cuboid::new([size * 0.9, size * 0.9].into());
             let tile_shape = Cuboid::new([size, size].into());
-
             let vels = [Vec2::new(thing.vel.x, 0.0) * dt, Vec2::new(0.0, thing.vel.y) * dt];
+            let mut contact_index:Option<Index> = None;
             for vel in vels {
                 if vel.length() > 0.0 {
                     let new_pos = thing.pos + vel;
@@ -64,6 +65,7 @@ impl Engine {
                                 if let Some(c) = contact {
                                     if res.dist < c.dist {
                                         contact = Some(res);
+                                        contact_index = Some(other_id);
                                     }
                                 } else {
                                     contact = Some(res);

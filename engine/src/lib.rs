@@ -36,6 +36,9 @@ pub use map::*;
 mod  history;
 pub use history::*;
 
+mod cleanup;
+pub use cleanup::*;
+
 pub use macroquad;
 use macroquad::prelude::{load_string, load_texture, FilterMode, Vec2, get_frame_time};
 pub use macroquad_tiled;
@@ -84,6 +87,9 @@ impl Engine {
         self.update_movement();
         self.draw();
         self.world.iterations += 1;
+        
+        self.update_cleanup();
+
 
         self.update_history();
     }
