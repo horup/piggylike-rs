@@ -2,11 +2,12 @@ use generational_arena::Index;
 use macroquad::prelude::*;
 use parry2d::{bounding_volume::{AABB, BoundingVolume}, shape::{Cuboid, Ball}, query, na::{Isometry2, ComplexField}};
 
-use crate::{Engine, Thing};
+use crate::{Engine, Thing, Command};
 
 impl Engine {
 
     pub fn update_movement(&mut self) {
+        let mut commands = self.commands.borrow_mut();
         let dt = self.get_delta_time();
         let ground_friction = 0.4;
         // https://www.youtube.com/watch?v=v3zT3Z5apaM
@@ -77,6 +78,7 @@ impl Engine {
                     if let Some(contact) = contact {
                         let v = vel.normalize() * contact.dist;
                         thing.pos = new_pos + v;
+                        commands.push(Command::Execute { function: Box::new(|_|{println!("lool")}) })
                     } else {
                         thing.pos = new_pos;
                     }
@@ -88,6 +90,7 @@ impl Engine {
             }
 
             *cloned_things.get_mut(id).unwrap().pos = *thing.pos;
+
         }
     }
 }

@@ -18,7 +18,7 @@ async fn main() {
 
 
     loop {
-        engine.update();
+        engine.update().await;
 
         set_default_camera();
     

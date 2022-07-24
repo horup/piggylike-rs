@@ -6,7 +6,7 @@ use std::borrow::BorrowMut;
 use std::rc::Rc;
 use std::{cell::RefCell, collections::HashMap};
 
-use crate::{Input, Thing, Sprite, Atlas, World, ScriptCommand, Tile};
+use crate::{Input, Thing, Sprite, Atlas, World, Command, Tile};
 
 pub struct Engine {
     pub timeline:Vec<World>,
@@ -17,7 +17,7 @@ pub struct Engine {
     pub tile_prototypes: HashMap<u32, Tile>,
     pub world: World,
     pub script_engine: rhai::Engine,
-    pub commands: Rc<RefCell<Vec<ScriptCommand>>>,
+    pub commands: Rc<RefCell<Vec<Command>>>,
 }
 
 
@@ -44,9 +44,10 @@ impl Engine {
         println!("warning: {}", warn);
     }
 
-    pub fn update(&mut self) {
+    pub async fn update(&mut self) {
         self.update_input();
         self.update_movement();
+        self.process_commands().await;
         self.draw();
         self.world.iterations += 1;
         
