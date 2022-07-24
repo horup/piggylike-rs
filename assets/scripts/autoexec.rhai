@@ -116,6 +116,6 @@ define_tile(WOODWALL_TILE, #{
     solid:true
 });
 
-load_map("assets/maps/test.tmj");
+//load_map("assets/maps/test.tmj");
 
-// load_world("quicksave.sav");
+load_world("quicksave.sav");
