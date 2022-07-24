@@ -1,7 +1,7 @@
 pub use macroquad;
 use macroquad::prelude::{load_string, load_texture, FilterMode, Vec2};
 pub use macroquad_tiled;
-use rhai::Scope;
+use rhai::{Scope, Module};
 use std::borrow::BorrowMut;
 use std::fs::read_to_string;
 use std::rc::Rc;
@@ -101,7 +101,8 @@ impl Engine {
     }
 
     pub async fn update_script(&mut self) {
-        let ast = self.script_engine.compile("").unwrap();
+        //let ast = self.script_engine.compile("").unwrap();
+        let r:() = self.script_engine.call_fn(&mut self.global_scope, &rhai::AST::default(), "test", ()).unwrap();
         //scope.push("test", 
         //let res:() = self.script_engine.call_fn(&mut self.global_scope, &ast, "test", ()).unwrap();
     }
@@ -113,6 +114,8 @@ impl Engine {
 
     pub async fn register_script(&mut self, script:&str) {
         let ast = self.script_engine.compile_into_self_contained(&self.global_scope, script).unwrap();// self.script_engine.compile(script).unwrap();
+        let module = Module::eval_ast_as_new(Scope::new(), &ast, &self.script_engine).unwrap();
+        self.script_engine.register_global_module(Rc::new(module));
         self.script_engine.run_ast_with_scope(&mut self.global_scope, &ast).unwrap();
         //let module = rhai::Module::eval_ast_as_new(scope, ast, engine)eval
         //self.script_engine.register_global_module()
