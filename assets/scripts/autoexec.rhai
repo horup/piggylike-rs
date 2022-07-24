@@ -11,13 +11,15 @@ const PLAYER_THING = 0;
 define_thing(PLAYER_THING, #{
     atlas:THINGS_ATLAS,
     atlas_index:0,
-    player:true
+    player:true,
+    solid:true
 });
 
 const PIGGY_THING = 1;
 define_thing(PIGGY_THING, #{
     atlas:THINGS_ATLAS,
-    atlas_index:1
+    atlas_index:1,
+    solid:true
 });
 
 const RED_KEY = 16;
@@ -41,19 +43,22 @@ define_thing(PURPLE_KEY, #{
 const RED_DOOR = 32;
 define_thing(RED_DOOR, #{
     atlas:THINGS_ATLAS,
-    atlas_index:32
+    atlas_index:32,
+    solid:true
 });
 
 const BLUE_DOOR = 33;
 define_thing(BLUE_DOOR, #{
     atlas:THINGS_ATLAS,
-    atlas_index:33
+    atlas_index:33,
+    solid:true
 });
 
 const YELLOW_DOOR = 34;
 define_thing(YELLOW_DOOR, #{
     atlas:THINGS_ATLAS,
-    atlas_index:34
+    atlas_index:34,
+    solid:true
 });
 
 const EXIT = 35;
@@ -116,6 +121,6 @@ define_tile(WOODWALL_TILE, #{
     solid:true
 });
 
-//load_map("assets/maps/test.tmj");
+load_map("assets/maps/test.tmj");
 
-load_world("quicksave.sav");
+//load_world("quicksave.sav");

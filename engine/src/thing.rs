@@ -12,7 +12,8 @@ pub struct Thing {
     pub pos: Vec2,
     pub vel: Vec2,
     pub player:bool,
-    pub walking:bool
+    pub walking:bool,
+    pub solid:bool
 }
 
 impl Thing {

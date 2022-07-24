@@ -57,7 +57,7 @@ impl Engine {
                         }
                     }
 
-                    for (other_id, other_thing) in cloned_things.iter().filter(|(other_id, _)| {&id != other_id}) {
+                    for (other_id, other_thing) in cloned_things.iter().filter(|(other_id, other_thing)| {&id != other_id && other_thing.solid}) {
                         let res = query::contact(&Isometry2::translation(new_pos.x, new_pos.y), 
                                 &thing_shape, &Isometry2::translation(other_thing.pos.x, other_thing.pos.y), &thing_shape, 1.0);
 
@@ -78,7 +78,6 @@ impl Engine {
                     if let Some(contact) = contact {
                         let v = vel.normalize() * contact.dist;
                         thing.pos = new_pos + v;
-                        commands.push(Command::Execute { function: Box::new(|_|{println!("lool")}) })
                     } else {
                         thing.pos = new_pos;
                     }
