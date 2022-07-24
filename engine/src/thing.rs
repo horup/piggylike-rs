@@ -6,13 +6,13 @@ use serde::{Serialize, Deserialize};
 #[derive(Clone, Copy, Serialize, Deserialize, Default)]
 #[serde(default)]
 pub struct Thing {
+    pub pickup:bool,
     pub delete:bool,
     pub atlas: u32,
     pub atlas_index: u16,
     pub pos: Vec2,
     pub vel: Vec2,
     pub player:bool,
-    pub walking:bool,
     pub solid:bool
 }
 

@@ -60,12 +60,14 @@ impl Engine {
             let atlas_index = get_i64(&thing, "atlas_index");
             let player = get_bool(&thing, "player");
             let solid = get_bool(&thing, "solid");
+            let pickup = get_bool(&thing, "pickup");
             cmd.as_ref().borrow_mut().push(Command::DefineThing {
                 id: id as u32,
                 thing: Thing {
                     atlas: atlas as u32,
                     player: player,
                     solid: solid,
+                    pickup: pickup,
                     atlas_index: atlas_index as u16,
                     ..Default::default()
                 },

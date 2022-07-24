@@ -33,7 +33,6 @@ impl Engine {
 
         if let Some((_, thing)) = self.world.things.iter_mut().find(|(_, thing)| thing.player) {
             let wish_dir = Vec2::new(self.input.x, self.input.y).normalize();
-            thing.walking = wish_dir.length() > 0.0;
             let wish_speed = 5.0;
             let accel = 10.00;
             let current_speed = wish_dir.dot(thing.vel);
