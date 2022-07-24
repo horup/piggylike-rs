@@ -11,7 +11,7 @@ struct PlayerInput {
 #[macroquad::main("PiggyLike")]
 async fn main() {
     let mut engine = Engine::default();
-    engine.eval_file("assets/scripts/autoexec.rhai").await;
+    engine.register_script_file("assets/scripts/autoexec.rhai").await;
 
     let mut console = String::new();
     let show_console = false;

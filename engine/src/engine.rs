@@ -17,6 +17,7 @@ pub struct Engine {
     pub tile_prototypes: HashMap<u32, Tile>,
     pub world: World,
     pub script_engine: rhai::Engine,
+    pub global_scope: rhai::Scope<'static>,
     pub commands: Rc<RefCell<Vec<Command>>>,
 }
 
@@ -25,6 +26,7 @@ impl Default for Engine {
     fn default() -> Self {
         let commands = Rc::new(RefCell::new(Vec::new()));
         Self {
+            global_scope: rhai::Scope::new(),
             timeline:Default::default(),
             input:Input::default(),
             thing_prototypes: HashMap::new(),
@@ -47,13 +49,15 @@ impl Engine {
     pub async fn update(&mut self) {
         self.update_input();
         self.update_movement();
+        self.update_script().await;
         self.process_commands().await;
+
+        
+
+
         self.draw();
         self.world.iterations += 1;
-        
         self.update_cleanup();
-
-
         self.update_history();
     }
 

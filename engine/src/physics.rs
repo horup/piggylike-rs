@@ -5,7 +5,6 @@ use parry2d::{bounding_volume::{AABB, BoundingVolume}, shape::{Cuboid, Ball}, qu
 use crate::{Engine, Thing, Command};
 
 impl Engine {
-
     pub fn update_movement(&mut self) {
         let mut commands = self.commands.borrow_mut();
         let dt = self.get_delta_time();

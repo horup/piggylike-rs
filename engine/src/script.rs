@@ -1,7 +1,9 @@
 pub use macroquad;
 use macroquad::prelude::{load_string, load_texture, FilterMode, Vec2};
 pub use macroquad_tiled;
+use rhai::Scope;
 use std::borrow::BorrowMut;
+use std::fs::read_to_string;
 use std::rc::Rc;
 use std::{cell::RefCell, collections::HashMap};
 
@@ -98,8 +100,26 @@ impl Engine {
         engine
     }
 
+    pub async fn update_script(&mut self) {
+        let ast = self.script_engine.compile("").unwrap();
+        //scope.push("test", 
+        //let res:() = self.script_engine.call_fn(&mut self.global_scope, &ast, "test", ()).unwrap();
+    }
+
+    pub async fn register_script_file(&mut self, path:&str) {
+        let script = read_to_string(path).unwrap();
+        self.register_script(&script).await;
+    }
+
+    pub async fn register_script(&mut self, script:&str) {
+        let ast = self.script_engine.compile_into_self_contained(&self.global_scope, script).unwrap();// self.script_engine.compile(script).unwrap();
+        self.script_engine.run_ast_with_scope(&mut self.global_scope, &ast).unwrap();
+        //let module = rhai::Module::eval_ast_as_new(scope, ast, engine)eval
+        //self.script_engine.register_global_module()
+    }
+
     pub async fn eval(&mut self, script: &str) {
-        match self.script_engine.eval::<()>(script) {
+        match self.script_engine.eval_with_scope::<()>(&mut self.global_scope, script) {
             Ok(_) => {}
             Err(err) => {
                 println!("error executing script: {}", err);
@@ -109,7 +129,7 @@ impl Engine {
         self.process_commands().await;
     }
     pub async fn eval_file(&mut self, path: &str) {
-        match self.script_engine.eval_file::<()>(path.into()) {
+        match self.script_engine.eval_file_with_scope::<()>(&mut self.global_scope, path.into()) {
             Ok(_) => {}
             Err(err) => {
                 println!("error executing script: {}", err);
