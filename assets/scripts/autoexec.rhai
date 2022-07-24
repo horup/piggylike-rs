@@ -20,6 +20,50 @@ define_thing(PIGGY_THING, #{
     atlas_index:1
 });
 
+const RED_KEY = 16;
+define_thing(RED_KEY, #{
+    atlas:THINGS_ATLAS,
+    atlas_index:16
+});
+
+const BLUE_KEY = 17;
+define_thing(BLUE_KEY, #{
+    atlas:THINGS_ATLAS,
+    atlas_index:17
+});
+
+const PURPLE_KEY = 18;
+define_thing(PURPLE_KEY, #{
+    atlas:THINGS_ATLAS,
+    atlas_index:18
+});
+
+const RED_DOOR = 32;
+define_thing(RED_DOOR, #{
+    atlas:THINGS_ATLAS,
+    atlas_index:32
+});
+
+const BLUE_DOOR = 33;
+define_thing(BLUE_DOOR, #{
+    atlas:THINGS_ATLAS,
+    atlas_index:33
+});
+
+const YELLOW_DOOR = 34;
+define_thing(YELLOW_DOOR, #{
+    atlas:THINGS_ATLAS,
+    atlas_index:34
+});
+
+const EXIT = 35;
+define_thing(EXIT, #{
+    atlas:THINGS_ATLAS,
+    atlas_index:35
+});
+
+
+
 
 // floors
 const GRASS_TILE = 0;
@@ -74,4 +118,4 @@ define_tile(WOODWALL_TILE, #{
 
 load_map("assets/maps/test.tmj");
 
-load_world("quicksave.sav");
+// load_world("quicksave.sav");
