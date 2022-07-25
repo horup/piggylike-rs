@@ -3,12 +3,10 @@ import "things" as things;
 import "tiles" as tiles;
 
 
-
-
-fn test() {
+fn update() {
+    this.iterations = 10;
+    print(this.iterations);
 }
 
+
 load_map("assets/maps/test.tmj");
-
-
-//load_world("quicksave.sav");

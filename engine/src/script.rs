@@ -2,7 +2,7 @@ pub use macroquad;
 use macroquad::prelude::{load_string, load_texture, FilterMode, Vec2};
 pub use macroquad_tiled;
 use rhai::module_resolvers::FileModuleResolver;
-use rhai::{Module, Scope, Dynamic};
+use rhai::{Module, Scope, Dynamic, EvalAltResult};
 use std::borrow::BorrowMut;
 use std::fs::read_to_string;
 use std::path::PathBuf;
@@ -11,30 +11,32 @@ use std::{cell::RefCell, collections::HashMap};
 
 use crate::{Atlas, Command, Engine, Sprite, Thing, Tile, Tilemap, World};
 
+
+fn get_i64(map: &rhai::Map, key: &str) -> i64 {
+    let v = map.get(key);
+    if let Some(v) = v {
+        if let Ok(v) = v.as_int() {
+            return v;
+        }
+    }
+
+    return i64::default();
+}
+fn get_bool(map: &rhai::Map, key: &str) -> bool {
+    let v = map.get(key);
+    if let Some(v) = v {
+        if let Ok(v) = v.as_bool() {
+            return v;
+        }
+    }
+
+    return bool::default();
+}
+
 impl Engine {
     pub fn new_script_engine(commands: Rc<RefCell<Vec<Command>>>) -> rhai::Engine {
-        fn get_i64(map: &rhai::Map, key: &str) -> i64 {
-            let v = map.get(key);
-            if let Some(v) = v {
-                if let Ok(v) = v.as_int() {
-                    return v;
-                }
-            }
-
-            return i64::default();
-        }
-        fn get_bool(map: &rhai::Map, key: &str) -> bool {
-            let v = map.get(key);
-            if let Some(v) = v {
-                if let Ok(v) = v.as_bool() {
-                    return v;
-                }
-            }
-
-            return bool::default();
-        }
-
         let mut engine = rhai::Engine::new();
+        World::register(&mut engine);
         engine.set_module_resolver(FileModuleResolver::new_with_path(PathBuf::from("assets/scripts")));
         let cmd = commands.clone();
         engine.register_fn("load_map", move |path: &str| {
@@ -99,29 +101,44 @@ impl Engine {
             });
         });
 
+        let cmd = commands.clone();
+        engine.register_fn("register_callback", move |type_name: String, call_back_name: String| {
+            cmd.as_ref().borrow_mut().push(Command::Execute { function: Box::new(move |engine| {
+                if let Some(callbacks) = engine.callbacks.get_mut(&type_name) {
+                    callbacks.push(call_back_name.clone());
+                } else {
+                    let mut v = Vec::new();
+                    v.push(call_back_name.clone());
+                    engine.callbacks.insert(type_name.clone(), v);
+                }
+            })});
+        });
+
         engine
     }
 
-    pub async fn update_script(&mut self) {
-        //let ast = self.script_engine.compile("").unwrap();
-        //let r:() = self.script_engine.call_fn(&mut self.global_scope, &rhai::AST::default(), "test", ()).unwrap();
-        //scope.push("test",
-        //let ast = self.script_engine.compile("fn abc(){test();}").unwrap();
-        //let r:() = self.script_engine.call_fn(&mut Scope::new(), &ast, "abc", ()).unwrap();
+    pub async fn script_update(&mut self) {
+        let mut world = Dynamic::from(self.world.clone());
+        let res = self.script_engine.call_fn_raw(
+            &mut self.global_scope,
+            &self.script,
+            false,
+            true,
+            "update",
+            Some(&mut world),
+            [],
+        );
 
-        let r = self
-            .script_engine
-            .call_fn_raw(
-                &mut self.global_scope,
-                &self.script,
-                false,
-                true,
-                "test",
-                None,
-                [],
-            )
-            .unwrap();
-
+        match res {
+            Ok(_) => self.world = world.cast::<World>(),
+            Err(err) => {
+                if let EvalAltResult::ErrorFunctionNotFound(_,_) = err.as_ref() {
+                    // ignore function not found
+                } else {
+                    self.warn(&format!("failed to execute update {:?}", err))
+                }
+            },
+        }
     }
 
     pub async fn register_script_file(&mut self, path: &str) {

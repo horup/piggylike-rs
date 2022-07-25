@@ -28,6 +28,7 @@ impl Engine {
             let tile_shape = Cuboid::new([size, size].into());
             let vels = [Vec2::new(thing.vel.x, 0.0) * dt, Vec2::new(0.0, thing.vel.y) * dt];
             let mut contact_index:Option<Index> = None;
+        
             for vel in vels {
                 if vel.length() > 0.0 {
                     let new_pos = thing.pos + vel;
@@ -77,6 +78,7 @@ impl Engine {
                     if let Some(contact) = contact {
                         let v = vel.normalize() * contact.dist;
                         thing.pos = new_pos + v;
+                        thing.touched_thing = contact_index;
                     } else {
                         thing.pos = new_pos;
                     }

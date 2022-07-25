@@ -9,6 +9,7 @@ use std::{cell::RefCell, collections::HashMap};
 use crate::{Input, Thing, Sprite, Atlas, World, Command, Tile};
 
 pub struct Engine {
+    pub callbacks:HashMap<String, Vec<String>>,
     pub timeline:Vec<World>,
     pub input:Input,
     pub thing_prototypes: HashMap<u32, Thing>,
@@ -27,6 +28,7 @@ impl Default for Engine {
     fn default() -> Self {
         let commands = Rc::new(RefCell::new(Vec::new()));
         Self {
+            callbacks: HashMap::new(),
             global_scope: rhai::Scope::new(),
             timeline:Default::default(),
             input:Input::default(),
@@ -49,17 +51,13 @@ impl Engine {
     }
 
     pub async fn update(&mut self) {
+        self.update_cleanup();
         self.update_input();
         self.update_movement();
-        self.update_script().await;
+        self.script_update().await;
         self.process_commands().await;
-
-        
-
-
         self.draw();
         self.world.iterations += 1;
-        self.update_cleanup();
         self.update_history();
     }
 

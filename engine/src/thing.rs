@@ -13,7 +13,8 @@ pub struct Thing {
     pub pos: Vec2,
     pub vel: Vec2,
     pub player:bool,
-    pub solid:bool
+    pub solid:bool,
+    pub touched_thing:Option<Index>
 }
 
 impl Thing {
