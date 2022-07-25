@@ -1,5 +1,3 @@
-// import "hello" as hello;
-
 // atlases
 const TILES_ATLAS = 0;
 define_atlas(TILES_ATLAS, 16, 16, "assets/textures/tiles.png");
@@ -125,9 +123,10 @@ define_tile(WOODWALL_TILE, #{
 
 
 fn test() {
-
 }
 
 load_map("assets/maps/test.tmj");
+
+print("t");
 
 //load_world("quicksave.sav");

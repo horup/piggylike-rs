@@ -17,6 +17,7 @@ pub struct Engine {
     pub tile_prototypes: HashMap<u32, Tile>,
     pub world: World,
     pub script_engine: rhai::Engine,
+    pub script: rhai::AST,
     pub global_scope: rhai::Scope<'static>,
     pub commands: Rc<RefCell<Vec<Command>>>,
 }
@@ -36,6 +37,7 @@ impl Default for Engine {
             world: Default::default(),
             script_engine: Self::new_script_engine(commands.clone()),
             commands:commands.clone(),
+            script:rhai::AST::default()
         }
     }
 }

@@ -1,13 +1,13 @@
 pub use macroquad;
 use macroquad::prelude::{load_string, load_texture, FilterMode, Vec2};
 pub use macroquad_tiled;
-use rhai::{Scope, Module};
+use rhai::{Module, Scope, Dynamic};
 use std::borrow::BorrowMut;
 use std::fs::read_to_string;
 use std::rc::Rc;
 use std::{cell::RefCell, collections::HashMap};
 
-use crate::{Atlas, Engine, Sprite, Thing, Tile, Tilemap, World, Command};
+use crate::{Atlas, Command, Engine, Sprite, Thing, Tile, Tilemap, World};
 
 impl Engine {
     pub fn new_script_engine(commands: Rc<RefCell<Vec<Command>>>) -> rhai::Engine {
@@ -90,39 +90,64 @@ impl Engine {
         );
 
         let cmd = commands.clone();
-        engine.register_fn(
-            "load_world",
-            move |file_name:String| {
-                cmd.as_ref().borrow_mut().push(Command::LoadWorld { file_name: file_name });
-            },
-        );
+        engine.register_fn("load_world", move |file_name: String| {
+            cmd.as_ref().borrow_mut().push(Command::LoadWorld {
+                file_name: file_name,
+            });
+        });
 
         engine
     }
 
     pub async fn update_script(&mut self) {
         //let ast = self.script_engine.compile("").unwrap();
-        let r:() = self.script_engine.call_fn(&mut self.global_scope, &rhai::AST::default(), "test", ()).unwrap();
-        //scope.push("test", 
-        //let res:() = self.script_engine.call_fn(&mut self.global_scope, &ast, "test", ()).unwrap();
+        //let r:() = self.script_engine.call_fn(&mut self.global_scope, &rhai::AST::default(), "test", ()).unwrap();
+        //scope.push("test",
+        //let ast = self.script_engine.compile("fn abc(){test();}").unwrap();
+        //let r:() = self.script_engine.call_fn(&mut Scope::new(), &ast, "abc", ()).unwrap();
+
+        let r = self
+            .script_engine
+            .call_fn_raw(
+                &mut self.global_scope,
+                &self.script,
+                false,
+                true,
+                "test",
+                None,
+                [],
+            )
+            .unwrap();
+
     }
 
-    pub async fn register_script_file(&mut self, path:&str) {
+    pub async fn register_script_file(&mut self, path: &str) {
         let script = read_to_string(path).unwrap();
         self.register_script(&script).await;
     }
 
-    pub async fn register_script(&mut self, script:&str) {
-        let ast = self.script_engine.compile_into_self_contained(&self.global_scope, script).unwrap();// self.script_engine.compile(script).unwrap();
-        let module = Module::eval_ast_as_new(Scope::new(), &ast, &self.script_engine).unwrap();
-        self.script_engine.register_global_module(Rc::new(module));
-        self.script_engine.run_ast_with_scope(&mut self.global_scope, &ast).unwrap();
+    pub async fn register_script(&mut self, script: &str) {
+        let ast = self
+            .script_engine
+            .compile_into_self_contained(&self.global_scope, script)
+            .unwrap();
+        self.script = self.script.merge(&ast);
+        self.script_engine.eval_ast_with_scope::<()>(&mut self.global_scope, &&self.script);
+
+        println!("{}", self.global_scope.len());
+        //let module = Module::eval_ast_as_new(Scope::new(), &ast, &self.script_engine).unwrap();
+        //self.script_engine.register_global_module(module.into());
+
+        //self.script_engine.run_ast_with_scope(&mut self.global_scope, &ast).unwrap();
         //let module = rhai::Module::eval_ast_as_new(scope, ast, engine)eval
         //self.script_engine.register_global_module()
     }
 
     pub async fn eval(&mut self, script: &str) {
-        match self.script_engine.eval_with_scope::<()>(&mut self.global_scope, script) {
+        match self
+            .script_engine
+            .eval_with_scope::<()>(&mut self.global_scope, script)
+        {
             Ok(_) => {}
             Err(err) => {
                 println!("error executing script: {}", err);
@@ -132,7 +157,10 @@ impl Engine {
         self.process_commands().await;
     }
     pub async fn eval_file(&mut self, path: &str) {
-        match self.script_engine.eval_file_with_scope::<()>(&mut self.global_scope, path.into()) {
+        match self
+            .script_engine
+            .eval_file_with_scope::<()>(&mut self.global_scope, path.into())
+        {
             Ok(_) => {}
             Err(err) => {
                 println!("error executing script: {}", err);
