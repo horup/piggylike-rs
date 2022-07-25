@@ -11,7 +11,7 @@ struct PlayerInput {
 #[macroquad::main("PiggyLike")]
 async fn main() {
     let mut engine = Engine::default();
-    engine.register_script_file("assets/scripts/autoexec.rhai").await;
+    engine.register_script_file("assets/scripts/main.rhai").await;
 
     let mut console = String::new();
     let show_console = false;
@@ -32,7 +32,7 @@ async fn main() {
                             console = console[0..console.len()-1].into();
                         }
                     } else if char == 13 as char {
-                        engine.eval(&console).await;
+                        //engine.eval(&console).await;
                         console = "".into();
                     }
                 }
