@@ -28,13 +28,16 @@ pub enum Command {
     }
 }
 
+unsafe impl Send for Command {}
+unsafe impl Sync for Command {}
+
 impl Engine {
 
     pub fn push_command(&self, command:Command) {
-        self.commands.borrow_mut().push(command);
+        //self.commands.borrow_mut().push(command);
     }
     pub async fn process_commands(&mut self) {
-        for cmd in self.commands.clone().as_ref().borrow_mut().drain(..) {
+       /* for cmd in self.commands.clone().as_ref().borrow_mut().drain(..) {
             match cmd {
                 Command::LoadMap { path } => {
                     self.load_map(&path).await;
@@ -67,6 +70,6 @@ impl Engine {
                     function(self);
                 },
             }
-        }
+        }*/
     }
 }

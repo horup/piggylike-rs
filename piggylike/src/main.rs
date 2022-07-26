@@ -1,5 +1,7 @@
 #![allow(warnings, unused)]
 
+use std::path::Path;
+
 use engine::{macroquad, Engine, Atlas};
 use macroquad::prelude::*;
 
@@ -10,8 +12,7 @@ struct PlayerInput {
 
 #[macroquad::main("PiggyLike")]
 async fn main() {
-    let mut engine = Engine::default();
-    engine.register_script_file("assets/scripts/main.rhai").await;
+    let mut engine = Engine::new(&Path::new("assets/scripts/main.rn"));
 
     let mut console = String::new();
     let show_console = false;

@@ -23,13 +23,4 @@ impl World {
     pub fn get_things(&mut self) -> Arena<Thing> {
         return self.things.clone();
     }
-
-
-    pub fn register(script_engine:&mut rhai::Engine) {
-        script_engine.register_type_with_name::<Self>("World");
-        script_engine.register_iterator::<Arena<Thing>>();
-        script_engine.register_get_set("iterations", Self::get_iterations, Self::set_iterations);
-
-        script_engine.register_get("things", Self::get_things);
-    }
 }

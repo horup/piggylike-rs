@@ -6,7 +6,7 @@ use crate::{Engine, Thing, Command};
 
 impl Engine {
     pub fn update_movement(&mut self) {
-        let mut commands = self.commands.borrow_mut();
+        //let mut commands = self.commands.borrow_mut();
         let dt = self.get_delta_time();
         let ground_friction = 0.4;
         // https://www.youtube.com/watch?v=v3zT3Z5apaM
