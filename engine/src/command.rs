@@ -1,3 +1,5 @@
+use std::sync::{Arc, Mutex};
+
 use macroquad::prelude::{load_texture, FilterMode};
 
 use crate::{Tile, Thing, Engine, Atlas};
@@ -31,13 +33,37 @@ pub enum Command {
 unsafe impl Send for Command {}
 unsafe impl Sync for Command {}
 
-impl Engine {
+#[derive(Clone)]
+pub struct Commands {
+    commands:Arc<Mutex<Vec<Command>>>
+}
+unsafe impl Send for Commands {}
+unsafe impl Sync for Commands {}
 
-    pub fn push_command(&self, command:Command) {
-        //self.commands.borrow_mut().push(command);
+impl Commands {
+    pub fn new() -> Self {
+        Commands { commands: Arc::new(Mutex::new(Vec::new())) }
     }
+
+    pub fn push(&self, command:Command) {
+        if let Ok(mut commands) = self.commands.lock() {
+            commands.push(command);
+        }
+    }
+
+    pub fn drain(&self) -> Vec<Command> {
+        let mut vec = Vec::new();
+        if let Ok(mut commands) = self.commands.lock() {
+            vec = commands.drain(..).collect();
+        }
+
+        return vec;
+    }
+}
+
+impl Engine {
     pub async fn process_commands(&mut self) {
-       /* for cmd in self.commands.clone().as_ref().borrow_mut().drain(..) {
+        for cmd in self.commands.drain() {
             match cmd {
                 Command::LoadMap { path } => {
                     self.load_map(&path).await;
@@ -70,6 +96,6 @@ impl Engine {
                     function(self);
                 },
             }
-        }*/
+        }
     }
 }

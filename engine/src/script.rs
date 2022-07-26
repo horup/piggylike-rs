@@ -17,11 +17,13 @@ impl Engine {
     pub fn vm_create(script_path:&Path, commands: Commands) -> Vm {
         let mut module = Module::new();
 
-        let cmds = commands.clone();
+        let mut cmds = commands.clone();
         module.function(&["test"], move ||{
-            if let Ok(mut cmds) = cmds.lock() {
-                cmds.push(Command::LoadWorld { file_name: "test.tmj".into() });
-            }
+            //cmds.push(Command::LoadWorld { file_name: "test.tmj".into() });
+
+            cmds.push(Command::Execute { function: Box::new(|engine| {
+                println!("hi from execute")
+            })});
         }).unwrap();
 
         let mut context = rune_modules::default_context().unwrap();

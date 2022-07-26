@@ -7,9 +7,7 @@ use std::path::Path;
 use std::sync::{Arc, Mutex};
 use std::{cell::RefCell, collections::HashMap};
 
-use crate::{Input, Thing, Sprite, Atlas, World, Command, Tile};
-
-pub type Commands = Arc<Mutex<Vec<Command>>>;
+use crate::{Input, Thing, Sprite, Atlas, World, Command, Tile, Commands};
 
 pub struct Engine {
     pub vm:rune::Vm,
@@ -27,7 +25,7 @@ pub struct Engine {
 
 impl Engine {
     pub fn new(script_path:&Path) -> Self {
-        let commands = Arc::new(Mutex::new(Vec::new()));
+        let commands = Commands::new();
         let vm = Self::vm_create(script_path, commands.clone());
         Self {
             vm:vm,
