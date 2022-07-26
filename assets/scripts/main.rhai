@@ -4,8 +4,9 @@ import "tiles" as tiles;
 
 
 fn update() {
-    this.iterations = 10;
-    print(this.iterations);
+    for thing in this.things {
+        print("a thing");
+    }
 }
 
 
