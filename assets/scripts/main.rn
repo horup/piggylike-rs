@@ -1,4 +1,5 @@
+mod atlases;
+
 pub fn main() {
-    println!("hi there!");
-    test();
+    atlases::define();
 }

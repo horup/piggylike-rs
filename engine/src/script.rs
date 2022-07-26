@@ -1,8 +1,9 @@
 pub use macroquad;
-use macroquad::prelude::{load_string, load_texture, FilterMode, Vec2};
+use macroquad::prelude::{load_string, load_texture, FilterMode, Vec2, Texture2D};
 pub use macroquad_tiled;
+use rune::runtime::Object;
 use rune::termcolor::{StandardStream, ColorChoice};
-use rune::{Vm, Sources, Source, prepare, Diagnostics, Module};
+use rune::{Vm, Sources, Source, prepare, Diagnostics, Module, Value};
 use std::borrow::BorrowMut;
 use std::fs::read_to_string;
 use std::path::{PathBuf, Path};
@@ -15,16 +16,20 @@ use crate::{Atlas, Command, Engine, Sprite, Thing, Tile, Tilemap, World, Command
 impl Engine {
 
     pub fn vm_create(script_path:&Path, commands: Commands) -> Vm {
-        let mut module = Module::new();
+        let mut module = Module::with_crate("engine");
 
+        
         let mut cmds = commands.clone();
-        module.function(&["test"], move ||{
-            //cmds.push(Command::LoadWorld { file_name: "test.tmj".into() });
-
-            cmds.push(Command::Execute { function: Box::new(|engine| {
-                println!("hi from execute")
-            })});
+        module.function(&["define_atlas"], move |id:i64, atlas:Object|{
+            let id = id.clone();
+            let columns = get_i64(atlas.get("columns"));
+            let rows = get_i64(atlas.get("rows"));
+            let texture_path = get_string(atlas.get("texture_path"));
+            cmds.push(Command::DefineAtlas { id: id as u32, columns: columns as u16, rows: rows as u16, texture_path });
         }).unwrap();
+
+
+        
 
         let mut context = rune_modules::default_context().unwrap();
         context.install(&module).unwrap();
@@ -50,4 +55,24 @@ impl Engine {
         vm.call(&["main"], ()).unwrap();
         return vm;
     }
+}
+
+pub fn get_i64(value:Option<&Value>) -> i64 {
+    if let Some(value) = value.to_owned() {
+        if let Ok(value) = value.to_owned().into_integer() {
+            return value;
+        }
+    }
+
+    return 0;
+}
+
+pub fn get_string(value:Option<&Value>) -> String {
+    if let Some(value) = value {
+        if let Value::StaticString(s) = value {
+            return s.to_string();
+        }
+    }
+
+    return String::default();
 }

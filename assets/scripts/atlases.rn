@@ -1,0 +1,18 @@
+use engine::*;
+pub const TILES = 0;
+pub const THINGS = 1;
+
+pub fn define() {
+    define_atlas(TILES, #{
+        columns:16,
+        rows:16,
+        texture_path:"assets/textures/tiles.png"
+    });
+
+    define_atlas(THINGS, #{
+        columns:16,
+        rows:16,
+        texture_path:"assets/textures/things.png"
+    });
+    //define_atlas(TILES, 1);
+}

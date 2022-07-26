@@ -25,9 +25,7 @@ pub enum Command {
     LoadWorld {
         file_name: String
     },
-    Execute {
-        function:Box<dyn FnMut(&mut Engine)>
-    }
+    Execute(Box<dyn FnMut(&mut Engine)>)
 }
 
 unsafe impl Send for Command {}
@@ -92,8 +90,8 @@ impl Engine {
                     self.thing_prototypes.insert(id, thing);
                 }
                 Command::LoadWorld { file_name } => self.load_world(&file_name),
-                Command::Execute { mut function } => {
-                    function(self);
+                Command::Execute(mut f) => {
+                    f(self);
                 },
             }
         }
