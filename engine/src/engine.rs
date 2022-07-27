@@ -1,69 +1,41 @@
+use bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}};
 
-pub use macroquad;
-use macroquad::prelude::{load_string, load_texture, FilterMode, Vec2, get_frame_time};
-pub use macroquad_tiled;
-use std::borrow::BorrowMut;
-use std::path::Path;
-use std::sync::{Arc, Mutex};
-use std::{cell::RefCell, collections::HashMap};
-
-use crate::{Input, Thing, Sprite, Atlas, World, Command, Tile, Commands, vm_create};
-
-pub struct Engine {
-    pub vm:rune::Vm,
-    pub callbacks:HashMap<String, Vec<String>>,
-    pub timeline:Vec<World>,
-    pub input:Input,
-    pub thing_prototypes: HashMap<u32, Thing>,
-    pub sprite_prototypes: HashMap<u32, Sprite>,
-    pub atlases: HashMap<u32, Atlas>,
-    pub tile_prototypes: HashMap<u32, Tile>,
-    pub world: World,
-    pub commands: Commands,
+pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut texture_atlases:ResMut<Assets<TextureAtlas>>) {
+    
+    let texture_handle = asset_server.load("textures/tiles.png");
+    let mut texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(16.0, 16.0), 16, 16);
+    texture_atlas.size = Vec2::new(1.0, 1.0);
+    let texture_atlas_handle = texture_atlases.add(texture_atlas);
+    
+    let mut camera_bundle = OrthographicCameraBundle::new_2d();
+    camera_bundle.orthographic_projection.scale = 1.0/16.0;
+    commands.spawn_bundle(camera_bundle);
+    let size = 256;
+    for y in 0..size {
+        for x in 0..size {
+            commands.spawn_bundle(SpriteSheetBundle {
+                sprite:TextureAtlasSprite {
+                    index:x % 17 as usize,
+                    custom_size:Some(Vec2::new(1.0, 1.0)),
+                    ..Default::default()
+                },
+                texture_atlas: texture_atlas_handle.clone(),
+                transform:Transform {
+                    translation:Vec3::new(x as f32, y as f32, 0.0),
+                    ..Default::default()
+                },
+                ..default()
+            });
+        }
+    } 
+   
 }
 
+pub struct EnginePlugin;
 
-impl Engine {
-    pub fn new(script_path:&Path) -> Self {
-        let commands = Commands::new();
-        let vm = vm_create(script_path, commands.clone());
-        Self {
-            vm:vm,
-            callbacks: HashMap::new(),
-            timeline:Default::default(),
-            input:Input::default(),
-            thing_prototypes: HashMap::new(),
-            sprite_prototypes: HashMap::new(),
-            atlases: HashMap::new(),
-            tile_prototypes: HashMap::new(),
-            world: Default::default(),
-            commands:commands.clone(),
-        }
-    }
-
-    pub fn warn(&self, warn:&str) {
-        println!("warning: {}", warn);
-    }
-
-    pub async fn update(&mut self) {
-        self.update_cleanup();
-        self.update_input();
-        self.update_movement();
-        self.vm_update();
-        self.process_commands().await;
-        self.draw();
-        self.world.iterations += 1;
-        self.update_history();
-    }
-
-    pub fn get_delta_time(&self) -> f32 {
-        let dt = get_frame_time();
-        let max = 0.1;
-        if dt < max {
-            return dt;
-        } else {
-            return max;
-        }
+impl Plugin for EnginePlugin {
+    fn build(&self, app: &mut App) {
+        app.add_startup_system(setup);
     }
 }
 

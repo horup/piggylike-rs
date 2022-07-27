@@ -1,5 +1,17 @@
 #![allow(warnings, unused)]
 
+use engine::{bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}}, EnginePlugin};
+
+
+fn main() {
+    App::new()
+    .add_plugins(DefaultPlugins)
+    .add_plugin(FrameTimeDiagnosticsPlugin::default())
+    .add_plugin(LogDiagnosticsPlugin::default())
+    .add_plugin(EnginePlugin)
+    .run();
+}
+/*
 use std::path::Path;
 
 use engine::{macroquad, Engine, Atlas};
@@ -44,4 +56,4 @@ async fn main() {
         }
         next_frame().await
     }
-}
+}*/
