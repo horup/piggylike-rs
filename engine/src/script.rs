@@ -14,11 +14,8 @@ use std::{cell::RefCell, collections::HashMap};
 use crate::{Atlas, Command, Engine, Sprite, Thing, Tile, Tilemap, World, Commands};
 
 impl Engine {
-
     pub fn vm_create(script_path:&Path, commands: Commands) -> Vm {
         let mut module = Module::with_crate("engine");
-
-        
         let mut cmds = commands.clone();
         module.function(&["define_atlas"], move |id:i64, atlas:Object|{
             let id = id.clone();
@@ -28,8 +25,23 @@ impl Engine {
             cmds.push(Command::DefineAtlas { id: id as u32, columns: columns as u16, rows: rows as u16, texture_path });
         }).unwrap();
 
+        let mut cmds = commands.clone();
+        module.function(&["define_tile"], move |id:i64, tile:Object|{
+            let id = id.clone() as u32;
+            let atlas = get_i64(tile.get("atlas")) as u32;
+            let atlas_index = get_i64(tile.get("atlas_index")) as u16;
+            let solid = get_bool(tile.get("solid"));
+            cmds.push(Command::DefineTile { id: id as u32, tile: Tile {
+                atlas_index,
+                atlas,
+                solid,
+            } });
+        }).unwrap();
 
-        
+        let mut cmds = commands.clone();
+        module.function(&["load_map"], move |path:&str|{
+            cmds.push(Command::LoadMap { path: String::from(path) });
+        }).unwrap();
 
         let mut context = rune_modules::default_context().unwrap();
         context.install(&module).unwrap();
@@ -65,6 +77,16 @@ pub fn get_i64(value:Option<&Value>) -> i64 {
     }
 
     return 0;
+}
+
+pub fn get_bool(value:Option<&Value>) -> bool {
+    if let Some(value) = value.to_owned() {
+        if let Ok(value) = value.to_owned().into_bool() {
+            return value;
+        }
+    }
+
+    return false;
 }
 
 pub fn get_string(value:Option<&Value>) -> String {

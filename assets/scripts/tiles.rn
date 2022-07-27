@@ -1,0 +1,69 @@
+use engine::*;
+use crate::atlases;
+use atlases::*;
+
+// floors
+pub const GRASS_TILE = 0;
+pub const SAND_TILE = 1;
+pub const STONE_TILE = 2;
+pub const WOOD_TILE = 5;
+
+// solids
+pub const FOLIAGE_TILE = 16;
+pub const ROCK_TILE = 18;
+pub const WOODWALL_TILE = 21;
+
+pub fn define() {
+    // Floors
+    define_tile(GRASS_TILE, #{
+        atlas:atlases::TILES
+        ,
+        atlas_index:0,
+        solid:false
+    });
+
+    define_tile(SAND_TILE, #{
+        atlas:atlases::TILES
+        ,
+        atlas_index:1,
+        solid:false
+    });
+
+    define_tile(STONE_TILE, #{
+        atlas:atlases::TILES
+        ,
+        atlas_index:2,
+        solid:false
+    });
+
+    define_tile(WOOD_TILE, #{
+        atlas:atlases::TILES
+        ,
+        atlas_index:5,
+        solid:false
+    });
+
+    // Solids
+    define_tile(FOLIAGE_TILE, #{
+        atlas:atlases::TILES
+        ,
+        atlas_index:16,
+        solid:true
+    });
+
+    define_tile(ROCK_TILE, #{
+        atlas:atlases::TILES
+        ,
+        atlas_index:18,
+        solid:true
+    });
+
+    define_tile(WOODWALL_TILE, #{
+        atlas:atlases::TILES
+        ,
+        atlas_index:21,
+        solid:true
+    });
+
+}
+
