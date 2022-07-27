@@ -39,6 +39,22 @@ impl Engine {
         }).unwrap();
 
         let mut cmds = commands.clone();
+        module.function(&["define_thing"], move |id:i64, thing:Object|{
+            let id = id.clone() as u32;
+            let atlas = get_i64(thing.get("atlas")) as u32;
+            let atlas_index = get_i64(thing.get("atlas_index")) as u16;
+            let solid = get_bool(thing.get("solid"));
+            let player = get_bool(thing.get("player"));
+            cmds.push(Command::DefineThing { id: id, thing: Thing {
+                atlas,
+                atlas_index,
+                solid,
+                player,
+              ..Default::default()  
+            } });
+        }).unwrap();
+
+        let mut cmds = commands.clone();
         module.function(&["load_map"], move |path:&str|{
             cmds.push(Command::LoadMap { path: String::from(path) });
         }).unwrap();
