@@ -3,6 +3,9 @@ mod tiles;
 mod things;
 use engine::*;
 
+pub fn update() {
+}
+
 pub fn main() {
     atlases::define();
     tiles::define();

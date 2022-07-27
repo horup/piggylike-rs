@@ -7,7 +7,7 @@ use std::path::Path;
 use std::sync::{Arc, Mutex};
 use std::{cell::RefCell, collections::HashMap};
 
-use crate::{Input, Thing, Sprite, Atlas, World, Command, Tile, Commands};
+use crate::{Input, Thing, Sprite, Atlas, World, Command, Tile, Commands, vm_create};
 
 pub struct Engine {
     pub vm:rune::Vm,
@@ -26,7 +26,7 @@ pub struct Engine {
 impl Engine {
     pub fn new(script_path:&Path) -> Self {
         let commands = Commands::new();
-        let vm = Self::vm_create(script_path, commands.clone());
+        let vm = vm_create(script_path, commands.clone());
         Self {
             vm:vm,
             callbacks: HashMap::new(),
@@ -49,6 +49,7 @@ impl Engine {
         self.update_cleanup();
         self.update_input();
         self.update_movement();
+        self.vm_update();
         self.process_commands().await;
         self.draw();
         self.world.iterations += 1;
