@@ -1,19 +1,28 @@
 use generational_arena::Index;
 use macroquad::prelude::{Vec2, IVec2, Vec3};
 use parry2d::bounding_volume::AABB;
+use rune::Any;
 use serde::{Serialize, Deserialize};
 
-#[derive(Clone, Copy, Serialize, Deserialize, Default)]
+#[derive(Clone, Copy, Serialize, Deserialize, Default, Any)]
 #[serde(default)]
 pub struct Thing {
+    #[rune(get, set)]
     pub pickup:bool,
+    #[rune(get, set)]
     pub delete:bool,
+    #[rune(get, set)]
     pub atlas: u32,
+    #[rune(get, set)]
     pub atlas_index: u16,
     pub pos: Vec2,
     pub vel: Vec2,
+    
+    #[rune(get, set)]
     pub player:bool,
+    #[rune(get, set)]
     pub solid:bool,
+
     pub touched_thing:Option<Index>
 }
 

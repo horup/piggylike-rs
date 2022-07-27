@@ -3,7 +3,9 @@ mod tiles;
 mod things;
 use engine::*;
 
-pub fn update() {
+pub fn update(world) {
+    for thing in world.things {
+    }
 }
 
 pub fn main() {
