@@ -8,5 +8,5 @@ pub fn main(engine) {
     atlases::define(engine);
     tiles::define(engine);
 
-    engine.load_map("maps/test.tmj");
+    engine.load_map("maps/test.tmx");
 }
