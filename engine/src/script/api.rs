@@ -42,7 +42,7 @@ impl API {
                 },
                 APICommand::DefineTile((id, tile)) => {
                     let atlas = get_i64(tile.get("atlas")) as u64;
-                    let atlas_index = get_i64(tile.get("atlas")) as u32;
+                    let atlas_index = get_i64(tile.get("atlas_index")) as u32;
                     let solid = get_bool(tile.get("solid"));
         
                     world.get_resource_mut::<Metadata>().unwrap().tiles.insert(id, TileDef {
