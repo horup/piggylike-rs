@@ -1,7 +1,8 @@
-use std::cell::UnsafeCell;
+use std::{cell::UnsafeCell, path::PathBuf};
 
-use bevy::{prelude::{Commands, AssetServer, Res, ResMut, Assets}, sprite::TextureAtlas, math::Vec2};
+use bevy::{prelude::{Commands, AssetServer, Res, ResMut, Assets, World}, sprite::TextureAtlas, math::Vec2, asset::FileAssetIo};
 use rune::{Module, runtime::Object, Value};
+use tiled::Loader;
 
 use crate::metadata::{Metadata, Id, AtlasDef, TileDef};
 
@@ -18,7 +19,11 @@ pub struct API {
 }
 
 impl API {
-    pub fn process(&mut self, mut metadata:&mut ResMut<Metadata>, commands:&mut Commands, asset_server:&Res<AssetServer>, texture_atlases:&mut ResMut<Assets<TextureAtlas>>) {
+    pub fn process(&mut self, world:&mut World) {
+        let asset_server = world.get_resource::<AssetServer>().unwrap();
+        let asset_io = asset_server.asset_io().downcast_ref::<FileAssetIo>().unwrap();
+        let assets_path = asset_io.root_path().clone();
+        
         for cmd in self.commands.drain(..) {
             match cmd {
                 APICommand::DefineAtlas((id, atlas)) => {
@@ -29,11 +34,11 @@ impl API {
                     let height = get_f32(atlas.get("height"));
                     let texture_path = get_string(atlas.get("texture_path"));
         
-                    let texture_handle = asset_server.load(&texture_path);
+                    let texture_handle = world.get_resource::<AssetServer>().unwrap().load(&texture_path);
                     let mut texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(width, height), columns as usize, rows as usize);
-                    let texture_atlas_handle = texture_atlases.add(texture_atlas);
+                    let texture_atlas_handle = world.get_resource_mut::<Assets<TextureAtlas>>().unwrap().add(texture_atlas);
                     
-                    metadata.atlases.insert(id, AtlasDef {
+                    world.get_resource_mut::<Metadata>().unwrap().atlases.insert(id, AtlasDef {
                         handle:texture_atlas_handle
                     });
                 },
@@ -42,7 +47,7 @@ impl API {
                     let atlas_index = get_i64(tile.get("atlas")) as u32;
                     let solid = get_bool(tile.get("solid"));
         
-                    metadata.tiles.insert(id, TileDef {
+                    world.get_resource_mut::<Metadata>().unwrap().tiles.insert(id, TileDef {
                         atlas,
                         atlas_index,
                         solid: solid,
@@ -50,6 +55,10 @@ impl API {
                 },
                 APICommand::LoadMap(map) => {
                     println!("loading map...");
+                    let mut loader = Loader::new();
+                    let mut path = assets_path.clone();
+                    path.push(PathBuf::from(map));
+                    let map = loader.load_tmx_map(path).unwrap();
                 },
             }
         }
