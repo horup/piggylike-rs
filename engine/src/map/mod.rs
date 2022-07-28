@@ -64,7 +64,20 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                 
             },
             LayerType::ObjectLayer(object_layer) => {
-
+                for obj in object_layer.objects() {
+                    match obj.shape {
+                        ObjectShape::Rect { width, height } => {
+                            if let Some(tile) = obj.get_tile() {
+                                let wx = obj.x / width;
+                                let wy = obj.y / -width;
+                                let id = tile.id();
+                                
+                                
+                            }
+                        },
+                        _=>{}
+                    }
+                }
             },
             _ => {}
         }

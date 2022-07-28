@@ -17,7 +17,7 @@ pub struct TileDef {
 #[derive(Default, Clone)]
 pub struct ThingDef {
     pub atlas:Id,
-    pub index:u32,
+    pub atlas_index:u32,
     pub player:bool,
     pub solid:bool
 }

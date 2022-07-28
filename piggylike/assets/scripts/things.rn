@@ -1,4 +1,3 @@
-use engine::*;
 use crate::atlases;
 use atlases::*;
 
@@ -12,54 +11,54 @@ const BLUE_DOOR = 33;
 const YELLOW_DOOR = 34;
 const EXIT = 35;
 
-pub fn define() {
-    define_thing(PLAYER_THING, #{
+pub fn define(engine) {
+    engine.define_thing(PLAYER_THING, #{
         atlas:atlases::THINGS,
         atlas_index:0,
         player:true,
         solid:true
     });
 
-    define_thing(PIGGY_THING, #{
+    engine.define_thing(PIGGY_THING, #{
         atlas:atlases::THINGS,
         atlas_index:1,
         solid:true
     });
 
-    define_thing(RED_KEY, #{
+    engine.define_thing(RED_KEY, #{
         atlas:atlases::THINGS,
         atlas_index:16
     });
 
-    define_thing(BLUE_KEY, #{
+    engine.define_thing(BLUE_KEY, #{
         atlas:atlases::THINGS,
         atlas_index:17
     });
 
-    define_thing(PURPLE_KEY, #{
+    engine.define_thing(PURPLE_KEY, #{
         atlas:atlases::THINGS,
         atlas_index:18
     });
 
-    define_thing(RED_DOOR, #{
+    engine.define_thing(RED_DOOR, #{
         atlas:atlases::THINGS,
         atlas_index:32,
         solid:true
     });
 
-    define_thing(BLUE_DOOR, #{
+    engine.define_thing(BLUE_DOOR, #{
         atlas:atlases::THINGS,
         atlas_index:33,
         solid:true
     });
 
-    define_thing(YELLOW_DOOR, #{
+    engine.define_thing(YELLOW_DOOR, #{
         atlas:atlases::THINGS,
         atlas_index:34,
         solid:true
     });
 
-    define_thing(EXIT, #{
+    engine.define_thing(EXIT, #{
         atlas:atlases::THINGS,
         atlas_index:35
     });

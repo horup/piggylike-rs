@@ -4,12 +4,13 @@ use bevy::{prelude::{Commands, AssetServer, Res, ResMut, Assets, World}, sprite:
 use rune::{Module, runtime::Object, Value};
 use tiled::Loader;
 
-use crate::{metadata::{Metadata, Id, AtlasDef, TileDef}, map::load_map};
+use crate::{metadata::{Metadata, Id, AtlasDef, TileDef, ThingDef}, map::load_map};
 
 #[derive(Clone)]
 pub enum APICommand {
     DefineAtlas((Id, Object)),
     DefineTile((Id, Object)),
+    DefineThing((Id, Object)),
     LoadMap(String)
 }
 
@@ -20,8 +21,6 @@ pub struct API {
 
 impl API {
     pub fn process(&mut self, world:&mut World) {
-       
-        
         for cmd in self.commands.drain(..) {
             match cmd {
                 APICommand::DefineAtlas((id, atlas)) => {
@@ -54,6 +53,18 @@ impl API {
                 APICommand::LoadMap(map_path) => {
                     load_map(world, &map_path);
                 },
+                APICommand::DefineThing((id, thing)) => {
+                    let atlas = get_i64(thing.get("atlas")) as Id;
+                    let atlas_index = get_i64(thing.get("atlas_index")) as u32;
+                    let solid = get_bool(thing.get("solid"));
+                    let player = get_bool(thing.get("player"));
+                    world.get_resource_mut::<Metadata>().unwrap().things.insert(id, ThingDef {
+                        atlas,
+                        atlas_index,
+                        player,
+                        solid,
+                    });
+                },
             }
         }
     }
@@ -66,6 +77,10 @@ impl API {
         self.commands.push(APICommand::DefineTile((id, tile)));
     }
 
+    pub fn define_thing(&mut self, id:Id, thing:Object) {
+        self.commands.push(APICommand::DefineThing((id, thing)));
+    }
+
     pub fn load_map(&mut self, map:String) {
         self.commands.push(APICommand::LoadMap(map));
     }
@@ -74,6 +89,7 @@ impl API {
         module.ty::<API>();
         module.inst_fn("define_atlas", Self::define_atlas).unwrap();
         module.inst_fn("define_tile", Self::define_tile).unwrap();
+        module.inst_fn("define_thing", Self::define_thing).unwrap();
         module.inst_fn("load_map", Self::load_map).unwrap();
     }
 }
