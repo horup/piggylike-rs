@@ -5,8 +5,9 @@ use crate::ScriptPlugin;
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut texture_atlases:ResMut<Assets<TextureAtlas>>) {
     
     let texture_handle = asset_server.load("textures/tiles.png");
+
     let mut texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(16.0, 16.0), 16, 16);
-    texture_atlas.size = Vec2::new(1.0, 1.0);
+
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
     
     let mut camera_bundle = OrthographicCameraBundle::new_2d();
@@ -37,8 +38,6 @@ pub struct EnginePlugin;
 
 impl Plugin for EnginePlugin {
     fn build(&self, app: &mut App) {
-        let p = env!("CARGO_MANIFEST_DIR");
-        println!("{}", p);
         app.add_startup_system(setup)
         .add_plugin(ScriptPlugin);
     }
