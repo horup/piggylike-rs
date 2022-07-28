@@ -2,8 +2,8 @@
 pub use bevy;
 use bevy::prelude::*;
 
-mod script;
-pub use script::*;
+pub mod script;
+pub mod metadata;
 
 mod engine;
 pub use engine::*;

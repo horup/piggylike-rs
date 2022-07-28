@@ -25,7 +25,6 @@ impl API {
 
             let texture_handle = asset_server.load(&texture_path);
             let mut texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(width, height), columns as usize, rows as usize);
-            //texture_atlas.size = Vec2::new(1.0, 1.0);
             let texture_atlas_handle = texture_atlases.add(texture_atlas);
         }
     }
