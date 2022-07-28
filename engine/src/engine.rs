@@ -1,10 +1,10 @@
 use bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}, asset::FileAssetIo};
 
 use crate::{script::ScriptPlugin, metadata::MetadataPlugin};
-
+/*
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut texture_atlases:ResMut<Assets<TextureAtlas>>) {
     
-    let texture_handle = asset_server.load("textures/tiles.png");
+   /* */ let texture_handle = asset_server.load("textures/tiles.png");
 
     let mut texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(16.0, 16.0), 16, 16);
 
@@ -32,13 +32,15 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut texture_atl
         }
     } 
    
-}
+    println!("setup 1");
+}*/
 
 pub struct EnginePlugin;
 
 impl Plugin for EnginePlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(setup)
+        //app.add_startup_system(setup)
+        app
         .add_plugin(MetadataPlugin)
         .add_plugin(ScriptPlugin);
     }

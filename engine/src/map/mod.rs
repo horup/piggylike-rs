@@ -2,6 +2,8 @@ use bevy::{prelude::*, asset::FileAssetIo};
 use tiled::*;
 use std::path::PathBuf;
 
+use crate::metadata::Metadata;
+
 pub fn get_assets_path(world:&World) -> PathBuf {
     let asset_server = world.get_resource::<AssetServer>().unwrap();
     let asset_io = asset_server.asset_io().downcast_ref::<FileAssetIo>().unwrap();
@@ -15,6 +17,59 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
     path.push(PathBuf::from(map_path));
     let map = loader.load_tmx_map(path)?;
 
-    println!("{:?}", map);
+    world.clear_entities();
+
+    // create a camera
+    let mut camera_entity = world.spawn();
+    let mut camera_bundle = OrthographicCameraBundle::new_2d();
+    camera_bundle.orthographic_projection.scale = 1.0/16.0;
+    camera_entity.insert_bundle(camera_bundle);
+
+    let metadata = world.get_resource::<Metadata>().unwrap().clone();
+    // spawn tilemap
+    for y in 0..map.width {
+        for x in 0..map.height {
+            let tile_def = metadata.tiles.get(&0).clone();
+            if let Some(tile_def) = tile_def {
+                let atlas_def = metadata.atlases.get(&tile_def.atlas).clone();
+                if let Some(atlas_def) = atlas_def {
+                    let mut tile = world.spawn();
+                    tile.insert_bundle(SpriteSheetBundle {
+                        sprite:TextureAtlasSprite {
+                            index:tile_def.atlas_index as usize,
+                            custom_size:Some(Vec2::new(1.0, 1.0)),
+                            ..Default::default()
+                        },
+                        texture_atlas: atlas_def.handle.clone(),
+                        transform:Transform {
+                            translation:Vec3::new(x as f32, y as f32, 0.0),
+                            ..Default::default()
+                        },
+                        ..default()
+                    });
+                }
+            }
+        }
+    }
+   /* commands.spawn_bundle(camera_bundle);
+    let size = 256;
+    for y in 0..size {
+        for x in 0..size {
+            commands.spawn_bundle(SpriteSheetBundle {
+                sprite:TextureAtlasSprite {
+                    index:x % 17 as usize,
+                    custom_size:Some(Vec2::new(1.0, 1.0)),
+                    ..Default::default()
+                },
+                texture_atlas: texture_atlas_handle.clone(),
+                transform:Transform {
+                    translation:Vec3::new(x as f32, y as f32, 0.0),
+                    ..Default::default()
+                },
+                ..default()
+            });
+        }
+    } */
+
     Ok(())
 }

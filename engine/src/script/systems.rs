@@ -46,4 +46,6 @@ pub fn setup(world: &mut World) {
     vm.call(&["main"], (&mut api, )).unwrap();
     api.process(world,);
 
+    println!("setup 2");
+
 }
