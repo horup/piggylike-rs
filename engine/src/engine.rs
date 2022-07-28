@@ -1,4 +1,6 @@
-use bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}};
+use bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}, asset::FileAssetIo};
+
+use crate::ScriptPlugin;
 
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut texture_atlases:ResMut<Assets<TextureAtlas>>) {
     
@@ -35,7 +37,10 @@ pub struct EnginePlugin;
 
 impl Plugin for EnginePlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(setup);
+        let p = env!("CARGO_MANIFEST_DIR");
+        println!("{}", p);
+        app.add_startup_system(setup)
+        .add_plugin(ScriptPlugin);
     }
 }
 

@@ -1,4 +1,4 @@
-mod atlases;
+/*mod atlases;
 mod tiles;
 mod things;
 use engine::*;
@@ -14,4 +14,8 @@ pub fn main() {
     things::define();
 
     load_map("./assets/maps/test.tmj");
+}*/
+
+pub fn main() {
+    println!("hihih");
 }
