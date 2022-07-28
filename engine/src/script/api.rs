@@ -4,7 +4,7 @@ use bevy::{prelude::{Commands, AssetServer, Res, ResMut, Assets, World}, sprite:
 use rune::{Module, runtime::Object, Value};
 use tiled::Loader;
 
-use crate::metadata::{Metadata, Id, AtlasDef, TileDef};
+use crate::{metadata::{Metadata, Id, AtlasDef, TileDef}, map::load_map};
 
 #[derive(Clone)]
 pub enum APICommand {
@@ -20,9 +20,7 @@ pub struct API {
 
 impl API {
     pub fn process(&mut self, world:&mut World) {
-        let asset_server = world.get_resource::<AssetServer>().unwrap();
-        let asset_io = asset_server.asset_io().downcast_ref::<FileAssetIo>().unwrap();
-        let assets_path = asset_io.root_path().clone();
+       
         
         for cmd in self.commands.drain(..) {
             match cmd {
@@ -53,12 +51,8 @@ impl API {
                         solid: solid,
                     });
                 },
-                APICommand::LoadMap(map) => {
-                    println!("loading map...");
-                    let mut loader = Loader::new();
-                    let mut path = assets_path.clone();
-                    path.push(PathBuf::from(map));
-                    let map = loader.load_tmx_map(path).unwrap();
+                APICommand::LoadMap(map_path) => {
+                    load_map(world, &map_path);
                 },
             }
         }
