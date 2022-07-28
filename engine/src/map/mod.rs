@@ -19,18 +19,17 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
 
     world.clear_entities();
 
-    // create a camera
-    let mut camera_entity = world.spawn();
-    let mut camera_bundle = OrthographicCameraBundle::new_2d();
-    camera_bundle.orthographic_projection.scale = 1.0/16.0;
-    camera_entity.insert_bundle(camera_bundle);
-
+   
     let metadata = world.get_resource::<Metadata>().unwrap().clone();
+    let mut width = 0;
+    let mut height = 0;
     // spawn tilemap
     for layer in map.layers() {
         match layer.layer_type() {
             LayerType::TileLayer(tile_layer) => {
-                if let (Some(width), Some(height)) = (tile_layer.width(), tile_layer.height()) {
+                if let (Some(w), Some(h)) = (tile_layer.width(), tile_layer.height()) {
+                    width = w;
+                    height = h;
                     for y in 0..map.width {
                         for x in 0..map.height {
                             if let Some(tile) = tile_layer.get_tile(x as i32, y as i32) {
@@ -38,8 +37,9 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                                 let tile_def = metadata.tiles.get(&id).clone();
 
                                 if let Some(tile_def) = tile_def {
-                                    println!("{:?}", tile_def.atlas_index);
                                     let atlas_def = metadata.atlases.get(&tile_def.atlas).clone();
+                                    let wx = x;
+                                    let wy = height - y;
                                     if let Some(atlas_def) = atlas_def {
                                         let mut tile = world.spawn();
                                         tile.insert_bundle(SpriteSheetBundle {
@@ -50,7 +50,7 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                                             },
                                             texture_atlas: atlas_def.handle.clone(),
                                             transform:Transform {
-                                                translation:Vec3::new(x as f32, y as f32, 0.0),
+                                                translation:Vec3::new(wx as f32, wy as f32, 0.0),
                                                 ..Default::default()
                                             },
                                             ..default()
@@ -69,6 +69,15 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
             _ => {}
         }
     }
+
+    // create a camera and center it on the map
+    let mut camera_entity = world.spawn();
+    let mut camera_bundle = OrthographicCameraBundle::new_2d();
+    camera_bundle.orthographic_projection.scale = 1.0/16.0;
+    camera_bundle.transform.translation.x = width as f32 / 2.0;
+    camera_bundle.transform.translation.y = height as f32 / 2.0;
+    camera_entity.insert_bundle(camera_bundle);
+ 
     
    /* commands.spawn_bundle(camera_bundle);
     let size = 256;
