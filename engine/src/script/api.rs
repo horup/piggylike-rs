@@ -8,7 +8,8 @@ use crate::metadata::{Metadata, Id, AtlasDef, TileDef};
 #[derive(Clone)]
 pub enum APICommand {
     DefineAtlas((Id, Object)),
-    DefineTile((Id, Object))
+    DefineTile((Id, Object)),
+    LoadMap(String)
 }
 
 #[derive(rune::Any, Default)]
@@ -17,7 +18,6 @@ pub struct API {
 }
 
 impl API {
-
     pub fn process(&mut self, mut metadata:&mut ResMut<Metadata>, commands:&mut Commands, asset_server:&Res<AssetServer>, texture_atlases:&mut ResMut<Assets<TextureAtlas>>) {
         for cmd in self.commands.drain(..) {
             match cmd {
@@ -48,6 +48,9 @@ impl API {
                         solid: solid,
                     });
                 },
+                APICommand::LoadMap(map) => {
+                    println!("loading map...");
+                },
             }
         }
     }
@@ -60,10 +63,15 @@ impl API {
         self.commands.push(APICommand::DefineTile((id, tile)));
     }
 
+    pub fn load_map(&mut self, map:String) {
+        self.commands.push(APICommand::LoadMap(map));
+    }
+
     pub fn register(module:&mut Module) {
         module.ty::<API>();
         module.inst_fn("define_atlas", Self::define_atlas).unwrap();
         module.inst_fn("define_tile", Self::define_tile).unwrap();
+        module.inst_fn("load_map", Self::load_map).unwrap();
     }
 }
 
