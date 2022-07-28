@@ -1,6 +1,6 @@
 mod atlases;
-/*mod tiles;
-mod things;
+mod tiles;
+/*mod things;
 use engine::*;
 
 pub fn update(world) {
@@ -18,4 +18,5 @@ pub fn main() {
 
 pub fn main(engine) {
     atlases::define(engine);
+    tiles::define(engine);
 }

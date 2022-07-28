@@ -3,10 +3,12 @@ use std::{sync::Arc, path::{Path, PathBuf}};
 use bevy::{asset::{AssetServerSettings, FileAssetIo}, prelude::{Res, AssetServer, Commands, ResMut, Assets}, sprite::TextureAtlas};
 use rune::{Module, Sources, Source, Diagnostics, prepare, termcolor::{StandardStream, ColorChoice}, Vm};
 
+use crate::metadata::Metadata;
+
 use super::api::API;
 
 
-pub fn setup(mut commands:Commands, asset_server:Res<AssetServer>, mut texture_atlases:ResMut<Assets<TextureAtlas>>) {
+pub fn setup(mut commands:Commands, mut metadata:ResMut<Metadata>, asset_server:Res<AssetServer>, mut texture_atlases:ResMut<Assets<TextureAtlas>>) {
     let asset_io = asset_server.asset_io().downcast_ref::<FileAssetIo>().unwrap();
     let mut script_path = asset_io.root_path().clone();
     script_path.push("scripts");
@@ -42,6 +44,6 @@ pub fn setup(mut commands:Commands, asset_server:Res<AssetServer>, mut texture_a
     
     let mut api = API::default();
     vm.call(&["main"], (&mut api, )).unwrap();
-    api.process(&mut commands, &asset_server, &mut texture_atlases);
+    api.process(&mut metadata, &mut commands, &asset_server, &mut texture_atlases);
 
 }

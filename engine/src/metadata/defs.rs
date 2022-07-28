@@ -10,7 +10,7 @@ pub struct AtlasDef {
 #[derive(Default, Clone)]
 pub struct TileDef {
     pub atlas:Id,
-    pub index:u32,
+    pub atlas_index:u32,
     pub solid:bool
 }
 
