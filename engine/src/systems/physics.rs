@@ -1,18 +1,15 @@
 use bevy::prelude::*;
 
-use crate::components::Velocity;
+use crate::components::Body;
 
-pub fn physics_system(mut query:Query<(&mut Transform, &mut Velocity)>, time:ResMut<Time>) {
+pub fn physics_system(mut query:Query<(&mut Body)>, time:ResMut<Time>) {
     let dt = time.delta_seconds().min(0.1);
-    
-    for (mut transform, mut velocity) in query.iter_mut() {
+    for (mut body) in query.iter_mut() {
         let ground_friction = 10.0;
         let mut total_friction = 0.0;
         total_friction += ground_friction;
-        velocity.velocity = velocity.velocity - velocity.velocity * total_friction * dt;
-        
-        transform.translation = transform.translation + velocity.velocity * dt;
-        println!("{:?}", velocity);
+        body.velocity = body.velocity - body.velocity * total_friction * dt;
+        body.position = body.position + body.velocity * dt;
     }
 }
 

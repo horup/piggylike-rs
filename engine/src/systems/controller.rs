@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
-use crate::components::{Controller, Velocity};
+use crate::components::{Controller, Body};
 
-pub fn controller_system(mut query:Query<(&Controller, &mut Velocity)>, time:Res<Time>) {
+pub fn controller_system(mut query:Query<(&Controller, &mut Body)>, time:Res<Time>) {
     /*
     
     

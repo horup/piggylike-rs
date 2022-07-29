@@ -12,8 +12,5 @@ pub use controller::*;
 mod thing;
 pub use thing::*;
 
-mod velocity;
-pub use velocity::*;
-
 use crate::metadata::{ThingDef, Metadata, Id};
 

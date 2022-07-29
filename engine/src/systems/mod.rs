@@ -11,3 +11,6 @@ pub use input::*;
 
 mod physics;
 pub use physics::*;
+
+mod render;
+pub use render::*;
