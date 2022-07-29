@@ -42,7 +42,9 @@ impl Plugin for EnginePlugin {
         app
         .add_plugin(MetadataPlugin)
         .add_plugin(ScriptPlugin)
-        .add_system(systems::camera_system);
+        .add_system(systems::camera_system)
+        .add_system(systems::controller_system)
+        .add_system(systems::input_system);
     }
 }
 
