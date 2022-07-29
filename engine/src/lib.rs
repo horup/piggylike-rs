@@ -5,7 +5,8 @@ use bevy::prelude::*;
 pub mod script;
 pub mod metadata;
 pub mod tiled;
-pub mod thing;
+pub mod components;
+pub mod systems;
 
 mod engine;
 pub use engine::*;

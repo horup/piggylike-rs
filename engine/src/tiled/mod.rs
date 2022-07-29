@@ -2,7 +2,7 @@ use bevy::{prelude::*, asset::FileAssetIo, sprite::Anchor};
 use tiled::*;
 use std::path::PathBuf;
 
-use crate::{metadata::{Metadata, Id}, thing};
+use crate::{metadata::{Metadata, Id}, components};
 
 pub fn get_assets_path(world:&World) -> PathBuf {
     let asset_server = world.get_resource::<AssetServer>().unwrap();
@@ -80,9 +80,8 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                                 let wy = map_height as f32 - obj.y / width + 0.5;
                                 let id = tile.id() as Id;
                                 
-                                if let Some(thing_def) = metadata.things.get(&id) {
-                                    thing::spawn_thing(world, wx, wy, &thing_def, &metadata);
-                                }
+                                let id = tile.id() as Id;
+                                components::spawn_thing(world, wx, wy, &id, &metadata);
                             }
                         },
                         _=>{}
