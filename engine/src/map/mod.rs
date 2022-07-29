@@ -1,4 +1,4 @@
-use bevy::{prelude::*, asset::FileAssetIo};
+use bevy::{prelude::*, asset::FileAssetIo, sprite::Anchor};
 use tiled::*;
 use std::path::PathBuf;
 
@@ -21,15 +21,15 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
 
    
     let metadata = world.get_resource::<Metadata>().unwrap().clone();
-    let mut width = 0;
-    let mut height = 0;
-    // spawn tilemap
-    for layer in map.layers() {
+    let mut map_width = 0;
+    let mut map_height = 0;
+     // spawn tilemap
+     for layer in map.layers() {
         match layer.layer_type() {
             LayerType::TileLayer(tile_layer) => {
                 if let (Some(w), Some(h)) = (tile_layer.width(), tile_layer.height()) {
-                    width = w;
-                    height = h;
+                    map_width = w;
+                    map_height = h;
                     for y in 0..map.width {
                         for x in 0..map.height {
                             if let Some(tile) = tile_layer.get_tile(x as i32, y as i32) {
@@ -39,13 +39,14 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                                 if let Some(tile_def) = tile_def {
                                     let atlas_def = metadata.atlases.get(&tile_def.atlas).clone();
                                     let wx = x;
-                                    let wy = height - y;
+                                    let wy = map_height - y;
                                     if let Some(atlas_def) = atlas_def {
                                         let mut tile = world.spawn();
                                         tile.insert_bundle(SpriteSheetBundle {
                                             sprite:TextureAtlasSprite {
                                                 index:tile_def.atlas_index as usize,
                                                 custom_size:Some(Vec2::new(1.0, 1.0)),
+                                                anchor:Anchor::TopLeft,
                                                 ..Default::default()
                                             },
                                             texture_atlas: atlas_def.handle.clone(),
@@ -62,17 +63,44 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                     }
                 }
                 
-            },
+            }
+            _ => {}
+        }
+    }
+
+    // spawn things
+    for layer in map.layers() {
+        match layer.layer_type() {
             LayerType::ObjectLayer(object_layer) => {
                 for obj in object_layer.objects() {
                     match obj.shape {
                         ObjectShape::Rect { width, height } => {
                             if let Some(tile) = obj.get_tile() {
-                                let wx = obj.x / width;
-                                let wy = obj.y / -width;
-                                let id = tile.id();
+                                let wx = obj.x / width + 0.5;
+                                let wy = map_height as f32 - obj.y / width + 0.5;
+                                let id = tile.id() as Id;
                                 
-                                
+                                if let Some(thing_def) = metadata.things.get(&id) {
+                                    let atlas = thing_def.atlas as Id;
+                                    if let Some(atlas_def) = metadata.atlases.get(&atlas) {
+                                        println!("ha");
+                                        let mut e = world.spawn();
+                                        e.insert_bundle(SpriteSheetBundle {
+                                            sprite:TextureAtlasSprite {
+                                                index:thing_def.atlas_index as usize,
+                                                custom_size:Some(Vec2::new(1.0, 1.0)),
+                                                ..Default::default()
+                                            },
+                                            texture_atlas: atlas_def.handle.clone(),
+                                            transform:Transform {
+                                                translation:Vec3::new(wx as f32, wy as f32, 0.0),
+                                                ..Default::default()
+                                            },
+                                            ..default()
+                                        });
+                                    }
+                                }
+
                             }
                         },
                         _=>{}
@@ -87,8 +115,8 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
     let mut camera_entity = world.spawn();
     let mut camera_bundle = OrthographicCameraBundle::new_2d();
     camera_bundle.orthographic_projection.scale = 1.0/16.0;
-    camera_bundle.transform.translation.x = width as f32 / 2.0;
-    camera_bundle.transform.translation.y = height as f32 / 2.0;
+  //  camera_bundle.transform.translation.x = width as f32 / 2.0;
+  //  camera_bundle.transform.translation.y = height as f32 / 2.0;
     camera_entity.insert_bundle(camera_bundle);
  
     
