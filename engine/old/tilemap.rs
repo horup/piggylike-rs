@@ -55,7 +55,7 @@ impl Tilemap {
     }
 
     pub fn get(&self, layer:usize, x:i32, y:i32) -> Option<Tile> {
-        let index = y * self.width + x;
+        let index = y.abs() * self.width + x;
         if let Some(layer) = self.layers.get(layer) {
             if let Some(tile) = layer.tiles.get(index as usize) {
                 return *tile;

@@ -33,6 +33,7 @@ impl Tilemap {
     }
 
     pub fn get(&self, x:i32, y:i32) -> &Option<Tile> {
+        let y = y.abs();
         if x < 0 || x > self.width as i32 || y < 0 || y > self.height as i32 {
             return &None;
         }

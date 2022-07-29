@@ -41,7 +41,7 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                                 if let Some(tile_def) = tile_def {
                                     let atlas_def = metadata.atlases.get(&tile_def.atlas).clone();
                                     let wx = x;
-                                    let wy = map_height - y;
+                                    let wy = -(y as i32);
                                     if let Some(atlas_def) = atlas_def {
                                         let mut tile = world.spawn();
                                         tile.insert_bundle(SpriteSheetBundle {
@@ -85,7 +85,7 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                         ObjectShape::Rect { width, height } => {
                             if let Some(tile) = obj.get_tile() {
                                 let wx = obj.x / width + 0.5;
-                                let wy = map_height as f32 - obj.y / width + 0.5;
+                                let wy = -obj.y / width + 0.5;
                                 let id = tile.id() as Id;
                                 let id = tile.id() as Id;
                                 components::spawn_thing(world, wx, wy, &id, &metadata);

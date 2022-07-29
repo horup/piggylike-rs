@@ -26,7 +26,7 @@ impl Body {
         } else if dir.y != 0 {
             // horizontal
             for x in [-1, 0, 1] {
-                tiles[i] = IVec2::new(center.x + x, center.y + dir.y);
+                tiles[i] = IVec2::new(center.x + x, center.y - dir.y);
                 i += 1;
             }
         }
