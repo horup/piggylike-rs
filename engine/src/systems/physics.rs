@@ -8,8 +8,8 @@ pub fn physics_system(mut query:Query<(&mut Body)>, time:ResMut<Time>) {
         let ground_friction = 10.0;
         let mut total_friction = 0.0;
         total_friction += ground_friction;
-        body.velocity = body.velocity - body.velocity * total_friction * dt;
-        body.position = body.position + body.velocity * dt;
+        body.vel = body.vel - body.vel * total_friction * dt;
+        body.pos = body.pos + body.vel * dt;
     }
 }
 

@@ -68,6 +68,7 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                             }
                         }
                     }
+                    world.insert_resource(tilemap);
                 }
                 
             }

@@ -1,3 +1,4 @@
+use bevy::math::{Vec3, IVec3};
 use serde::{Serialize, Deserialize};
 
 use crate::metadata::Id;
@@ -24,6 +25,11 @@ impl Tilemap {
         }
         
         Self { width, height, tiles: vec }
+    }
+
+    pub fn get_pos(&self, pos:Vec3) -> &Option<Tile> {
+        let pos:IVec3 = pos.as_ivec3();
+        return self.get(pos.x, pos.y);
     }
 
     pub fn get(&self, x:i32, y:i32) -> &Option<Tile> {
