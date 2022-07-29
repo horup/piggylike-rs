@@ -1,7 +1,7 @@
 use bevy::{prelude::{World, Transform, Component}, sprite::{SpriteSheetBundle, TextureAtlasSprite}, math::{Vec2, Vec3}};
 use serde::{Serialize, Deserialize};
 use crate::metadata::{Id, ThingDef, Metadata};
-use super::{Player, Controller};
+use super::{Player, Controller, Velocity};
 
 #[derive(Component, Debug, Clone, Copy, Serialize, Deserialize, Default)]
 pub struct Thing {
@@ -33,6 +33,7 @@ pub fn spawn_thing(world:&mut World, x:f32, y:f32, thing_def_id:&Id, metadata:&M
             if thing_def.player {
                 e.insert(Player::default());
                 e.insert(Controller::default());
+                e.insert(Velocity::default());
             }
         }
     }

@@ -8,3 +8,6 @@ pub use controller::*;
 
 mod input;
 pub use input::*;
+
+mod physics;
+pub use physics::*;

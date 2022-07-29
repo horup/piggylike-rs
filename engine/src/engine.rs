@@ -44,7 +44,8 @@ impl Plugin for EnginePlugin {
         .add_plugin(ScriptPlugin)
         .add_system(systems::camera_system)
         .add_system(systems::controller_system)
-        .add_system(systems::input_system);
+        .add_system(systems::input_system)
+        .add_system(systems::physics_system);
     }
 }
 
