@@ -1,4 +1,4 @@
-use bevy::{prelude::{World, Transform, Component}, sprite::{SpriteSheetBundle, TextureAtlasSprite}, math::{Vec2, Vec3}};
+use bevy::{prelude::{World, Transform, Component, Entity}, sprite::{SpriteSheetBundle, TextureAtlasSprite}, math::{Vec2, Vec3}};
 use serde::{Serialize, Deserialize};
 use crate::metadata::{Id, ThingDef, Metadata};
 use super::{Player, Controller, Body};
@@ -8,7 +8,7 @@ pub struct Thing {
     pub thing_def:Id,
 }
 
-pub fn spawn_thing(world:&mut World, x:f32, y:f32, thing_def_id:&Id, metadata:&Metadata) {
+pub fn spawn_thing(world:&mut World, x:f32, y:f32, thing_def_id:&Id, metadata:&Metadata) -> Option<Entity> {
     if let Some(thing_def) = metadata.things.get(thing_def_id) {
         let atlas = thing_def.atlas as Id;
         if let Some(atlas_def) = metadata.atlases.get(&atlas) {
@@ -41,7 +41,11 @@ pub fn spawn_thing(world:&mut World, x:f32, y:f32, thing_def_id:&Id, metadata:&M
                     ..Default::default()
                 });
             }
+
+            return Some(e.id());
         }
     }
+
+    return None;
     
 }

@@ -2,7 +2,7 @@ use bevy::{prelude::*, asset::FileAssetIo, sprite::Anchor};
 use tiled::*;
 use std::path::PathBuf;
 
-use crate::{metadata::{Metadata, Id}, components};
+use crate::{metadata::{Metadata, Id}, components, resources::{Tilemap, self}};
 
 pub fn get_assets_path(world:&World) -> PathBuf {
     let asset_server = world.get_resource::<AssetServer>().unwrap();
@@ -21,20 +21,22 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
 
    
     let metadata = world.get_resource::<Metadata>().unwrap().clone();
+
     let mut map_width = 0;
     let mut map_height = 0;
-     // spawn tilemap
-     for layer in map.layers() {
+    // spawn tilemap
+    for layer in map.layers() {
         match layer.layer_type() {
             LayerType::TileLayer(tile_layer) => {
                 if let (Some(w), Some(h)) = (tile_layer.width(), tile_layer.height()) {
                     map_width = w;
                     map_height = h;
+                    let mut tilemap = Tilemap::new(map_width, map_height);
                     for y in 0..map.width {
                         for x in 0..map.height {
                             if let Some(tile) = tile_layer.get_tile(x as i32, y as i32) {
-                                let id = tile.id() as Id;
-                                let tile_def = metadata.tiles.get(&id).clone();
+                                let tile_def_id = tile.id() as Id;
+                                let tile_def = metadata.tiles.get(&tile_def_id).clone();
 
                                 if let Some(tile_def) = tile_def {
                                     let atlas_def = metadata.atlases.get(&tile_def.atlas).clone();
@@ -57,6 +59,11 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                                             ..default()
                                         });
                                     }
+                                    
+                                    tilemap.set(x as i32, y as i32, Some(resources::Tile {
+                                        solid: tile_def.solid,
+                                        tile_def: tile_def_id,
+                                    }));
                                 }
                             }
                         }
@@ -79,7 +86,6 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                                 let wx = obj.x / width + 0.5;
                                 let wy = map_height as f32 - obj.y / width + 0.5;
                                 let id = tile.id() as Id;
-                                
                                 let id = tile.id() as Id;
                                 components::spawn_thing(world, wx, wy, &id, &metadata);
                             }
