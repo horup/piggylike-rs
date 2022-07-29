@@ -34,21 +34,21 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                     let mut tilemap = Tilemap::new(map_width, map_height);
                     for y in 0..map.width {
                         for x in 0..map.height {
+                            let wx = x;
+                            let wy = map_height - y - 1;
                             if let Some(tile) = tile_layer.get_tile(x as i32, y as i32) {
                                 let tile_def_id = tile.id() as Id;
                                 let tile_def = metadata.tiles.get(&tile_def_id).clone();
-
                                 if let Some(tile_def) = tile_def {
                                     let atlas_def = metadata.atlases.get(&tile_def.atlas).clone();
-                                    let wx = x;
-                                    let wy = -(y as i32);
+                                   
                                     if let Some(atlas_def) = atlas_def {
                                         let mut tile = world.spawn();
                                         tile.insert_bundle(SpriteSheetBundle {
                                             sprite:TextureAtlasSprite {
                                                 index:tile_def.atlas_index as usize,
                                                 custom_size:Some(Vec2::new(1.0, 1.0)),
-                                                anchor:Anchor::TopLeft,
+                                                anchor:Anchor::BottomLeft,
                                                 ..Default::default()
                                             },
                                             texture_atlas: atlas_def.handle.clone(),
@@ -60,7 +60,7 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                                         });
                                     }
                                     
-                                    tilemap.set(x as i32, y as i32, Some(resources::Tile {
+                                    tilemap.set(x as i32, wy as i32, Some(resources::Tile {
                                         solid: tile_def.solid,
                                         tile_def: tile_def_id,
                                     }));
@@ -85,7 +85,7 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                         ObjectShape::Rect { width, height } => {
                             if let Some(tile) = obj.get_tile() {
                                 let wx = obj.x / width + 0.5;
-                                let wy = -obj.y / width + 0.5;
+                                let wy = map_height as f32 - obj.y / width + 0.5;
                                 let id = tile.id() as Id;
                                 let id = tile.id() as Id;
                                 components::spawn_thing(world, wx, wy, &id, &metadata);
