@@ -1256,6 +1256,8 @@ dependencies = [
  "bevy",
  "rune",
  "rune-modules",
+ "serde",
+ "serde_json",
  "tiled",
 ]
 

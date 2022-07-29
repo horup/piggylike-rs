@@ -4,7 +4,7 @@ use bevy::{prelude::{Commands, AssetServer, Res, ResMut, Assets, World}, sprite:
 use rune::{Module, runtime::Object, Value};
 use tiled::Loader;
 
-use crate::{metadata::{Metadata, Id, AtlasDef, TileDef, ThingDef}, map::load_map};
+use crate::{metadata::{Metadata, Id, AtlasDef, TileDef, ThingDef}, tiled::load_map};
 
 #[derive(Clone)]
 pub enum APICommand {

@@ -2,7 +2,7 @@ use bevy::{prelude::*, asset::FileAssetIo, sprite::Anchor};
 use tiled::*;
 use std::path::PathBuf;
 
-use crate::metadata::{Metadata, Id};
+use crate::{metadata::{Metadata, Id}, thing};
 
 pub fn get_assets_path(world:&World) -> PathBuf {
     let asset_server = world.get_resource::<AssetServer>().unwrap();
@@ -81,26 +81,8 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                                 let id = tile.id() as Id;
                                 
                                 if let Some(thing_def) = metadata.things.get(&id) {
-                                    let atlas = thing_def.atlas as Id;
-                                    if let Some(atlas_def) = metadata.atlases.get(&atlas) {
-                                        println!("ha");
-                                        let mut e = world.spawn();
-                                        e.insert_bundle(SpriteSheetBundle {
-                                            sprite:TextureAtlasSprite {
-                                                index:thing_def.atlas_index as usize,
-                                                custom_size:Some(Vec2::new(1.0, 1.0)),
-                                                ..Default::default()
-                                            },
-                                            texture_atlas: atlas_def.handle.clone(),
-                                            transform:Transform {
-                                                translation:Vec3::new(wx as f32, wy as f32, 0.0),
-                                                ..Default::default()
-                                            },
-                                            ..default()
-                                        });
-                                    }
+                                    thing::spawn_thing(world, wx, wy, &thing_def, &metadata);
                                 }
-
                             }
                         },
                         _=>{}
@@ -115,8 +97,8 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
     let mut camera_entity = world.spawn();
     let mut camera_bundle = OrthographicCameraBundle::new_2d();
     camera_bundle.orthographic_projection.scale = 1.0/16.0;
-  //  camera_bundle.transform.translation.x = width as f32 / 2.0;
-  //  camera_bundle.transform.translation.y = height as f32 / 2.0;
+    camera_bundle.transform.translation.x = map_width as f32 / 2.0;
+    camera_bundle.transform.translation.y = map_height as f32 / 2.0;
     camera_entity.insert_bundle(camera_bundle);
  
     
