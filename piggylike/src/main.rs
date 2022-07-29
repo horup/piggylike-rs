@@ -1,6 +1,6 @@
 #![allow(warnings, unused)]
 
-use engine::{bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}}, EnginePlugin};
+use engine::{bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}}, EnginePlugin, resources::Config};
 
 
 fn main() {
@@ -10,6 +10,9 @@ fn main() {
     .add_plugin(FrameTimeDiagnosticsPlugin::default())
    // .add_plugin(LogDiagnosticsPlugin::default())
     .add_plugin(EnginePlugin)
+    .insert_resource(Config {
+        pixel_snap_resolution: 1.0/16.0,
+    })
     .run();
 }
 /*

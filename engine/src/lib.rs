@@ -7,6 +7,8 @@ pub mod metadata;
 pub mod tiled;
 pub mod components;
 pub mod systems;
+pub mod resources;
+
 
 mod engine;
 pub use engine::*;

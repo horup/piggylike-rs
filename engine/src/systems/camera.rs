@@ -9,9 +9,5 @@ pub fn camera_system(
     set.p1().iter().for_each(|(_, transform)| translation = transform.translation.clone());
     set.p0().for_each_mut(|(_, mut transform)| {
         transform.translation = translation;
-
-        let alpha = 1.0/16.0;
-        let t = transform.translation;
-        transform.translation = Vec3::new((t.x / alpha).floor() * alpha, (t.y / alpha).floor() * alpha, t.z)
     });
 }

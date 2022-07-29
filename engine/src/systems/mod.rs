@@ -12,5 +12,8 @@ pub use input::*;
 mod physics;
 pub use physics::*;
 
+mod interpolation;
+pub use interpolation::*;
+
 mod render;
 pub use render::*;
