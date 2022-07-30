@@ -6,6 +6,7 @@ use crate::resources::Snapshot;
 
 pub fn snapshot_system(world:&mut World) {
     let snapshot = Snapshot::new(world);
+    world.insert_resource(snapshot.clone());
 
     let quick_save_path = "saves/quicksave.sav";
 
