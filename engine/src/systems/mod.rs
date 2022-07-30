@@ -17,3 +17,6 @@ pub use interpolation::*;
 
 mod render;
 pub use render::*;
+
+mod snapshot;
+pub use snapshot::*;

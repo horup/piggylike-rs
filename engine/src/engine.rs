@@ -18,7 +18,9 @@ impl Plugin for EnginePlugin {
         .add_system(input_system.before(controller_system))
         .add_system(physics_system.after(controller_system))
         .add_system(interpolation_system.after(physics_system))
-        .add_system(render_system);
+        .add_system(render_system)
+        .add_system_to_stage(CoreStage::PostUpdate, snapshot_system.exclusive_system())
+        ;
     }
 }
 
