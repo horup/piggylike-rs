@@ -30,16 +30,17 @@ pub fn spawn_thing(world:&mut World, x:f32, y:f32, thing_def_id:&Id, metadata:&M
                 },
                 ..Default::default()
             });
+
+            e.insert(Body {
+                pos:p,
+                size:1.0,
+                solid:thing_def.solid,
+                ..Default::default()
+            });
     
             if thing_def.player {
                 e.insert(Player::default());
                 e.insert(Controller::default());
-                e.insert(Body {
-                    pos:p,
-                    size:1.0,
-                    solid:thing_def.solid,
-                    ..Default::default()
-                });
             }
 
             return Some(e.id());
