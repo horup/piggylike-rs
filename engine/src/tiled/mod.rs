@@ -40,26 +40,6 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                                 let tile_def_id = tile.id() as Id;
                                 let tile_def = metadata.tiles.get(&tile_def_id).clone();
                                 if let Some(tile_def) = tile_def {
-                                  /*  let atlas_def = metadata.atlases.get(&tile_def.atlas).clone();
-                                   
-                                    if let Some(atlas_def) = atlas_def {
-                                        let mut tile = world.spawn();
-                                        tile.insert_bundle(SpriteSheetBundle {
-                                            sprite:TextureAtlasSprite {
-                                                index:tile_def.atlas_index as usize,
-                                                custom_size:Some(Vec2::new(1.0, 1.0)),
-                                                anchor:Anchor::BottomLeft,
-                                                ..Default::default()
-                                            },
-                                            texture_atlas: atlas_def.handle.clone(),
-                                            transform:Transform {
-                                                translation:Vec3::new(wx as f32, wy as f32, 0.0),
-                                                ..Default::default()
-                                            },
-                                            ..default()
-                                        });
-                                    }*/
-                                    
                                     tilemap.set(x as i32, wy as i32, Some(resources::Tile {
                                         solid: tile_def.solid,
                                         tile_def: tile_def_id,

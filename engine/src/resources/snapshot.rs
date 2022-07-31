@@ -1,7 +1,7 @@
 use bevy::{prelude::{Entity, World, Component}, utils::HashMap};
 use serde::{Serialize, Deserialize};
 
-use crate::components::{Player, Thing, Controller, Cam};
+use crate::components::{Player, Thing, Controller, Cam, Body};
 
 use super::Tilemap;
 
@@ -12,7 +12,8 @@ pub struct Snapshot {
     pub players:Vec<(Entity, Player)>,
     pub things:Vec<(Entity, Thing)>,
     pub controllers:Vec<(Entity, Controller)>,
-    pub cams:Components<Cam>
+    pub cams:Components<Cam>,
+    pub bodies:Components<Body>
 }
 
 impl Snapshot {
@@ -22,7 +23,8 @@ impl Snapshot {
             players:collect::<Player>(world),
             things:collect::<Thing>(world),
             controllers:collect::<Controller>(world),
-            cams:collect::<Cam>(world)
+            cams:collect::<Cam>(world),
+            bodies:collect::<Body>(world)
         }
     }
     pub fn restore(&self, world:&mut World) {
@@ -32,6 +34,9 @@ impl Snapshot {
         r.components(world, &self.things);
         r.components(world, &self.controllers);
         r.components(world, &self.cams);
+
+        println!("{:?}", self.bodies);
+        r.components(world, &self.bodies);
     }
 }
 
@@ -54,9 +59,11 @@ impl Snapshotter {
         world.insert_resource(res.clone());
     }
     pub fn components<T:Component + Clone>(&mut self, world:&mut World, components:&Vec<(Entity, T)>) {       
-        for (e, c) in components.iter() {
-            let e = *self.map.get(e).unwrap_or(&world.spawn().id());
+        for (org_e, c) in components.iter() {
+            let e = *self.map.get(org_e).unwrap_or(&world.spawn().id());
             world.entity_mut(e).insert::<T>(c.clone());
+
+            self.map.insert(*org_e, e);
         }
     }
 }
