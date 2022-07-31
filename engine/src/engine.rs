@@ -10,6 +10,7 @@ impl Plugin for EnginePlugin {
     
     fn build(&self, app: &mut App) {
         app
+        .insert_resource(Msaa {samples: 1})
         .add_plugin(MetadataPlugin)
         .add_plugin(ScriptPlugin)
         .add_plugin(ResourcesPlugin)

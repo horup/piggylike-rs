@@ -7,7 +7,6 @@ pub fn spawn_camera_system(mut commands:Commands, query:Query<(Entity, Added<Cam
         if added {
             let mut e = commands.entity(e);
             let mut camera_bundle = OrthographicCameraBundle::new_2d();
-            camera_bundle.orthographic_projection.scale = 1.0/16.0;
             e.insert_bundle(camera_bundle);
         }
     });

@@ -17,4 +17,16 @@ impl Config {
 
         return v;
     }
+
+    pub fn snap_vec32(mut v:Vec3, resolution:f32) -> Vec3 {
+        if resolution <= 0.0 {
+            return v;
+        }
+        
+        for i in 0..3 {
+            v[i] = (v[i] / resolution).floor() * resolution;
+        }
+
+        return v;
+    }
 }

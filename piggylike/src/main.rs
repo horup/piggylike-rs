@@ -10,7 +10,7 @@ fn main() {
    // .add_plugin(LogDiagnosticsPlugin::default())
     .add_plugin(EnginePlugin)
     .insert_resource(Config {
-        pixel_snap_resolution: 1.0/16.0,
+        pixel_snap_resolution: 1.0/48.0,
     })
     .run();
 }
