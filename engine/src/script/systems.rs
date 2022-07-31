@@ -45,7 +45,4 @@ pub fn setup(world: &mut World) {
     let mut api = API::default();
     vm.call(&["main"], (&mut api, )).unwrap();
     api.process(world,);
-
-    println!("setup 2");
-
 }

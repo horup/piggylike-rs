@@ -12,5 +12,8 @@ pub use controller::*;
 mod thing;
 pub use thing::*;
 
+mod cam;
+pub use cam::*;
+
 use crate::metadata::{ThingDef, Metadata, Id};
 

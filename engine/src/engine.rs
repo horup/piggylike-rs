@@ -20,6 +20,8 @@ impl Plugin for EnginePlugin {
         .add_system(interpolation_system.after(physics_system))
         .add_system(render_system)
         .add_system_to_stage(CoreStage::PostUpdate, snapshot_system.exclusive_system())
+        .add_system_to_stage(CoreStage::PreUpdate, spawn_camera)
+        .add_system_to_stage(CoreStage::PreUpdate, spawn_tilemap)
         ;
     }
 }

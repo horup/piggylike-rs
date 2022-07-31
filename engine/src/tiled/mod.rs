@@ -2,7 +2,7 @@ use bevy::{prelude::*, asset::FileAssetIo, sprite::Anchor};
 use tiled::*;
 use std::path::PathBuf;
 
-use crate::{metadata::{Metadata, Id}, components, resources::{Tilemap, self}};
+use crate::{metadata::{Metadata, Id}, components::{self, Cam}, resources::{Tilemap, self}};
 
 pub fn get_assets_path(world:&World) -> PathBuf {
     let asset_server = world.get_resource::<AssetServer>().unwrap();
@@ -40,7 +40,7 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                                 let tile_def_id = tile.id() as Id;
                                 let tile_def = metadata.tiles.get(&tile_def_id).clone();
                                 if let Some(tile_def) = tile_def {
-                                    let atlas_def = metadata.atlases.get(&tile_def.atlas).clone();
+                                  /*  let atlas_def = metadata.atlases.get(&tile_def.atlas).clone();
                                    
                                     if let Some(atlas_def) = atlas_def {
                                         let mut tile = world.spawn();
@@ -58,11 +58,12 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                                             },
                                             ..default()
                                         });
-                                    }
+                                    }*/
                                     
                                     tilemap.set(x as i32, wy as i32, Some(resources::Tile {
                                         solid: tile_def.solid,
                                         tile_def: tile_def_id,
+                                        entity:None
                                     }));
                                 }
                             }
@@ -100,12 +101,17 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
     }
 
     // create a camera and center it on the map
-    let mut camera_entity = world.spawn();
+   /* let mut camera_entity = world.spawn();
     let mut camera_bundle = OrthographicCameraBundle::new_2d();
     camera_bundle.orthographic_projection.scale = 1.0/16.0;
     camera_bundle.transform.translation.x = map_width as f32 / 2.0;
     camera_bundle.transform.translation.y = map_height as f32 / 2.0;
-    camera_entity.insert_bundle(camera_bundle);
+    camera_entity.insert_bundle(camera_bundle);*/
+
+    let mut camera_entity = world.spawn();
+    camera_entity.insert(Cam {
+        zoom: 1.0 / 16.0
+    });
  
     
    /* commands.spawn_bundle(camera_bundle);

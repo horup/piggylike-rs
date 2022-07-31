@@ -1,4 +1,4 @@
-use bevy::math::{Vec3, IVec3};
+use bevy::{math::{Vec3, IVec3}, prelude::Entity};
 use serde::{Serialize, Deserialize};
 
 use crate::metadata::Id;
@@ -6,7 +6,9 @@ use crate::metadata::Id;
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, Default)]
 pub struct Tile {
     pub solid:bool,
-    pub tile_def:Id 
+    pub tile_def:Id,
+    #[serde(skip_serializing)]
+    pub entity:Option<Entity>
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -45,6 +47,23 @@ impl Tilemap {
         }
 
         return &None; 
+    }
+
+    pub fn get_mut(&mut self, x:i32, y:i32) -> Option<&mut Tile> {
+        if x < 0 || x > self.width as i32 || y < 0 || y > self.height as i32 {
+            return None;
+        }
+
+        let index = y * self.width as i32 + x;
+        let index = index as usize;
+        
+        if let Some(tile) = self.tiles.get_mut(index) {
+            if let Some(tile) = tile {
+                return Some(tile);
+            }
+        }
+
+        return None; 
     }
 
     pub fn set(&mut self, x:i32, y:i32, tile:Option<Tile>) {

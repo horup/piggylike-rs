@@ -1,33 +1,37 @@
 use bevy::{prelude::{Entity, World, Component}, utils::HashMap};
 use serde::{Serialize, Deserialize};
 
-use crate::components::{Player, Thing, Controller};
+use crate::components::{Player, Thing, Controller, Cam};
 
 use super::Tilemap;
 
+type Components<T:Default + Component + Clone> = Vec<(Entity, T)>;
 #[derive(Clone, Debug, Default, rune::Any, Serialize, Deserialize)]
 pub struct Snapshot {
     pub tilemap:Tilemap,
-    pub player:Vec<(Entity, Player)>,
+    pub players:Vec<(Entity, Player)>,
     pub things:Vec<(Entity, Thing)>,
-    pub controllers:Vec<(Entity, Controller)>
+    pub controllers:Vec<(Entity, Controller)>,
+    pub cams:Components<Cam>
 }
 
 impl Snapshot {
     pub fn new(world:&mut World) -> Self {
         Snapshot {
             tilemap:collect_resource::<Tilemap>(world),
-            player:collect::<Player>(world),
+            players:collect::<Player>(world),
             things:collect::<Thing>(world),
-            controllers:collect::<Controller>(world)
+            controllers:collect::<Controller>(world),
+            cams:collect::<Cam>(world)
         }
     }
     pub fn restore(&self, world:&mut World) {
         let mut r = Snapshotter::default();
         r.resource(world, &self.tilemap);
-        r.components(world, &self.player);
+        r.components(world, &self.players);
         r.components(world, &self.things);
         r.components(world, &self.controllers);
+        r.components(world, &self.cams);
     }
 }
 
