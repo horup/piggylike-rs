@@ -15,5 +15,8 @@ pub use thing::*;
 mod cam;
 pub use cam::*;
 
+mod tilesprite;
+pub use tilesprite::*;
+
 use crate::metadata::{ThingDef, Metadata, Id};
 

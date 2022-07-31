@@ -2,7 +2,7 @@ use std::{path::Path, fs::{create_dir_all, read_to_string}};
 
 use bevy::prelude::*;
 
-use crate::resources::Snapshot;
+use crate::resources::{Snapshot, History};
 
 pub fn snapshot_system(world:&mut World) {
     let snapshot = Snapshot::new(world);
@@ -31,6 +31,25 @@ pub fn snapshot_system(world:&mut World) {
 
                 },
                 Err(err) => println!("{:?}", err),
+            }
+        }
+    };
+
+    let dt = world.get_resource::<Time>().unwrap().delta_seconds();
+    if let Some(mut history) = world.get_resource_mut::<History>() {
+        if history.timer_sec > history.interval_sec {
+            history.history.push(snapshot);
+            history.timer_sec = 0.0;
+        }
+
+        history.timer_sec += dt;
+    }
+
+    if world.get_resource::<Input<KeyCode>>().unwrap().pressed(KeyCode::F1) {
+        if let Some(mut history) = world.get_resource_mut::<History>() {
+            if let Some(snapshot) = history.history.pop() {
+                world.clear_entities();
+                snapshot.restore(world);
             }
         }
     };
