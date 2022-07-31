@@ -34,8 +34,6 @@ impl Snapshot {
         r.components(world, &self.things);
         r.components(world, &self.controllers);
         r.components(world, &self.cams);
-
-        println!("{:?}", self.bodies);
         r.components(world, &self.bodies);
     }
 }
