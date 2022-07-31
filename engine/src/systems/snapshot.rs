@@ -36,8 +36,12 @@ pub fn snapshot_system(world:&mut World) {
     let dt = world.get_resource::<Time>().unwrap().delta_seconds();
     if let Some(mut history) = world.get_resource_mut::<History>() {
         if history.timer_sec > history.interval_sec {
-            history.history.push(snapshot.clone());
+            history.snapshots.push_front(snapshot.clone());
             history.timer_sec = 0.0;
+            
+            if history.snapshots.len() > history.max_snapshots {
+                history.snapshots.pop_back();
+            }
         }
 
         history.timer_sec += dt;
