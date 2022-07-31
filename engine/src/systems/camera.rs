@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, render::camera::ScalingMode};
 
 use crate::components::Player;
 
