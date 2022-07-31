@@ -26,9 +26,7 @@ pub fn snapshot_system(world:&mut World) {
             match serde_json::from_str::<Snapshot>(&s) {
                 Ok(snapshot) => {
                     world.clear_entities();
-
                     snapshot.restore(world);
-
                 },
                 Err(err) => println!("{:?}", err),
             }
@@ -38,19 +36,12 @@ pub fn snapshot_system(world:&mut World) {
     let dt = world.get_resource::<Time>().unwrap().delta_seconds();
     if let Some(mut history) = world.get_resource_mut::<History>() {
         if history.timer_sec > history.interval_sec {
-            history.history.push(snapshot);
+            history.history.push(snapshot.clone());
             history.timer_sec = 0.0;
         }
 
         history.timer_sec += dt;
     }
 
-    if world.get_resource::<Input<KeyCode>>().unwrap().pressed(KeyCode::F1) {
-        if let Some(mut history) = world.get_resource_mut::<History>() {
-            if let Some(snapshot) = history.history.pop() {
-                world.clear_entities();
-                snapshot.restore(world);
-            }
-        }
-    };
+  
 }

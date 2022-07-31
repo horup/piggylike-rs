@@ -23,6 +23,7 @@ impl Plugin for EnginePlugin {
         .add_system_to_stage(CoreStage::PreUpdate, spawn_camera_system)
         .add_system_to_stage(CoreStage::PreUpdate, spawn_tilemap_system)
         .add_system_to_stage(CoreStage::PreUpdate, spawn_things_system)
+        .add_system_to_stage(CoreStage::PreUpdate, history_system.exclusive_system().at_start())
         ;
     }
 }

@@ -23,3 +23,6 @@ pub use snapshot::*;
 
 mod spawn;
 pub use spawn::*;
+
+mod history;
+pub use history::*;
