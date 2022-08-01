@@ -1,10 +1,14 @@
 #![allow(warnings, unused)]
 
-use engine::{bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}}, EnginePlugin, resources::Config};
+use engine::{bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}, window::{WindowMode, PresentMode}}, EnginePlugin, resources::Config};
 
 
 fn main() {
     App::new()
+    .insert_resource(WindowDescriptor {
+        present_mode:PresentMode::Mailbox,
+        ..Default::default()
+    })
     .add_plugins(DefaultPlugins)
     .add_plugin(FrameTimeDiagnosticsPlugin::default())
   //  .add_plugin(LogDiagnosticsPlugin::default())
@@ -12,6 +16,7 @@ fn main() {
     .insert_resource(Config {
         pixel_snap_resolution: 1.0/48.0,
     })
+   
     .run();
 }
 /*
