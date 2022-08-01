@@ -1,6 +1,6 @@
 use bevy::{prelude::*, sprite::Anchor};
 use rune::compile::Meta;
-use crate::{components::{Cam, Thing, Tilesprite}, resources::Tilemap, metadata::Metadata};
+use crate::{components::{Cam, Thing, Tilesprite}, resources::Tilemap, resources::Metadata};
 
 pub fn spawn_camera_system(mut commands:Commands, query:Query<(Entity, Added<Cam>)>) {
     query.for_each(|(e, added)| {

@@ -4,7 +4,7 @@ use std::{sync::{Arc, Mutex}, path::{Path, PathBuf}};
 use bevy::{asset::{AssetServerSettings, FileAssetIo}, prelude::{Res, AssetServer, Commands, ResMut, Assets, World}, sprite::TextureAtlas, math::Vec2};
 use rune::{Module, Sources, Source, Diagnostics, prepare, termcolor::{StandardStream, ColorChoice}, Vm, runtime::Object, Value};
 
-use crate::{metadata::{Metadata, Id, AtlasDef, TileDef, ThingDef}, tiled::load_map};
+use crate::{resources::{Metadata, Id, AtlasDef, TileDef, ThingDef}, tiled::load_map};
 
 pub struct ScriptVm {
     pub vm:Arc<Mutex<Vm>>
@@ -22,11 +22,11 @@ pub enum APICommand {
 }
 
 #[derive(rune::Any, Default)]
-pub struct API {
+pub struct ExclusiveContext {
     commands:Vec<APICommand>,
 }
 
-impl API {
+impl ExclusiveContext {
     pub fn process(&mut self, world:&mut World) {
         for cmd in self.commands.drain(..) {
             match cmd {
@@ -93,7 +93,7 @@ impl API {
     }
 
     pub fn register(module:&mut Module) {
-        module.ty::<API>();
+        module.ty::<ExclusiveContext>();
         module.inst_fn("define_atlas", Self::define_atlas).unwrap();
         module.inst_fn("define_tile", Self::define_tile).unwrap();
         module.inst_fn("define_thing", Self::define_thing).unwrap();
@@ -153,7 +153,7 @@ pub fn setup(world: &mut World) {
    
 
     let mut module = Module::with_crate("engine");
-    API::register(&mut module);
+    ExclusiveContext::register(&mut module);
 
     let mut context = rune_modules::default_context().unwrap();
     context.install(&module).unwrap();
@@ -176,7 +176,7 @@ pub fn setup(world: &mut World) {
 
     let mut vm = Vm::new(runtime, Arc::new(unit.unwrap()));
     
-    let mut api = API::default();
+    let mut api = ExclusiveContext::default();
     vm.call(&["main"], (&mut api, )).unwrap();
     api.process(world,);
 

@@ -1,6 +1,6 @@
 use bevy::{prelude::{World, Transform, Component, Entity}, sprite::{SpriteSheetBundle, TextureAtlasSprite}, math::{Vec2, Vec3}};
 use serde::{Serialize, Deserialize};
-use crate::metadata::{Id, ThingDef, Metadata};
+use crate::resources::{Id, ThingDef, Metadata};
 use super::{Player, Controller, Body};
 
 #[derive(Component, Debug, Clone, Copy, Serialize, Deserialize, Default)]

@@ -1,6 +1,6 @@
 use bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}, asset::FileAssetIo};
 
-use crate::{metadata::MetadataPlugin, systems, resources::ResourcesPlugin};
+use crate::{systems, resources::ResourcesPlugin};
 use systems::*;
 
 
@@ -9,9 +9,9 @@ pub struct EnginePlugin;
 impl Plugin for EnginePlugin {
     
     fn build(&self, app: &mut App) {
+
         app
         .insert_resource(Msaa {samples: 1})
-        .add_plugin(MetadataPlugin)
         .add_plugin(ResourcesPlugin)
         .add_system(camera_system.after(interpolation_system).before(render_system))
         .add_system(controller_system)

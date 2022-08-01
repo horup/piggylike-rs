@@ -16,6 +16,9 @@ pub struct ResourcesPlugin;
 mod scriptvm;
 pub use scriptvm::{ScriptVm};
 
+mod metadata;
+pub use metadata::*;
+
 impl Plugin for ResourcesPlugin {
     fn build(&self, app: &mut App) {
         app
@@ -23,6 +26,7 @@ impl Plugin for ResourcesPlugin {
         .insert_resource(Tilemap::default())
         .insert_resource(Snapshot::default())
         .insert_resource(History::default())
+        .insert_resource(Metadata::default())
         .add_startup_system(scriptvm::setup.exclusive_system().at_start())
         ;
     }

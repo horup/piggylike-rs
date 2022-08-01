@@ -1,7 +1,7 @@
 use bevy::{math::{Vec3, IVec3}, prelude::Entity};
 use serde::{Serialize, Deserialize};
 
-use crate::metadata::Id;
+use crate::resources::Id;
 
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, Default)]
 pub struct Tile {

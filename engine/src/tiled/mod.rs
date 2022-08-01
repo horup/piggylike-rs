@@ -2,7 +2,7 @@ use bevy::{prelude::*, asset::FileAssetIo, sprite::Anchor};
 use tiled::*;
 use std::path::PathBuf;
 
-use crate::{metadata::{Metadata, Id}, components::{self, Cam}, resources::{Tilemap, self}};
+use crate::{resources::{Metadata, Id}, components::{self, Cam}, resources::{Tilemap, self}};
 
 pub fn get_assets_path(world:&World) -> PathBuf {
     let asset_server = world.get_resource::<AssetServer>().unwrap();

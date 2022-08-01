@@ -1,6 +1,7 @@
+use std::collections::HashMap;
 use bevy::{prelude::Handle, sprite::TextureAtlas};
 
-use super::Id;
+pub type Id = u64;
 
 #[derive(Default, Clone)]
 pub struct AtlasDef {
@@ -20,4 +21,12 @@ pub struct ThingDef {
     pub atlas_index:u32,
     pub player:bool,
     pub solid:bool
+}
+
+
+#[derive(Default, Clone)]
+pub struct Metadata {
+    pub atlases:HashMap<Id, AtlasDef>,
+    pub tiles:HashMap<Id, TileDef>,
+    pub things:HashMap<Id, ThingDef>
 }
