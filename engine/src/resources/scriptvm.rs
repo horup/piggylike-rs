@@ -1,10 +1,12 @@
 
-use std::{sync::{Arc, Mutex}, path::{Path, PathBuf}};
+use std::{sync::{Arc, Mutex}, path::{Path, PathBuf}, fs::read_to_string};
 
 use bevy::{asset::{AssetServerSettings, FileAssetIo}, prelude::{Res, AssetServer, Commands, ResMut, Assets, World}, sprite::TextureAtlas, math::Vec2};
 use rune::{Module, Sources, Source, Diagnostics, prepare, termcolor::{StandardStream, ColorChoice}, Vm, runtime::Object, Value};
 
 use crate::{resources::{Metadata, Id, AtlasDef, TileDef, ThingDef}, tiled::load_map};
+
+use super::Snapshot;
 
 pub struct ScriptVm {
     pub vm:Arc<Mutex<Vm>>
@@ -14,23 +16,24 @@ unsafe impl Sync for ScriptVm {}
 
 
 #[derive(Clone)]
-pub enum APICommand {
+pub enum ExclusiveContextCommands {
     DefineAtlas((Id, Object)),
     DefineTile((Id, Object)),
     DefineThing((Id, Object)),
-    LoadMap(String)
+    LoadMap(String),
+    Quickload,
 }
 
 #[derive(rune::Any, Default)]
 pub struct ExclusiveContext {
-    commands:Vec<APICommand>,
+    commands:Vec<ExclusiveContextCommands>,
 }
 
 impl ExclusiveContext {
     pub fn process(&mut self, world:&mut World) {
         for cmd in self.commands.drain(..) {
             match cmd {
-                APICommand::DefineAtlas((id, atlas)) => {
+                ExclusiveContextCommands::DefineAtlas((id, atlas)) => {
                     let id = id.clone();
                     let columns = get_i64(atlas.get("columns"));
                     let rows = get_i64(atlas.get("rows"));
@@ -46,7 +49,7 @@ impl ExclusiveContext {
                         handle:texture_atlas_handle
                     });
                 },
-                APICommand::DefineTile((id, tile)) => {
+                ExclusiveContextCommands::DefineTile((id, tile)) => {
                     let atlas = get_i64(tile.get("atlas")) as u64;
                     let atlas_index = get_i64(tile.get("atlas_index")) as u32;
                     let solid = get_bool(tile.get("solid"));
@@ -57,10 +60,10 @@ impl ExclusiveContext {
                         solid: solid,
                     });
                 },
-                APICommand::LoadMap(map_path) => {
+                ExclusiveContextCommands::LoadMap(map_path) => {
                     load_map(world, &map_path);
                 },
-                APICommand::DefineThing((id, thing)) => {
+                ExclusiveContextCommands::DefineThing((id, thing)) => {
                     let atlas = get_i64(thing.get("atlas")) as Id;
                     let atlas_index = get_i64(thing.get("atlas_index")) as u32;
                     let solid = get_bool(thing.get("solid"));
@@ -72,24 +75,40 @@ impl ExclusiveContext {
                         solid,
                     });
                 },
+                ExclusiveContextCommands::Quickload => {
+                    let quick_save_path = "saves/quicksave.sav";
+                    if let Ok(s) = read_to_string(&quick_save_path) {
+                        match serde_json::from_str::<Snapshot>(&s) {
+                            Ok(snapshot) => {
+                                world.clear_entities();
+                                snapshot.restore(world);
+                            },
+                            Err(err) => println!("{:?}", err),
+                        }
+                    }
+                },
             }
         }
     }
 
     pub fn define_atlas(&mut self, id:Id, atlas:Object) {
-        self.commands.push(APICommand::DefineAtlas((id, atlas)));
+        self.commands.push(ExclusiveContextCommands::DefineAtlas((id, atlas)));
     }
 
     pub fn define_tile(&mut self, id:Id, tile:Object) {
-        self.commands.push(APICommand::DefineTile((id, tile)));
+        self.commands.push(ExclusiveContextCommands::DefineTile((id, tile)));
     }
 
     pub fn define_thing(&mut self, id:Id, thing:Object) {
-        self.commands.push(APICommand::DefineThing((id, thing)));
+        self.commands.push(ExclusiveContextCommands::DefineThing((id, thing)));
     }
 
     pub fn load_map(&mut self, map:String) {
-        self.commands.push(APICommand::LoadMap(map));
+        self.commands.push(ExclusiveContextCommands::LoadMap(map));
+    }
+
+    pub fn quickload(&mut self) {
+        self.commands.push(ExclusiveContextCommands::Quickload);
     }
 
     pub fn register(module:&mut Module) {
@@ -98,6 +117,7 @@ impl ExclusiveContext {
         module.inst_fn("define_tile", Self::define_tile).unwrap();
         module.inst_fn("define_thing", Self::define_thing).unwrap();
         module.inst_fn("load_map", Self::load_map).unwrap();
+        module.inst_fn("quickload", Self::quickload).unwrap();
     }
 }
 

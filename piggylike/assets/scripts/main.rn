@@ -10,4 +10,5 @@ pub fn main(engine) {
     things::define(engine);
 
     engine.load_map("maps/test.tmx");
+    engine.quickload();
 }
