@@ -2,7 +2,6 @@
 pub use bevy;
 use bevy::prelude::*;
 
-pub mod script;
 pub mod metadata;
 pub mod tiled;
 pub mod components;

@@ -1,10 +1,17 @@
-use std::{cell::UnsafeCell, path::PathBuf};
 
-use bevy::{prelude::{Commands, AssetServer, Res, ResMut, Assets, World}, sprite::TextureAtlas, math::Vec2, asset::FileAssetIo};
-use rune::{Module, runtime::Object, Value};
-use tiled::Loader;
+use std::{sync::{Arc, Mutex}, path::{Path, PathBuf}};
+
+use bevy::{asset::{AssetServerSettings, FileAssetIo}, prelude::{Res, AssetServer, Commands, ResMut, Assets, World}, sprite::TextureAtlas, math::Vec2};
+use rune::{Module, Sources, Source, Diagnostics, prepare, termcolor::{StandardStream, ColorChoice}, Vm, runtime::Object, Value};
 
 use crate::{metadata::{Metadata, Id, AtlasDef, TileDef, ThingDef}, tiled::load_map};
+
+pub struct ScriptVm {
+    pub vm:Arc<Mutex<Vm>>
+}
+unsafe impl Send for ScriptVm {}
+unsafe impl Sync for ScriptVm {}
+
 
 #[derive(Clone)]
 pub enum APICommand {
@@ -132,4 +139,49 @@ pub fn get_string(value: Option<&Value>) -> String {
     }
 
     return String::default();
+}
+
+
+//pub fn setup(mut commands:Commands, mut metadata:ResMut<Metadata>, asset_server:Res<AssetServer>, mut texture_atlases:ResMut<Assets<TextureAtlas>>, world: &mut World) {
+pub fn setup(world: &mut World) {
+    let asset_server = world.get_resource::<AssetServer>().unwrap();
+    let asset_io = asset_server.asset_io().downcast_ref::<FileAssetIo>().unwrap();
+    let assets_path = asset_io.root_path().clone();
+    let mut script_path = assets_path.clone();
+    script_path.push("scripts");
+    script_path.push("main.rn");
+   
+
+    let mut module = Module::with_crate("engine");
+    API::register(&mut module);
+
+    let mut context = rune_modules::default_context().unwrap();
+    context.install(&module).unwrap();
+    let mut runtime = Arc::new(context.runtime());
+
+    let mut sources = Sources::new();
+    let source = Source::from_path(script_path.as_path()).unwrap();
+    sources.insert(source);
+
+    let mut diagnostics = Diagnostics::new();
+    let unit = prepare(&mut sources)
+        .with_context(&context)
+        .with_diagnostics(&mut diagnostics)
+        .build();
+
+    if !diagnostics.is_empty() {
+        let mut writer = StandardStream::stderr(ColorChoice::Always);
+        diagnostics.emit(&mut writer, &sources).unwrap();
+    }
+
+    let mut vm = Vm::new(runtime, Arc::new(unit.unwrap()));
+    
+    let mut api = API::default();
+    vm.call(&["main"], (&mut api, )).unwrap();
+    api.process(world,);
+
+    //world.insert_resource(vm);
+    world.insert_resource(ScriptVm {
+        vm:Arc::new(Mutex::new(vm))
+    });
 }
