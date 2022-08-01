@@ -18,5 +18,4 @@ pub use cam::*;
 mod tilesprite;
 pub use tilesprite::*;
 
-use crate::resources::{ThingDef, Metadata, Id};
 
