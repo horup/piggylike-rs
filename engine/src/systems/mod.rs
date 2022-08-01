@@ -35,10 +35,11 @@ impl Plugin for SystemsPlugin {
         // startup
 
         // preupdate
+        app.add_system_to_stage(CoreStage::PreUpdate, history_system.exclusive_system().at_start());
+
         app.add_system_to_stage(CoreStage::PreUpdate, spawn_camera_system);
         app.add_system_to_stage(CoreStage::PreUpdate, spawn_tilemap_system);
         app.add_system_to_stage(CoreStage::PreUpdate, spawn_things_system);
-        app.add_system_to_stage(CoreStage::PreUpdate, history_system.exclusive_system().at_start());
 
         // update
         app.add_system(camera_system.after(interpolation_system).before(render_system));

@@ -8,6 +8,7 @@ pub fn history_system(world:&mut World) {
             if let Some(snapshot) = history.snapshots.pop_front() {
                 world.clear_entities();
                 snapshot.restore(world);
+                println!("cleared!");
             }
         }
     };

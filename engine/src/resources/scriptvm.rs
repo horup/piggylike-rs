@@ -43,6 +43,13 @@ impl ExclusiveContext {
         
                     let texture_handle = world.get_resource::<AssetServer>().unwrap().load(&texture_path);
                     let mut texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(width, height), columns as usize, rows as usize);
+                    let a = 0.01;
+                    for r in texture_atlas.textures.iter_mut() {
+                        r.min.x += a;
+                        r.min.y +=  a;
+                        r.max.x -= a;
+                        r.max.y -= a;
+                    }
                     let texture_atlas_handle = world.get_resource_mut::<Assets<TextureAtlas>>().unwrap().add(texture_atlas);
                     
                     world.get_resource_mut::<Metadata>().unwrap().atlases.insert(id, AtlasDef {
