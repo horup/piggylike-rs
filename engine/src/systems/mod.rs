@@ -30,6 +30,9 @@ pub use history::*;
 mod touch;
 pub use touch::*;
 
+mod proximity;
+pub use proximity::*;
+
 
 pub struct SystemsPlugin;
 
@@ -52,6 +55,7 @@ impl Plugin for SystemsPlugin {
         app.add_system(interpolation_system.after(physics_system));
         app.add_system(render_system);
         app.add_system(touch_system.after(physics_system));
+        app.add_system(proximity_system.after(touch_system));
 
         // post update
         app.add_system_to_stage(CoreStage::PostUpdate, snapshot_system.exclusive_system());
