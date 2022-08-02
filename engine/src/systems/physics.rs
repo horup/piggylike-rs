@@ -94,7 +94,7 @@ pub fn physics_system(mut query:Query<(Entity, &mut Body)>, time:ResMut<Time>, t
             }
         }
 
-        *cloned_bodies.get_mut(&entity).unwrap().pos = *body.pos;
+        cloned_bodies.get_mut(&entity).unwrap().pos = body.pos;
     }
     
     

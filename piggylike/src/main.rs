@@ -1,19 +1,16 @@
 #![allow(warnings, unused)]
 
-use engine::{bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}, window::{WindowMode, PresentMode}, render::settings::{self, Backends}}, EnginePlugin, resources::Config};
+use engine::{bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}, window::{WindowMode, PresentMode}, render::{settings::{self, Backends}, texture::ImageSettings}}, EnginePlugin, resources::Config};
 
 
 fn main() {
     App::new()
-    .insert_resource(settings::WgpuSettings {
-        backends:Some(Backends::PRIMARY),
-        ..Default::default()
-    })
     .insert_resource(WindowDescriptor {
         present_mode:PresentMode::Fifo,
         mode:WindowMode::Windowed,
         ..Default::default()
     })
+    .insert_resource(ImageSettings::default_nearest())
     .add_plugins(DefaultPlugins)
     .add_plugin(FrameTimeDiagnosticsPlugin::default())
   //  .add_plugin(LogDiagnosticsPlugin::default())

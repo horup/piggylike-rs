@@ -6,7 +6,7 @@ pub fn spawn_camera_system(mut commands:Commands, query:Query<(Entity, Added<Cam
     query.for_each(|(e, added)| {
         if added {
             let mut e = commands.entity(e);
-            let mut camera_bundle = OrthographicCameraBundle::new_2d();
+            let mut camera_bundle = Camera2dBundle::default();
             e.insert_bundle(camera_bundle);
         }
     });

@@ -1,4 +1,4 @@
-use bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}, asset::FileAssetIo};
+use bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}, asset::FileAssetIo, render::texture::ImageSettings};
 
 use crate::{systems, resources::ResourcesPlugin, events::EventsPlugin};
 use systems::*;
