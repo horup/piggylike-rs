@@ -6,6 +6,7 @@ pub mod tiled;
 pub mod components;
 pub mod systems;
 pub mod resources;
+pub mod events;
 
 
 mod engine;

@@ -1,6 +1,6 @@
 use bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}, asset::FileAssetIo};
 
-use crate::{systems, resources::ResourcesPlugin};
+use crate::{systems, resources::ResourcesPlugin, events::EventsPlugin};
 use systems::*;
 
 
@@ -14,6 +14,7 @@ impl Plugin for EnginePlugin {
         .insert_resource(Msaa {samples: 1})
         .add_plugin(ResourcesPlugin)
         .add_plugin(SystemsPlugin)
+        .add_plugin(EventsPlugin)
         ;
     }
 }

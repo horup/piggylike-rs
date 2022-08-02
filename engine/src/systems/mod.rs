@@ -27,6 +27,9 @@ pub use spawn::*;
 mod history;
 pub use history::*;
 
+mod touch;
+pub use touch::*;
+
 
 pub struct SystemsPlugin;
 
@@ -48,6 +51,7 @@ impl Plugin for SystemsPlugin {
         app.add_system(physics_system.after(controller_system));
         app.add_system(interpolation_system.after(physics_system));
         app.add_system(render_system);
+        app.add_system(touch_system.after(physics_system));
 
         // post update
         app.add_system_to_stage(CoreStage::PostUpdate, snapshot_system.exclusive_system());

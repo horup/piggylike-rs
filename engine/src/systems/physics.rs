@@ -1,9 +1,9 @@
 use bevy::{prelude::*, utils::HashMap};
 use parry2d::{shape::Cuboid, query::{self, Contact}, na::Isometry2};
 
-use crate::{components::Body, resources::Tilemap};
+use crate::{components::Body, resources::Tilemap, events::{TouchEvent, Touchee}};
 
-pub fn physics_system(mut query:Query<(Entity, &mut Body)>, time:ResMut<Time>, tilemap:Res<Tilemap>) {
+pub fn physics_system(mut query:Query<(Entity, &mut Body)>, time:ResMut<Time>, tilemap:Res<Tilemap>, mut touch_events:EventWriter<TouchEvent>) {
     let dt = time.delta_seconds().min(0.1);
     
     let mut cloned_bodies:HashMap<Entity, Body> = query.iter().map(|(entity, body)| (entity, body.clone())).into_iter().collect();
@@ -23,6 +23,7 @@ pub fn physics_system(mut query:Query<(Entity, &mut Body)>, time:ResMut<Time>, t
         let tile_shape = Cuboid::new([size, size].into());
         let vels = [Vec3::new(body.vel.x, 0.0, 0.0) * dt, Vec3::new(0.0, body.vel.y, 0.0) * dt];
         let mut contact_entity:Option<Entity> = None;
+        let mut contact_tile:Option<IVec2> = None;
     
         for vel in vels {
             if vel.length() > 0.0 {
@@ -30,9 +31,9 @@ pub fn physics_system(mut query:Query<(Entity, &mut Body)>, time:ResMut<Time>, t
                 let tiles = Body::get_tiles_in_front(new_pos, [if vel.x > 0.0 {1} else if vel.x < 0.0 {-1} else {0}, if vel.y > 0.0 {1} else if vel.y < 0.0 {-1} else {0}].into());
                 
                 let mut contact:Option<Contact> = None;
-                for tile in tiles {
-                    let tile_pos = Vec2::new(tile.x as f32 + 0.5, tile.y as f32 + 0.5);
-                    if let Some(tile) = tilemap.get(tile.x as i32, tile.y as i32) {
+                for tile_index in tiles {
+                    let tile_pos = Vec2::new(tile_index.x as f32 + 0.5, tile_index.y as f32 + 0.5);
+                    if let Some(tile) = tilemap.get(tile_index.x as i32, tile_index.y as i32) {
                         if tile.solid {
                             let res = query::contact(&Isometry2::translation(new_pos.x, new_pos.y), 
                             &thing_shape, &Isometry2::translation(tile_pos.x, tile_pos.y), &thing_shape, 1.0);
@@ -41,9 +42,11 @@ pub fn physics_system(mut query:Query<(Entity, &mut Body)>, time:ResMut<Time>, t
                                     if let Some(c) = contact {
                                         if res.dist < c.dist {
                                             contact = Some(res);
+                                            contact_tile = Some(tile_index);
                                         }
                                     } else {
                                         contact = Some(res);
+                                        contact_tile = Some(tile_index);
                                     }
                                 }
                             }
@@ -61,6 +64,7 @@ pub fn physics_system(mut query:Query<(Entity, &mut Body)>, time:ResMut<Time>, t
                                 if res.dist < c.dist {
                                     contact = Some(res);
                                     contact_entity = Some(other_id.clone());
+                                    contact_tile = None;
                                 }
                             } else {
                                 contact = Some(res);
@@ -72,6 +76,18 @@ pub fn physics_system(mut query:Query<(Entity, &mut Body)>, time:ResMut<Time>, t
                 if let Some(contact) = contact {
                     let v = vel.normalize() * contact.dist;
                     body.pos = new_pos + v;
+                    if let Some(e) = contact_entity {
+                        touch_events.send(TouchEvent {
+                            toucher:entity, 
+                            touchee:Touchee::Entity((e))
+                        });
+                    }
+                    else if let Some(tile) = contact_tile {
+                        touch_events.send(TouchEvent {
+                            toucher:entity, 
+                            touchee:Touchee::Tile((tile))
+                        });
+                    }
                 } else {
                     body.pos = new_pos;
                 }
