@@ -18,7 +18,7 @@ pub fn camera_system(
         .for_each(|(_, transform)| translation = transform.translation.clone());
 
     set.p1().for_each_mut(|(_, mut transform, mut projection)| {
-        transform.translation = translation;
+       // transform.translation = translation;
         //transform.translation.x = transform.translation.x.floor();
         //transform.translation.y = transform.translation.y.floor();
         //let w = projection.left.abs() + projection.right.abs();

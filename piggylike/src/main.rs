@@ -13,7 +13,7 @@ fn main() {
     .insert_resource(ImageSettings::default_nearest())
     .add_plugins(DefaultPlugins)
     .add_plugin(FrameTimeDiagnosticsPlugin::default())
-  //  .add_plugin(LogDiagnosticsPlugin::default())
+    .add_plugin(LogDiagnosticsPlugin::default())
     .add_plugin(EnginePlugin)
     .insert_resource(Config {
         pixel_snap_resolution: 1.0/48.0,
