@@ -6,10 +6,7 @@ pub fn spawn_camera_system(mut commands:Commands, query:Query<(Entity, Added<Cam
     query.for_each(|(e, added)| {
         if added {
             let mut e = commands.entity(e);
-           // let mut camera_bundle = Camera2dBundle::default();
-           // e.insert_bundle(camera_bundle);
-           /* */ e.insert_bundle(Camera3dBundle {
-                transform: Transform::from_xyz(16.0, 16.0, 32.0).looking_at(Vec3::new(16.0, 0.0, 16.0), Vec3::Y),
+            e.insert_bundle(Camera3dBundle {
                 ..Default::default()
             });
 
@@ -64,7 +61,6 @@ pub fn spawn_tilemap_system(mut commands:Commands, mut meshes:ResMut<Assets<Mesh
                             }
 
                             tile.entity = Some(e.id());
-
                         }
                     }
                 }
