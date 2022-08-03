@@ -38,53 +38,30 @@ pub fn spawn_tilemap_system(mut commands:Commands, mut meshes:ResMut<Assets<Mesh
             }
         });
 
+        let mat = materials.add(Color::rgb(1.0, 1.0, 1.0).into());
+        let floor = meshes.add(Mesh::from(shape::Plane { size: 1.0 }));
+        let cube = meshes.add(Mesh::from(shape::Cube { size: 1.0 }));
         for y in 0..tilemap.height {
             for x in 0..tilemap.width {
                 if let Some(tile) = tilemap.get_mut(x as i32, y as i32) {
                     if let Some(tile_def) = metadata.tiles.get(&tile.tile_def) {
                         if let Some(atlas_def) = metadata.atlases.get(&tile_def.atlas) {
                             let mut e = commands.spawn();
-                          /*  e.insert_bundle(SpriteSheetBundle {
-                                sprite:TextureAtlasSprite {
-                                    index:tile_def.atlas_index as usize,
-                                    custom_size:Some(Vec2::new(1.0, 1.0)),
-                                    anchor:Anchor::BottomLeft,
-                                    ..Default::default()
-                                },
-                                texture_atlas: atlas_def.handle.clone(),
-                                transform:Transform {
-                                    translation:Vec3::new(x as f32, y as f32, 0.0),
-                                    ..Default::default()
-                                },
-                                ..default()
-                            });
-                            e.insert(Tilesprite::default());*/
-
-                          /*  e.insert_bundle(SceneBundle {
-                                scene:asset_server.load("meshes/test.glb#Scene0"),
-                                transform:Transform {
-                                    translation:Vec3::new(x as f32, y as f32, 0.0),
-                                    ..Default::default()
-                                },
-                                ..Default::default()
-                            });*/
-
                             if tile_def.solid {
                                 e.insert_bundle(PbrBundle {
-                                    mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-                                    material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
+                                    mesh: cube.clone(),
+                                    material: mat.clone(),
                                     transform: Transform::from_xyz(x as f32 + 0.5, 0.5, y as f32 + 0.5),
                                     ..default()
                                 });
                             } else {
                                 e.insert_bundle(PbrBundle {
-                                    mesh: meshes.add(Mesh::from(shape::Plane { size: 1.0 })),
-                                    material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
+                                    mesh: floor.clone(),
+                                    material: mat.clone(),
                                     transform: Transform::from_xyz(x as f32 + 0.5, 0.0, y as f32 + 0.5),
                                     ..default()
                                 });
                             }
-                           
 
                             tile.entity = Some(e.id());
 
