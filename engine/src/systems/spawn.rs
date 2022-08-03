@@ -8,18 +8,18 @@ pub fn spawn_camera_system(mut commands:Commands, query:Query<(Entity, Added<Cam
             let mut e = commands.entity(e);
            // let mut camera_bundle = Camera2dBundle::default();
            // e.insert_bundle(camera_bundle);
-            e.insert_bundle(Camera3dBundle {
-                transform: Transform::from_xyz(16.0, 16.0, 100.0).looking_at(Vec3::new(0.0, 0.0, 0.0), Vec3::Z),
+           /* */ e.insert_bundle(Camera3dBundle {
+                transform: Transform::from_xyz(16.0, 16.0, 32.0).looking_at(Vec3::new(16.0, 0.0, 16.0), Vec3::Y),
                 ..Default::default()
             });
 
             commands.spawn_bundle(PointLightBundle {
                 point_light: PointLight {
-                    intensity: 1500.0,
+                    intensity: 5000.0,
                     shadows_enabled: true,
                     ..default()
                 },
-                transform: Transform::from_xyz(4.0, 8.0, 4.0),
+                transform: Transform::from_xyz(16.0, 16.0, 16.0),
                 ..default()
             });
         }
@@ -60,21 +60,31 @@ pub fn spawn_tilemap_system(mut commands:Commands, mut meshes:ResMut<Assets<Mesh
                             });
                             e.insert(Tilesprite::default());*/
 
-                            e.insert_bundle(SceneBundle {
+                          /*  e.insert_bundle(SceneBundle {
                                 scene:asset_server.load("meshes/test.glb#Scene0"),
                                 transform:Transform {
                                     translation:Vec3::new(x as f32, y as f32, 0.0),
                                     ..Default::default()
                                 },
                                 ..Default::default()
-                            });
-
-                           /*  e.insert_bundle(PbrBundle {
-                                mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-                                material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
-                                transform: Transform::from_xyz(x as f32, y as f32,  0.0),
-                                ..default()
                             });*/
+
+                            if tile_def.solid {
+                                e.insert_bundle(PbrBundle {
+                                    mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+                                    material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
+                                    transform: Transform::from_xyz(x as f32 + 0.5, 0.5, y as f32 + 0.5),
+                                    ..default()
+                                });
+                            } else {
+                                e.insert_bundle(PbrBundle {
+                                    mesh: meshes.add(Mesh::from(shape::Plane { size: 1.0 })),
+                                    material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
+                                    transform: Transform::from_xyz(x as f32 + 0.5, 0.0, y as f32 + 0.5),
+                                    ..default()
+                                });
+                            }
+                           
 
                             tile.entity = Some(e.id());
 
@@ -86,19 +96,28 @@ pub fn spawn_tilemap_system(mut commands:Commands, mut meshes:ResMut<Assets<Mesh
     }
 }
 
-pub fn spawn_things_system(mut commands:Commands, query:Query<(Entity, Added<Thing>, &Thing)>, metadata:Res<Metadata>) {
+pub fn spawn_things_system(mut commands:Commands, asset_server:Res<AssetServer>, query:Query<(Entity, Added<Thing>, &Thing)>, metadata:Res<Metadata>) {
     query.for_each(|(e, added, thing)| {
         if added {
             if let Some(thing_def) = metadata.things.get(&thing.thing_def) {
                 if let Some(atlas_def) = metadata.atlases.get(&thing_def.atlas) {
                     let mut e = commands.entity(e);
-                    e.insert_bundle(SpriteSheetBundle {
+                   /* e.insert_bundle(SpriteSheetBundle {
                         sprite:TextureAtlasSprite {
                             index:thing_def.atlas_index as usize,
                             custom_size:Some(Vec2::new(1.0, 1.0)),
                             ..Default::default()
                         },
                         texture_atlas: atlas_def.handle.clone(),
+                        ..Default::default()
+                    });*/
+
+                    e.insert_bundle(SceneBundle {
+                        scene:asset_server.load("meshes/piggy.glb#Scene0"),
+                        transform:Transform {
+                            //translation:Vec3::new(x as f32, 0.0, y as f32),
+                            ..Default::default()
+                        },
                         ..Default::default()
                     });
                 }

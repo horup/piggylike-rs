@@ -6,7 +6,7 @@ use engine::{bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiag
 fn main() {
     App::new()
     .insert_resource(WindowDescriptor {
-        present_mode:PresentMode::Fifo,
+        present_mode:PresentMode::Immediate,
         mode:WindowMode::Windowed,
         ..Default::default()
     })
