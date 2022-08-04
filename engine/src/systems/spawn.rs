@@ -10,15 +10,7 @@ pub fn spawn_camera_system(mut commands:Commands, query:Query<(Entity, Added<Cam
                 ..Default::default()
             });
 
-            commands.spawn_bundle(PointLightBundle {
-                point_light: PointLight {
-                    intensity: 5000.0,
-                    shadows_enabled: true,
-                    ..default()
-                },
-                transform: Transform::from_xyz(16.0, 16.0, 16.0),
-                ..default()
-            });
+            commands.insert_resource(AmbientLight { brightness:0.1, ..Default::default() });
         }
     });
 }
