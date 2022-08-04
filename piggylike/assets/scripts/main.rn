@@ -1,11 +1,9 @@
-mod atlases;
 mod tiles;
 mod things;
 /*use engine::*;
 */
 
 pub fn main(engine) {
-    atlases::define(engine);
     tiles::define(engine);
     things::define(engine);
 

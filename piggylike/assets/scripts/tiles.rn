@@ -1,7 +1,3 @@
-use engine::*;
-use crate::atlases;
-use atlases::*;
-
 // floors
 pub const GRASS_TILE = 0;
 pub const SAND_TILE = 1;
@@ -16,40 +12,29 @@ pub const WOODWALL_TILE = 21;
 pub fn define(engine) {
     // Floors
     engine.define_tile(GRASS_TILE, #{
-        atlas:atlases::TILES,
-        atlas_index:0,
         solid:false
     });
     engine.define_tile(SAND_TILE, #{
-        atlas:atlases::TILES,
-        atlas_index:1,
         solid:false
     });
     engine.define_tile(STONE_TILE, #{
-        atlas:atlases::TILES,
-        atlas_index:2,
         solid:false
     });
     engine.define_tile(WOOD_TILE, #{
-        atlas:atlases::TILES,
-        atlas_index:5,
         solid:false
     });
 
     // Walls
     engine.define_tile(FOLIAGE_TILE, #{
-        atlas:atlases::TILES,
-        atlas_index:16,
+        mesh:"meshes/tiles/wall.glb#Scene0",
         solid:true
     });
     engine.define_tile(ROCK_TILE, #{
-        atlas:atlases::TILES,
-        atlas_index:18,
+        mesh:"meshes/tiles/wall.glb#Scene0",
         solid:true
     });
     engine.define_tile(WOODWALL_TILE, #{
-        atlas:atlases::TILES,
-        atlas_index:21,
+        mesh:"meshes/tiles/wall.glb#Scene0",
         solid:true
     });
 }

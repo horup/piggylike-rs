@@ -4,7 +4,7 @@ use std::{sync::{Arc, Mutex}, path::{Path, PathBuf}, fs::read_to_string};
 use bevy::{asset::{AssetServerSettings, FileAssetIo}, prelude::{Res, AssetServer, Commands, ResMut, Assets, World}, sprite::TextureAtlas, math::Vec2};
 use rune::{Module, Sources, Source, Diagnostics, prepare, termcolor::{StandardStream, ColorChoice}, Vm, runtime::Object, Value};
 
-use crate::{resources::{Metadata, Id, AtlasDef, TileDef, ThingDef}, tiled::load_map};
+use crate::{resources::{Metadata, Id, TileDef, ThingDef}, tiled::load_map};
 
 use super::Snapshot;
 
@@ -17,7 +17,6 @@ unsafe impl Sync for ScriptVm {}
 
 #[derive(Clone)]
 pub enum ExclusiveContextCommands {
-    DefineAtlas((Id, Object)),
     DefineTile((Id, Object)),
     DefineThing((Id, Object)),
     LoadMap(String),
@@ -33,53 +32,26 @@ impl ExclusiveContext {
     pub fn process(&mut self, world:&mut World) {
         for cmd in self.commands.drain(..) {
             match cmd {
-                ExclusiveContextCommands::DefineAtlas((id, atlas)) => {
-                    let id = id.clone();
-                    let columns = get_i64(atlas.get("columns"));
-                    let rows = get_i64(atlas.get("rows"));
-                    let width = get_f32(atlas.get("width"));
-                    let height = get_f32(atlas.get("height"));
-                    let texture_path = get_string(atlas.get("texture_path"));
-        
-                    let texture_handle = world.get_resource::<AssetServer>().unwrap().load(&texture_path);
-                    let mut texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(width, height), columns as usize, rows as usize);
-                    let a = 0.01;
-                    for r in texture_atlas.textures.iter_mut() {
-                        r.min.x += a;
-                        r.min.y +=  a;
-                        r.max.x -= a;
-                        r.max.y -= a;
-                    }
-                    let texture_atlas_handle = world.get_resource_mut::<Assets<TextureAtlas>>().unwrap().add(texture_atlas);
-                    
-                    world.get_resource_mut::<Metadata>().unwrap().atlases.insert(id, AtlasDef {
-                        handle:texture_atlas_handle
-                    });
-                },
                 ExclusiveContextCommands::DefineTile((id, tile)) => {
-                    let atlas = get_i64(tile.get("atlas")) as u64;
-                    let atlas_index = get_i64(tile.get("atlas_index")) as u32;
+                    let mesh = get_i64(tile.get("mesh")) as Id;
                     let solid = get_bool(tile.get("solid"));
-        
+                    let mesh = get_string(tile.get("mesh"));
                     world.get_resource_mut::<Metadata>().unwrap().tiles.insert(id, TileDef {
-                        atlas,
-                        atlas_index,
                         solid: solid,
+                        mesh:mesh
                     });
                 },
                 ExclusiveContextCommands::LoadMap(map_path) => {
                     load_map(world, &map_path);
                 },
                 ExclusiveContextCommands::DefineThing((id, thing)) => {
-                    let atlas = get_i64(thing.get("atlas")) as Id;
-                    let atlas_index = get_i64(thing.get("atlas_index")) as u32;
                     let solid = get_bool(thing.get("solid"));
                     let player = get_bool(thing.get("player"));
+                    let mesh = get_string(thing.get("mesh"));
                     world.get_resource_mut::<Metadata>().unwrap().things.insert(id, ThingDef {
-                        atlas,
-                        atlas_index,
                         player,
                         solid,
+                        mesh
                     });
                 },
                 ExclusiveContextCommands::Quickload => {
@@ -96,10 +68,6 @@ impl ExclusiveContext {
                 },
             }
         }
-    }
-
-    pub fn define_atlas(&mut self, id:Id, atlas:Object) {
-        self.commands.push(ExclusiveContextCommands::DefineAtlas((id, atlas)));
     }
 
     pub fn define_tile(&mut self, id:Id, tile:Object) {
@@ -120,7 +88,6 @@ impl ExclusiveContext {
 
     pub fn register(module:&mut Module) {
         module.ty::<ExclusiveContext>();
-        module.inst_fn("define_atlas", Self::define_atlas).unwrap();
         module.inst_fn("define_tile", Self::define_tile).unwrap();
         module.inst_fn("define_thing", Self::define_thing).unwrap();
         module.inst_fn("load_map", Self::load_map).unwrap();
