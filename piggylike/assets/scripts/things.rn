@@ -21,12 +21,15 @@ pub fn define(engine) {
     });
 
     engine.define_thing(RED_KEY, #{
+        mesh:"meshes/things/key.glb#Scene0",
     });
 
     engine.define_thing(BLUE_KEY, #{
+        mesh:"meshes/things/key.glb#Scene0",
     });
 
     engine.define_thing(PURPLE_KEY, #{
+        mesh:"meshes/things/key.glb#Scene0",
     });
 
     engine.define_thing(RED_DOOR, #{
