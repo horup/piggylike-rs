@@ -69,7 +69,7 @@ pub fn load_map(world:&mut World, map_path:&str) -> Result<()> {
                                 let wy = obj.y / height - 0.5;
                                 let id = tile.id() as Id;
                                 let id = tile.id() as Id;
-                                components::spawn_thing(world, wx, wy, &id, &metadata);
+                                components::spawn_thing(world, wx, 0.0, wy, &id, &metadata);
                             }
                         },
                         _=>{}

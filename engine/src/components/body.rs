@@ -11,7 +11,7 @@ pub struct Body {
 
 impl Body {
     pub fn get_center_tile(pos:Vec3) -> IVec2 {
-        return IVec2::new(pos.x as i32, pos.y as i32);
+        return IVec2::new(pos.x as i32, pos.z as i32);
     } 
     pub fn get_tiles_in_front(pos:Vec3, dir:IVec2) -> [IVec2; 3] {
         let center = Self::get_center_tile(pos);

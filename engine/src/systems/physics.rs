@@ -21,21 +21,21 @@ pub fn physics_system(mut query:Query<(Entity, &mut Body)>, time:ResMut<Time>, t
         let size = 0.5;
         let thing_shape = Cuboid::new([size * 0.9, size * 0.9].into());
         let tile_shape = Cuboid::new([size, size].into());
-        let vels = [Vec3::new(body.vel.x, 0.0, 0.0) * dt, Vec3::new(0.0, body.vel.y, 0.0) * dt];
+        let vels = [Vec3::new(body.vel.x, 0.0, 0.0) * dt, Vec3::new(0.0, 0.0, body.vel.z) * dt];
         let mut contact_entity:Option<Entity> = None;
         let mut contact_tile:Option<IVec2> = None;
     
         for vel in vels {
             if vel.length() > 0.0 {
                 let new_pos = body.pos + vel;
-                let tiles = Body::get_tiles_in_front(new_pos, [if vel.x > 0.0 {1} else if vel.x < 0.0 {-1} else {0}, if vel.y > 0.0 {1} else if vel.y < 0.0 {-1} else {0}].into());
+                let tiles = Body::get_tiles_in_front(new_pos, [if vel.x > 0.0 {1} else if vel.x < 0.0 {-1} else {0}, if vel.z > 0.0 {1} else if vel.z < 0.0 {-1} else {0}].into());
                 
                 let mut contact:Option<Contact> = None;
                 for tile_index in tiles {
                     let tile_pos = Vec2::new(tile_index.x as f32 + 0.5, tile_index.y as f32 + 0.5);
                     if let Some(tile) = tilemap.get(tile_index.x as i32, tile_index.y as i32) {
                         if tile.solid {
-                            let res = query::contact(&Isometry2::translation(new_pos.x, new_pos.y), 
+                            let res = query::contact(&Isometry2::translation(new_pos.x, new_pos.z), 
                             &thing_shape, &Isometry2::translation(tile_pos.x, tile_pos.y), &thing_shape, 1.0);
                             if let Ok(Some(res)) = res {
                                 if res.dist < 0.0 {
