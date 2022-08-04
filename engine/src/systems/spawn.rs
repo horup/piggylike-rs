@@ -45,11 +45,16 @@ pub fn spawn_tilemap_system(mut commands:Commands, mut meshes:ResMut<Assets<Mesh
                         if let Some(atlas_def) = metadata.atlases.get(&tile_def.atlas) {
                             let mut e = commands.spawn();
                             if tile_def.solid {
-                                e.insert_bundle(PbrBundle {
+                               /* e.insert_bundle(PbrBundle {
                                     mesh: cube.clone(),
                                     material: mat.clone(),
                                     transform: Transform::from_xyz(x as f32 + 0.5, 0.5, y as f32 + 0.5),
                                     ..default()
+                                });*/
+                                e.insert_bundle(SceneBundle {
+                                    scene:asset_server.load("meshes/wall.glb#Scene0"),
+                                    transform: Transform::from_xyz(x as f32 + 0.5, 0.0, y as f32 + 0.5),
+                                    ..Default::default()
                                 });
                             } else {
                                 e.insert_bundle(PbrBundle {

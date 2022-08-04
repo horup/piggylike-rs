@@ -55,8 +55,8 @@ pub fn physics_system(mut query:Query<(Entity, &mut Body)>, time:ResMut<Time>, t
                 }
 
                 for (other_id, other_thing) in cloned_bodies.iter().filter(|(other_id, other_thing)| {&&entity != other_id && other_thing.solid}) {
-                    let res = query::contact(&Isometry2::translation(new_pos.x, new_pos.y), 
-                            &thing_shape, &Isometry2::translation(other_thing.pos.x, other_thing.pos.y), &thing_shape, 1.0);
+                    let res = query::contact(&Isometry2::translation(new_pos.x, new_pos.z), 
+                            &thing_shape, &Isometry2::translation(other_thing.pos.x, other_thing.pos.z), &thing_shape, 1.0);
 
                     if let Ok(Some(res)) = res {
                         if res.dist < 0.0 {
@@ -68,6 +68,7 @@ pub fn physics_system(mut query:Query<(Entity, &mut Body)>, time:ResMut<Time>, t
                                 }
                             } else {
                                 contact = Some(res);
+                                contact_entity = Some(other_id.clone());
                             }
                         }
                     }    
