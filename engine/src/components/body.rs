@@ -6,7 +6,8 @@ pub struct Body {
     pub pos:Vec3,
     pub vel:Vec3,
     pub size:f32,
-    pub solid:bool
+    pub solid:bool,
+    pub facing:f32
 }
 
 impl Body {
