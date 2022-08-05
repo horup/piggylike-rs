@@ -10,7 +10,15 @@ pub fn spawn_camera_system(mut commands:Commands, query:Query<(Entity, Added<Cam
                 ..Default::default()
             });
 
-            commands.insert_resource(AmbientLight { brightness:0.1, ..Default::default() });
+           /* commands.spawn_bundle(DirectionalLightBundle {
+                transform:Transform {
+                    translation: Vec3::new(0.0, 16.0, 16.0),
+                    rotation: Quat::from_rotation_y(0.5),
+                    ..Default::default()
+                },
+                ..Default::default()
+            });*/
+            commands.insert_resource(AmbientLight { brightness:0.80, ..Default::default() });
         }
     });
 }

@@ -12,29 +12,32 @@ pub const WOODWALL_TILE = 21;
 pub fn define(engine) {
     // Floors
     engine.define_tile(GRASS_TILE, #{
+        mesh:"meshes/tiles/grass.glb#Scene0",
         solid:false
     });
     engine.define_tile(SAND_TILE, #{
         solid:false
     });
     engine.define_tile(STONE_TILE, #{
+        mesh:"meshes/tiles/stone.glb#Scene0",
         solid:false
     });
     engine.define_tile(WOOD_TILE, #{
+        mesh:"meshes/tiles/wood.glb#Scene0",
         solid:false
     });
 
     // Walls
     engine.define_tile(FOLIAGE_TILE, #{
-        mesh:"meshes/tiles/wall.glb#Scene0",
+        mesh:"meshes/tiles/bush.glb#Scene0",
         solid:true
     });
     engine.define_tile(ROCK_TILE, #{
-        mesh:"meshes/tiles/wall.glb#Scene0",
+        mesh:"meshes/tiles/stone_wall.glb#Scene0",
         solid:true
     });
     engine.define_tile(WOODWALL_TILE, #{
-        mesh:"meshes/tiles/wall.glb#Scene0",
+        mesh:"meshes/tiles/wood_wall.glb#Scene0",
         solid:true
     });
 }
