@@ -43,7 +43,7 @@
   <object id="2" gid="2" x="400" y="128" width="16" height="16"/>
   <object id="3" gid="19" x="448" y="80" width="16" height="16"/>
   <object id="5" gid="35" x="320" y="320" width="16" height="16"/>
-  <object id="7" gid="34" x="240" y="208" width="16" height="16"/>
+  <object id="7" gid="34" x="222" y="192" width="16" height="16"/>
   <object id="8" gid="18" x="64" y="288" width="16" height="16"/>
   <object id="18" gid="36" x="336" y="464" width="16" height="16"/>
  </objectgroup>

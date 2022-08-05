@@ -2,7 +2,7 @@ use bevy::{prelude::*, sprite::Anchor};
 use rune::compile::Meta;
 use crate::{components::{Cam, Thing, Tilesprite}, resources::Tilemap, resources::Metadata};
 
-pub fn spawn_camera_system(mut commands:Commands, query:Query<(Entity, Added<Cam>)>) {
+pub fn spawn_camera_system(mut commands:Commands, query:Query<(Entity, Added<Cam>)>, mut spots:Query<(&mut SpotLight)>, mut points:Query<(&mut PointLight)>) {
     query.for_each(|(e, added)| {
         if added {
             let mut e = commands.entity(e);
@@ -10,16 +10,16 @@ pub fn spawn_camera_system(mut commands:Commands, query:Query<(Entity, Added<Cam
                 ..Default::default()
             });
 
-           /* commands.spawn_bundle(DirectionalLightBundle {
-                transform:Transform {
-                    translation: Vec3::new(0.0, 16.0, 16.0),
-                    rotation: Quat::from_rotation_y(0.5),
-                    ..Default::default()
-                },
-                ..Default::default()
-            });*/
-            commands.insert_resource(AmbientLight { brightness:0.80, ..Default::default() });
+            commands.insert_resource(AmbientLight { brightness:0.0, ..Default::default() });
         }
+    });
+
+    spots.for_each_mut(|(mut cam)| {
+        cam.shadows_enabled = true;
+    });
+
+    points.for_each_mut(|(mut cam)| {
+        cam.shadows_enabled = true;
     });
 }
 

@@ -10,7 +10,7 @@ const EXIT = 35;
 
 pub fn define(engine) {
     engine.define_thing(PLAYER_THING, #{
-        mesh:"meshes/things/piggy.glb#Scene0",
+        mesh:"meshes/things/guy.glb#Scene0",
         player:true,
         solid:true
     });
