@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_flycam::FlyCam;
 use bevy_mod_raycast::{RayCastSource, DefaultPluginState, RayCastMesh};
 
 use crate::components::MyRaycastSet;
@@ -24,5 +25,6 @@ pub fn startup(mut commands:Commands, mut meshes:ResMut<Assets<Mesh>>, mut mater
     commands.spawn_bundle(Camera3dBundle {
         transform: Transform::from_xyz(0.0, size, size).looking_at(Vec3::new(10.0, 0.0, 10.0), Vec3::Y),
         ..Default::default()
-    }).insert(RayCastSource::<MyRaycastSet>::new_transform_empty());;
+    }).insert(RayCastSource::<MyRaycastSet>::new_transform_empty())
+    .insert(FlyCam);
 }
