@@ -19,3 +19,4 @@ mod tilesprite;
 pub use tilesprite::*;
 
 
+pub struct MyRaycastSet;

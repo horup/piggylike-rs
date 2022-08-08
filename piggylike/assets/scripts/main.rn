@@ -7,6 +7,6 @@ pub fn main(engine) {
     tiles::define(engine);
     things::define(engine);
 
-    engine.load_map("maps/test.tmx");
+    //engine.load_map("maps/test.tmx");
     //engine.quickload();
 }

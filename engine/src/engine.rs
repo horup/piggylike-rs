@@ -1,6 +1,7 @@
 use bevy::{prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}, asset::FileAssetIo, render::texture::ImageSettings};
+use bevy_mod_raycast::DefaultRaycastingPlugin;
 
-use crate::{systems, resources::ResourcesPlugin, events::EventsPlugin};
+use crate::{systems, resources::ResourcesPlugin, events::EventsPlugin, components::MyRaycastSet};
 use systems::*;
 
 
@@ -15,6 +16,7 @@ impl Plugin for EnginePlugin {
         .add_plugin(ResourcesPlugin)
         .add_plugin(SystemsPlugin)
         .add_plugin(EventsPlugin)
+        .add_plugin(DefaultRaycastingPlugin::<MyRaycastSet>::default())
         ;
     }
 }

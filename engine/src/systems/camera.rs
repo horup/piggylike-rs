@@ -9,7 +9,7 @@ pub fn camera_system(
     )>,
     mut windows: ResMut<Windows>,
 ) {
-    if let Some(window) = windows.get_primary_mut() {
+  /*  if let Some(window) = windows.get_primary_mut() {
         let width = window.width();
         let height = window.height();
         let mut target = Vec3::default();
@@ -23,5 +23,5 @@ pub fn camera_system(
             transform.translation = target + dist;
             *transform = transform.looking_at(target, Vec3::Y);
         });
-    }
+    }*/
 }

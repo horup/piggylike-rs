@@ -33,13 +33,16 @@ pub use touch::*;
 mod proximity;
 pub use proximity::*;
 
+mod build;
+pub use build::*;
+
 
 pub struct SystemsPlugin;
 
 impl Plugin for SystemsPlugin {
     fn build(&self, app: &mut App) {
         // startup
-
+        app.add_startup_system(startup);
         // preupdate
         app.add_system_to_stage(CoreStage::PreUpdate, history_system.exclusive_system().at_start());
 
