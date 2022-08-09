@@ -1,10 +1,12 @@
-use core::bevy::prelude::*;
+use core::bevy::{prelude::*, diagnostic::{DiagnosticsPlugin, LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
 use smart_camera::*;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(SmartCameraPlugin)
+        .add_plugin(FrameTimeDiagnosticsPlugin::default())
+        .add_plugin(LogDiagnosticsPlugin::default())
         .add_system_to_stage(CoreStage::PreUpdate, move_target)
         .add_startup_system(setup)
         .run();
@@ -43,12 +45,30 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
+
+    let mat = materials.add(Color::rgb(0.3, 0.5, 0.3).into());
+
+    let size = 256;
+    for y in 0..size {
+        for x in 0..size {
+            let p = Vec3::new(x as f32, 0.0, y as f32);
+            commands.spawn_bundle(PbrBundle {
+                mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
+                material: mat.clone(),
+                transform:Transform {
+                    translation:p,
+                    ..Default::default()
+                },
+                ..default()
+            });
+        }
+    }
     // plane
-    commands.spawn_bundle(PbrBundle {
+   /*  commands.spawn_bundle(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
         ..default()
-    });
+    });*/
     // cube
     commands.spawn_bundle(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
