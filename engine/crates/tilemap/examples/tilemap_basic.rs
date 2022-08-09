@@ -1,4 +1,7 @@
-use core::bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
+use core::bevy::{
+    diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
+    prelude::*,
+};
 use smart_camera::*;
 use tilemap::TilemapPlugin;
 
@@ -14,31 +17,49 @@ fn main() {
         .run();
 }
 
-fn move_target(mut query:ParamSet<(Query<(&mut Transform, &SmartCameraTarget)>, Query<(&Transform, &SmartCamera)>)>, input: Res<Input<KeyCode>>, time:Res<Time>) {
+fn move_target(
+    mut query: ParamSet<(
+        Query<(&mut Transform, &SmartCameraTarget)>,
+        Query<(&Transform, &SmartCamera)>,
+    )>,
+    input: Res<Input<KeyCode>>,
+    time: Res<Time>,
+) {
     let mut v = Vec3::default();
     let mut up = Vec3::default();
     let speed = 2.0;
-    if input.pressed(KeyCode::A) {v.x -= 1.0}
-    if input.pressed(KeyCode::D) {v.x += 1.0}
-    if input.pressed(KeyCode::W) {v.z -= 1.0}
-    if input.pressed(KeyCode::S) {v.z += 1.0}
-    if input.pressed(KeyCode::Space) {up.y += 1.0}
-    if input.pressed(KeyCode::LShift) {up.y -= 1.0}
+    if input.pressed(KeyCode::A) {
+        v.x -= 1.0
+    }
+    if input.pressed(KeyCode::D) {
+        v.x += 1.0
+    }
+    if input.pressed(KeyCode::W) {
+        v.z -= 1.0
+    }
+    if input.pressed(KeyCode::S) {
+        v.z += 1.0
+    }
+    if input.pressed(KeyCode::Space) {
+        up.y += 1.0
+    }
+    if input.pressed(KeyCode::LShift) {
+        up.y -= 1.0
+    }
 
     let v = v.normalize_or_zero();
 
     match query.p1().get_single() {
         Ok((transform, _)) => {
             let transform = transform.clone();
-            query.p0().for_each_mut(|(mut t,_)| {
+            query.p0().for_each_mut(|(mut t, _)| {
                 let v = transform.rotation * v;
                 t.translation += Vec3::new(v.x, 0.0, v.z) * speed * time.delta_seconds();
                 t.translation += up * speed * speed * time.delta_seconds();
             });
-        },
-        Err(_) => {},
+        }
+        Err(_) => {}
     }
-    
 }
 
 /// set up a simple 3D scene
@@ -47,17 +68,12 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-
-   
-
     commands.spawn_bundle(PbrBundle {
         material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
-        mesh:meshes.add(Mesh::from(tilemap::Grid {
-            size:16
-        })),
+        mesh: meshes.add(Mesh::from(tilemap::Grid { size: 16 })),
         ..Default::default()
     });
-  
+
     // light
     commands.spawn_bundle(PointLightBundle {
         point_light: PointLight {
@@ -70,16 +86,19 @@ fn setup(
     });
 
     // target
-    commands.spawn_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Cube { size: 0.1 })),
-        material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
-        transform: Transform::from_xyz(0.0, 0.0, 0.0),
-        ..default()
-    }).insert(SmartCameraTarget::default());
+    commands
+        .spawn_bundle(PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Cube { size: 0.1 })),
+            material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
+            transform: Transform::from_xyz(0.0, 0.0, 0.0),
+            ..default()
+        })
+        .insert(SmartCameraTarget::default());
 
-
-    commands.spawn_bundle(Camera3dBundle{
-        transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
-        ..Default::default()
-    }).insert(SmartCamera::default());
+    commands
+        .spawn_bundle(Camera3dBundle {
+            transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+            ..Default::default()
+        })
+        .insert(SmartCamera::default());
 }
