@@ -1,6 +1,8 @@
 use core::bevy::ecs as bevy_ecs;
 use core::bevy::input::mouse::{MouseWheel, MouseMotion};
+use core::bevy::math::Vec4Swizzles;
 use core::bevy::prelude::*;
+use core::bevy::render::camera::Projection;
 use std::f32::consts::PI;
  
 #[derive(Component, Clone, Copy)]
@@ -25,6 +27,39 @@ impl Default for SmartCamera {
 #[derive(Component, Clone, Copy, Default)]
 pub struct SmartCameraTarget {}
 
+
+fn cursor_position(mut query: Query<(&GlobalTransform, &Camera)>, mut cursor_evr: EventReader<CursorMoved>, windows:Res<Windows>) {
+    query.for_each(|(transform, camera)| {
+        let mut cursor_position = match cursor_evr.iter().last() {
+            Some(v) => v.position,
+            None => return,
+        };
+
+        let window = windows.primary();
+        cursor_position.x = cursor_position.x / window.width() * 2.0 - 1.0;
+        cursor_position.y = cursor_position.y / window.height() * 2.0 - 1.0;
+        let ndc = Vec3::new(cursor_position.x, cursor_position.y, 1.0);
+
+        
+     
+        let ndc_to_world: Mat4 = camera.projection_matrix() * transform.compute_matrix().inverse();
+        let ndc_to_world = ndc_to_world.inverse();
+        let p: Vec3 = ndc_to_world.project_point3(ndc);
+
+        let dir: Vec3 = (p - transform.translation()).normalize_or_zero();
+
+        let normal = Vec3::new(0.0, 1.0, 0.0);
+
+        let d = Vec3::new(0.0, 0.0, 0.0).dot(-normal);
+        let dir_dot_normal = dir.dot(normal);
+        if dir_dot_normal.abs() > 0.001 {
+            let t = -(d + transform.translation().dot(normal) / dir_dot_normal);
+            let ndc_to_world = transform.translation() + t * dir;
+            println!("{:?}", ndc_to_world);
+        }
+
+    });
+}
 
 fn input(_time:Res<Time>, mut query: Query<(&mut Transform, &mut SmartCamera)>, buttons: Res<Input<MouseButton>>, mut scroll_evr: EventReader<MouseWheel>, mut motion_evr: EventReader<MouseMotion>) {
     let scroll_speed = 0.1;
@@ -52,10 +87,6 @@ fn input(_time:Res<Time>, mut query: Query<(&mut Transform, &mut SmartCamera)>, 
                 if sign == 1.0 {
                     transform.look_at(camera.target, Vec3::Y);
                 }
-
-                //println!("{:?}", transform.local_y());
-                //transform.rotate_local_x(0.01);
-               // println!("{:?}", transform.rotate_local_y(angle));
             }
         }
     });
@@ -82,6 +113,7 @@ pub struct SmartCameraPlugin;
 
 impl Plugin for SmartCameraPlugin {
     fn build(&self, app: &mut App) {
+        app.add_system(cursor_position);
         app.add_system(translate);
         app.add_system(find_target.before(input));
         app.add_system(input.before(translate));

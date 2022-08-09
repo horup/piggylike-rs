@@ -11,7 +11,7 @@ fn main() {
         .add_plugin(SmartCameraPlugin)
         .add_plugin(TilemapPlugin)
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
-        .add_plugin(LogDiagnosticsPlugin::default())
+        //.add_plugin(LogDiagnosticsPlugin::default())
         .add_system_to_stage(CoreStage::PreUpdate, move_target)
         .add_startup_system(setup)
         .run();
