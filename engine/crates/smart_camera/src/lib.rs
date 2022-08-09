@@ -26,7 +26,7 @@ impl Default for SmartCamera {
 pub struct SmartCameraTarget {}
 
 
-fn input(time:Res<Time>, mut query: Query<(&mut Transform, &mut SmartCamera)>, buttons: Res<Input<MouseButton>>, mut scroll_evr: EventReader<MouseWheel>, mut motion_evr: EventReader<MouseMotion>) {
+fn input(_time:Res<Time>, mut query: Query<(&mut Transform, &mut SmartCamera)>, buttons: Res<Input<MouseButton>>, mut scroll_evr: EventReader<MouseWheel>, mut motion_evr: EventReader<MouseMotion>) {
     let scroll_speed = 0.1;
     let rotate_speed = 0.01;
     query.for_each_mut(|(mut transform, mut camera)| {

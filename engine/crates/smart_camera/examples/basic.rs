@@ -1,4 +1,4 @@
-use core::bevy::{prelude::*, diagnostic::{DiagnosticsPlugin, LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
+use core::bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
 use smart_camera::*;
 
 fn main() {
