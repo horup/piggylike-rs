@@ -27,19 +27,18 @@ pub struct SmartCameraTarget {}
 
 
 fn input(time:Res<Time>, mut query: Query<(&mut Transform, &mut SmartCamera)>, buttons: Res<Input<MouseButton>>, mut scroll_evr: EventReader<MouseWheel>, mut motion_evr: EventReader<MouseMotion>) {
-    let scroll_speed = 20.0;
-    let rotate_speed = 1.0;
-    let dt = time.delta_seconds();
+    let scroll_speed = 0.1;
+    let rotate_speed = 0.01;
     query.for_each_mut(|(mut transform, mut camera)| {
         for ev in scroll_evr.iter() {
-            camera.distance -= ev.y * dt * scroll_speed * camera.distance;
+            camera.distance -= ev.y * scroll_speed * camera.distance;
         }
 
         camera.distance = camera.distance.clamp(camera.min_distance, camera.max_distance);
         if buttons.pressed(MouseButton::Right) {
             for ev in motion_evr.iter() {
-                transform.rotate_y(-ev.delta.x * rotate_speed * dt);
-                transform.rotate_local_x(-ev.delta.y * rotate_speed * dt);
+                transform.rotate_y(-ev.delta.x * rotate_speed);
+                transform.rotate_local_x(-ev.delta.y * rotate_speed);
                 
 
                 let sign = transform.forward().y.signum();
