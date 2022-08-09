@@ -5,12 +5,12 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(SmartCameraPlugin)
-        .add_system(move_target)
+        .add_system_to_stage(CoreStage::PreUpdate, move_target)
         .add_startup_system(setup)
         .run();
 }
 
-fn move_target(mut query:Query<(&mut Transform, &SmartCameraTarget)>, input: Res<Input<KeyCode>>, time:Res<Time>) {
+fn move_target(mut query:ParamSet<(Query<(&mut Transform, &SmartCameraTarget)>, Query<(&Transform, &SmartCamera)>)>, input: Res<Input<KeyCode>>, time:Res<Time>) {
     let mut v = Vec3::default();
     let speed = 1.0;
     if input.pressed(KeyCode::A) {v.x -= speed}
@@ -18,11 +18,21 @@ fn move_target(mut query:Query<(&mut Transform, &SmartCameraTarget)>, input: Res
     if input.pressed(KeyCode::W) {v.z -= speed}
     if input.pressed(KeyCode::S) {v.z += speed}
 
-    let v = v.normalize_or_zero() * time.delta_seconds();
+    let v = v.normalize_or_zero();
 
-    query.for_each_mut(|(mut t,_)| {
-        t.translation += v;
-    });
+    match query.p1().get_single() {
+        Ok((transform, _)) => {
+            let transform = transform.clone();
+            query.p0().for_each_mut(|(mut t,_)| {
+
+                let v = transform.rotation * v;
+
+                t.translation += Vec3::new(v.x, 0.0, v.z) * time.delta_seconds();
+            });
+        },
+        Err(_) => {},
+    }
+    
 }
 
 /// set up a simple 3D scene

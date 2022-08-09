@@ -46,8 +46,8 @@ fn input(time:Res<Time>, mut query: Query<(&mut Transform, &mut SmartCamera)>, b
     
 }
 
-fn find_target(mut cameras:Query<(&mut SmartCamera)>, targets:Query<(&Transform, &SmartCameraTarget)>) {
-    cameras.for_each_mut(|(mut camera)| {
+fn find_target(mut cameras:Query<&mut SmartCamera>, targets:Query<(&Transform, &SmartCameraTarget)>) {
+    cameras.for_each_mut(|mut camera| {
         targets.for_each(|(transform, _)| {
             camera.target = transform.translation;
         });
