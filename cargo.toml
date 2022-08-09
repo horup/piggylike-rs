@@ -1,7 +1,9 @@
 [workspace]
 members = [
     "piggylike",
-    "engine"
+    "engine",
+    "engine/crates/core",
+    "engine/crates/smart_camera"
 ]
 
 resolver = "2" 
