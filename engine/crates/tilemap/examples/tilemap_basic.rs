@@ -1,5 +1,5 @@
 use core::bevy::{
-    diagnostic::{FrameTimeDiagnosticsPlugin},
+    diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
     prelude::*,
 };
 use core::bevy::ecs as bevy_ecs;
@@ -12,7 +12,7 @@ fn main() {
         .add_plugin(SmartCameraPlugin)
         .add_plugin(TilemapPlugin)
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
-        //.add_plugin(LogDiagnosticsPlugin::default())
+        .add_plugin(LogDiagnosticsPlugin::default())
         .add_system_to_stage(CoreStage::PreUpdate, move_target)
         .add_system(update_cursor)
         .add_startup_system(setup)
@@ -83,7 +83,7 @@ fn setup(
 ) {
     commands.spawn_bundle(PbrBundle {
         material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
-        mesh: meshes.add(Mesh::from(tilemap::Grid { size: 16 })),
+        mesh: meshes.add(Mesh::from(tilemap::Grid { size: 256 })),
         ..Default::default()
     });
 
@@ -103,7 +103,15 @@ fn setup(
         mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
         material: materials.add(Color::rgba(1.0, 1.0, 1.0, 0.5).into()),
         ..Default::default()
-    }).insert(Cursor3D);
+    }).insert(Cursor3D)
+    .insert_bundle(PointLightBundle {
+        point_light: PointLight {
+            intensity: 1500.0,
+            shadows_enabled: true,
+            ..default()
+        },
+        ..default()
+    });
 
     // target
     commands
