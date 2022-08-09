@@ -1,5 +1,5 @@
 use core::bevy::{
-    diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
+    diagnostic::{FrameTimeDiagnosticsPlugin},
     prelude::*,
 };
 use core::bevy::ecs as bevy_ecs;

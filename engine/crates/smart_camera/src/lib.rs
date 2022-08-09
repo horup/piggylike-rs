@@ -1,8 +1,8 @@
 use core::bevy::ecs as bevy_ecs;
 use core::bevy::input::mouse::{MouseWheel, MouseMotion};
-use core::bevy::math::Vec4Swizzles;
+
 use core::bevy::prelude::*;
-use core::bevy::render::camera::Projection;
+
 use std::f32::consts::PI;
  
 #[derive(Component, Clone, Copy)]
@@ -32,7 +32,7 @@ pub struct WorldCursor {
     pub position:Vec3
 }
 
-fn cursor_position(mut query: Query<(&GlobalTransform, &Camera)>, mut cursor_evr: EventReader<CursorMoved>, windows:Res<Windows>, mut cursor_world_pos:ResMut<WorldCursor>) {
+fn cursor_position(query: Query<(&GlobalTransform, &Camera)>, mut cursor_evr: EventReader<CursorMoved>, windows:Res<Windows>, mut cursor_world_pos:ResMut<WorldCursor>) {
     query.for_each(|(transform, camera)| {
         let mut cursor_position = match cursor_evr.iter().last() {
             Some(v) => v.position,
