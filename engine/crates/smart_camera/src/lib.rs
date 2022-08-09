@@ -37,8 +37,8 @@ fn input(time:Res<Time>, mut query: Query<(&mut Transform, &mut SmartCamera)>, b
         camera.distance = camera.distance.clamp(camera.min_distance, camera.max_distance);
         if buttons.pressed(MouseButton::Right) {
             for ev in motion_evr.iter() {
-                transform.rotate_y(-ev.delta.x * dt);
-                transform.rotate_local_x(-ev.delta.y * dt);
+                transform.rotate_y(-ev.delta.x * rotate_speed * dt);
+                transform.rotate_local_x(-ev.delta.y * rotate_speed * dt);
                 //transform.looking_at(target, up)
             }
         }
