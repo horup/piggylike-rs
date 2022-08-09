@@ -2,6 +2,7 @@ use core::bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
     prelude::*,
 };
+use core::bevy::ecs as bevy_ecs;
 use smart_camera::*;
 use tilemap::TilemapPlugin;
 
@@ -13,8 +14,17 @@ fn main() {
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         //.add_plugin(LogDiagnosticsPlugin::default())
         .add_system_to_stage(CoreStage::PreUpdate, move_target)
+        .add_system(update_cursor)
         .add_startup_system(setup)
         .run();
+}
+
+fn update_cursor(mut query:Query<(&mut Transform, &Cursor3D)>, world_cursor:Res<WorldCursor>) {
+    query.for_each_mut(|(mut transform, _)| {
+        transform.translation.y = 0.5;
+        transform.translation.x = world_cursor.position.x.floor() + 0.5;
+        transform.translation.z = world_cursor.position.z.floor() + 0.5;
+    });
 }
 
 fn move_target(
@@ -62,6 +72,9 @@ fn move_target(
     }
 }
 
+#[derive(Component)]
+struct Cursor3D;
+
 /// set up a simple 3D scene
 fn setup(
     mut commands: Commands,
@@ -85,11 +98,18 @@ fn setup(
         ..default()
     });
 
+    // selection
+    commands.spawn_bundle(PbrBundle {
+        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+        material: materials.add(Color::rgba(1.0, 1.0, 1.0, 0.5).into()),
+        ..Default::default()
+    }).insert(Cursor3D);
+
     // target
     commands
         .spawn_bundle(PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube { size: 0.1 })),
-            material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
+       //     mesh: meshes.add(Mesh::from(shape::Cube { size: 0.1 })),
+         //   material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
             transform: Transform::from_xyz(0.0, 0.0, 0.0),
             ..default()
         })

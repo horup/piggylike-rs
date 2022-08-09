@@ -27,8 +27,12 @@ impl Default for SmartCamera {
 #[derive(Component, Clone, Copy, Default)]
 pub struct SmartCameraTarget {}
 
+#[derive(Default, Clone, Copy)]
+pub struct WorldCursor {
+    pub position:Vec3
+}
 
-fn cursor_position(mut query: Query<(&GlobalTransform, &Camera)>, mut cursor_evr: EventReader<CursorMoved>, windows:Res<Windows>) {
+fn cursor_position(mut query: Query<(&GlobalTransform, &Camera)>, mut cursor_evr: EventReader<CursorMoved>, windows:Res<Windows>, mut cursor_world_pos:ResMut<WorldCursor>) {
     query.for_each(|(transform, camera)| {
         let mut cursor_position = match cursor_evr.iter().last() {
             Some(v) => v.position,
@@ -55,9 +59,8 @@ fn cursor_position(mut query: Query<(&GlobalTransform, &Camera)>, mut cursor_evr
         if dir_dot_normal.abs() > 0.001 {
             let t = -(d + transform.translation().dot(normal) / dir_dot_normal);
             let ndc_to_world = transform.translation() + t * dir;
-            println!("{:?}", ndc_to_world);
+            cursor_world_pos.position = ndc_to_world;
         }
-
     });
 }
 
@@ -113,6 +116,7 @@ pub struct SmartCameraPlugin;
 
 impl Plugin for SmartCameraPlugin {
     fn build(&self, app: &mut App) {
+        app.insert_resource(WorldCursor::default());
         app.add_system(cursor_position);
         app.add_system(translate);
         app.add_system(find_target.before(input));
