@@ -4,14 +4,13 @@ use smart_camera::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_startup_system(smart_camera_spawn)
-        .add_system(smart_camera_update)
-        .add_system(input)
+        .add_plugin(SmartCameraPlugin)
+        .add_system(move_target)
         .add_startup_system(setup)
         .run();
 }
 
-fn input(mut query:Query<(&mut Transform, &SmartCameraTarget)>, input: Res<Input<KeyCode>>, time:Res<Time>) {
+fn move_target(mut query:Query<(&mut Transform, &SmartCameraTarget)>, input: Res<Input<KeyCode>>, time:Res<Time>) {
     let mut v = Vec3::default();
     let speed = 1.0;
     if input.pressed(KeyCode::A) {v.x -= speed}
@@ -63,4 +62,10 @@ fn setup(
         transform: Transform::from_xyz(0.0, 0.0, 0.0),
         ..default()
     }).insert(SmartCameraTarget::default());
+
+
+    commands.spawn_bundle(Camera3dBundle{
+        transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+        ..Default::default()
+    }).insert(SmartCamera::default());
 }
