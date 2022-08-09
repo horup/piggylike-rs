@@ -45,9 +45,9 @@ fn input(time:Res<Time>, mut query: Query<(&mut Transform, &mut SmartCamera)>, b
                 let sign = transform.forward().y.signum();
                 let angle = transform.up().angle_between(Vec3::Y);
                 let max = PI / 2.0;
-                let min = 0.0;
+                let _min = 0.0;
                 if angle > max {
-                    transform.rotate_local_x((angle - max));
+                    transform.rotate_local_x(angle - max);
                 }
 
                 if sign == 1.0 {
