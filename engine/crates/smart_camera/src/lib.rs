@@ -1,6 +1,7 @@
 use core::bevy::ecs as bevy_ecs;
 use core::bevy::input::mouse::{MouseWheel, MouseMotion};
 use core::bevy::prelude::*;
+use std::f32::consts::PI;
 
 #[derive(Component, Clone, Copy)]
 pub struct SmartCamera {
@@ -39,7 +40,23 @@ fn input(time:Res<Time>, mut query: Query<(&mut Transform, &mut SmartCamera)>, b
             for ev in motion_evr.iter() {
                 transform.rotate_y(-ev.delta.x * rotate_speed * dt);
                 transform.rotate_local_x(-ev.delta.y * rotate_speed * dt);
-                //transform.looking_at(target, up)
+                
+
+                let sign = transform.forward().y.signum();
+                let angle = transform.up().angle_between(Vec3::Y);
+                let max = PI / 2.0;
+                let min = 0.0;
+                if angle > max {
+                    transform.rotate_local_x((angle - max));
+                }
+
+                if sign == 1.0 {
+                    transform.look_at(camera.target, Vec3::Y);
+                }
+
+                //println!("{:?}", transform.local_y());
+                //transform.rotate_local_x(0.01);
+               // println!("{:?}", transform.rotate_local_y(angle));
             }
         }
     });

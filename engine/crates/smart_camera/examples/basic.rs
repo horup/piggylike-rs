@@ -12,11 +12,14 @@ fn main() {
 
 fn move_target(mut query:ParamSet<(Query<(&mut Transform, &SmartCameraTarget)>, Query<(&Transform, &SmartCamera)>)>, input: Res<Input<KeyCode>>, time:Res<Time>) {
     let mut v = Vec3::default();
-    let speed = 1.0;
-    if input.pressed(KeyCode::A) {v.x -= speed}
-    if input.pressed(KeyCode::D) {v.x += speed}
-    if input.pressed(KeyCode::W) {v.z -= speed}
-    if input.pressed(KeyCode::S) {v.z += speed}
+    let mut up = Vec3::default();
+    let speed = 2.0;
+    if input.pressed(KeyCode::A) {v.x -= 1.0}
+    if input.pressed(KeyCode::D) {v.x += 1.0}
+    if input.pressed(KeyCode::W) {v.z -= 1.0}
+    if input.pressed(KeyCode::S) {v.z += 1.0}
+    if input.pressed(KeyCode::Space) {up.y += 1.0}
+    if input.pressed(KeyCode::LShift) {up.y -= 1.0}
 
     let v = v.normalize_or_zero();
 
@@ -24,10 +27,9 @@ fn move_target(mut query:ParamSet<(Query<(&mut Transform, &SmartCameraTarget)>, 
         Ok((transform, _)) => {
             let transform = transform.clone();
             query.p0().for_each_mut(|(mut t,_)| {
-
                 let v = transform.rotation * v;
-
-                t.translation += Vec3::new(v.x, 0.0, v.z) * time.delta_seconds();
+                t.translation += Vec3::new(v.x, 0.0, v.z) * speed * time.delta_seconds();
+                t.translation += up * speed * speed * time.delta_seconds();
             });
         },
         Err(_) => {},
