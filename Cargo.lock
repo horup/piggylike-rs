@@ -3109,6 +3109,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "tilemap"
+version = "0.1.0"
+dependencies = [
+ "core",
+ "smart_camera",
+]
+
+[[package]]
 name = "tinyvec"
 version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

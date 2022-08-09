@@ -2,7 +2,7 @@ use core::bevy::ecs as bevy_ecs;
 use core::bevy::input::mouse::{MouseWheel, MouseMotion};
 use core::bevy::prelude::*;
 use std::f32::consts::PI;
-
+ 
 #[derive(Component, Clone, Copy)]
 pub struct SmartCamera {
     pub target: Vec3,

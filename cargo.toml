@@ -3,7 +3,8 @@ members = [
     "piggylike",
     "engine",
     "engine/crates/core",
-    "engine/crates/smart_camera"
+    "engine/crates/smart_camera",
+    "engine/crates/tilemap"
 ]
 
 resolver = "2" 
