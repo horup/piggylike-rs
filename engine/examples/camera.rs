@@ -1,4 +1,4 @@
-use core::bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
+use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
 use smart_camera::*;
 
 fn main() {
@@ -10,7 +10,7 @@ fn main() {
         .add_system_to_stage(CoreStage::PreUpdate, move_target)
         .add_startup_system(setup)
         .run();
-} 
+}
 
 fn move_target(mut query:ParamSet<(Query<(&mut Transform, &SmartCameraTarget)>, Query<(&Transform, &SmartCamera)>)>, input: Res<Input<KeyCode>>, time:Res<Time>) {
     let mut v = Vec3::default();
@@ -36,6 +36,7 @@ fn move_target(mut query:ParamSet<(Query<(&mut Transform, &SmartCameraTarget)>, 
         },
         Err(_) => {},
     }
+    
 }
 
 /// set up a simple 3D scene
@@ -48,20 +49,7 @@ fn setup(
     let mat = materials.add(Color::rgb(0.3, 0.5, 0.3).into());
     let mesh = meshes.add(Mesh::from(shape::Plane { size: 5.0 }));
     let size = 256;
-    for y in 0..size {
-        for x in 0..size {
-            let p = Vec3::new(x as f32, 0.0, y as f32);
-            commands.spawn_bundle(PbrBundle {
-                mesh: mesh.clone(),
-                material: mat.clone(),
-                transform:Transform {
-                    translation:p,
-                    ..Default::default()
-                },
-                ..default()
-            });
-        }
-    }
+   
     // plane
    /*  commands.spawn_bundle(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
