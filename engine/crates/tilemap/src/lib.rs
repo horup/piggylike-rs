@@ -85,7 +85,7 @@ impl Tilemap {
 #[derive(Component, Debug, Clone, Copy, Serialize, Deserialize, Default)]
 pub struct Tilesprite;
 
-pub fn spawn_tilemap_system(mut commands:Commands, mut meshes:ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>,asset_server:Res<AssetServer>, mut tilemap:ResMut<Tilemap>, metadata:Res<Metadata>, tile_sprites:Query<(Entity, &Tilesprite)>) {
+pub fn spawn_tilemap_system(mut commands:Commands, _meshes:ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>,asset_server:Res<AssetServer>, mut tilemap:ResMut<Tilemap>, metadata:Res<Metadata>, tile_sprites:Query<(Entity, &Tilesprite)>) {
     if tilemap.is_changed() {
         tile_sprites.for_each(|(e,_)| {
             let c = tilemap.tiles.iter().filter(|p| {
@@ -112,7 +112,7 @@ pub fn spawn_tilemap_system(mut commands:Commands, mut meshes:ResMut<Assets<Mesh
             }
         });
 
-        let mat = materials.add(Color::rgb(1.0, 1.0, 1.0).into());
+        let _mat = materials.add(Color::rgb(1.0, 1.0, 1.0).into());
         for y in 0..tilemap.height {
             for x in 0..tilemap.width {
                 if let Some(tile) = tilemap.get_mut(x as i32, y as i32) {

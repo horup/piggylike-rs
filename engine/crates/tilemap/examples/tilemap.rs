@@ -47,32 +47,32 @@ fn move_target(
     input: Res<Input<KeyCode>>,
     time: Res<Time>,
 ) {
-    let mut v = Vec3::default();
-    let mut up = Vec3::default();
-    let speed = 2.0;
-    if input.pressed(KeyCode::A) {
-        v.x -= 1.0
-    }
-    if input.pressed(KeyCode::D) {
-        v.x += 1.0
-    }
-    if input.pressed(KeyCode::W) {
-        v.z -= 1.0
-    }
-    if input.pressed(KeyCode::S) {
-        v.z += 1.0
-    }
-    if input.pressed(KeyCode::Space) {
-        up.y += 1.0
-    }
-    if input.pressed(KeyCode::LShift) {
-        up.y -= 1.0
-    }
-
-    let v = v.normalize_or_zero();
-
     match query.p1().get_single() {
-        Ok((transform, _)) => {
+        Ok((transform, smart_camera)) => {
+            let mut v = Vec3::default();
+            let mut up = Vec3::default();
+            let speed = 2.0 * smart_camera.distance;
+            if input.pressed(KeyCode::A) {
+                v.x -= 1.0
+            }
+            if input.pressed(KeyCode::D) {
+                v.x += 1.0
+            }
+            if input.pressed(KeyCode::W) {
+                v.z -= 1.0
+            }
+            if input.pressed(KeyCode::S) {
+                v.z += 1.0
+            }
+            if input.pressed(KeyCode::Space) {
+                up.y += 1.0
+            }
+            if input.pressed(KeyCode::LShift) {
+                up.y -= 1.0
+            }
+
+            let v = v.normalize_or_zero();
+    
             let transform = transform.clone();
             query.p0().for_each_mut(|(mut t, _)| {
                 let v = transform.rotation * v;
