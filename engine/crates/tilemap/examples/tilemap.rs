@@ -3,12 +3,14 @@ use bevy::{
     prelude::*,
 };
 
+use metadata::{MetadataPlugin, Metadata, TileDef};
 use smart_camera::*;
-use tilemap::TilemapPlugin;
+use tilemap::{TilemapPlugin, Tilemap, Tile};
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugin(MetadataPlugin)
         .add_plugin(SmartCameraPlugin)
         .add_plugin(TilemapPlugin)
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
@@ -19,11 +21,21 @@ fn main() {
         .run();
 }
 
-fn update_cursor(mut query:Query<(&mut Transform, &Cursor3D)>, world_cursor:Res<WorldCursor>) {
+fn update_cursor(mut query:Query<(&mut Transform, &Cursor3D)>, world_cursor:Res<WorldCursor>, mut tilemap:ResMut<Tilemap>, buttons:Res<Input<MouseButton>>) {
     query.for_each_mut(|(mut transform, _)| {
         transform.translation.y = 0.5;
-        transform.translation.x = world_cursor.position.x.floor() + 0.5;
-        transform.translation.z = world_cursor.position.z.floor() + 0.5;
+        let p = world_cursor.position.clamp(Vec3::new(0.0, 0.0, 0.0), Vec3::new(tilemap.width as f32, 0.0, tilemap.height as f32)).floor();
+        transform.translation.x = p.x + 0.5;
+        transform.translation.z = p.z + 0.5;
+
+        if buttons.pressed(MouseButton::Left) {
+            tilemap.set(p.x as i32, p.z as i32, Some(Tile {
+                tile_def:0,
+                ..Default::default()
+            }));
+        } else if buttons.pressed(MouseButton::Right) {
+            tilemap.set(p.x as i32, p.z as i32, None);
+        }
     });
 }
 
@@ -75,23 +87,34 @@ fn move_target(
 #[derive(Component)]
 struct Cursor3D;
 
-/// set up a simple 3D scene
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    mut metadata: ResMut<Metadata>
 ) {
-    commands.spawn_bundle(PbrBundle {
-        material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
-        mesh: meshes.add(Mesh::from(tilemap::Grid { size: 256 })),
-        ..Default::default()
+    let mut tilemap = Tilemap::new(16, 16);
+
+    tilemap.set(0, 0, Some(Tile {
+        solid: false,
+        tile_def: 0,
+        entity: None,
+    }));
+
+    commands.insert_resource(tilemap);
+
+
+    metadata.tiles.insert(0, TileDef {
+        solid: false,
+        mesh: "../../../assets/test.glb#Scene0".into(),
     });
+
 
     // light
     commands.spawn_bundle(PointLightBundle {
         point_light: PointLight {
             intensity: 1500.0,
-            shadows_enabled: true,
+            shadows_enabled: false,
             ..default()
         },
         transform: Transform::from_xyz(4.0, 8.0, 4.0),

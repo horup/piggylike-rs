@@ -75,6 +75,16 @@
 			],
 			"group": "build",
 			"label": "Tilemap Example"
+		},
+		{
+			"type": "cargo",
+			"command": "check",
+			"isBackground": false,
+			"problemMatcher": [
+				"$rustc"
+			],
+			"group": "build",
+			"label": "Check"
 		}
 	]
 }
