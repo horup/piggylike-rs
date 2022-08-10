@@ -4,7 +4,11 @@
 		{
 			"type": "cargo",
 			"command": "run",
-			"args": ["--features", "bevy/dynamic"],
+			"isBackground": false,
+			"args": [
+				"--features",
+				"bevy/dynamic"
+			],
 			"problemMatcher": [
 				"$rustc"
 			],
@@ -14,7 +18,13 @@
 		{
 			"type": "cargo",
 			"command": "run",
-			"args": ["--features", "bevy/dynamic", "--example", "smart_camera"],
+			"isBackground": false,
+			"args": [
+				"--features",
+				"bevy/dynamic",
+				"--example",
+				"smart_camera"
+			],
 			"problemMatcher": [
 				"$rustc"
 			],
@@ -24,7 +34,13 @@
 		{
 			"type": "cargo",
 			"command": "run",
-			"args": ["--features", "bevy/dynamic", "--example", "tilemap"],
+			"isBackground": false,
+			"args": [
+				"--features",
+				"bevy/dynamic",
+				"--example",
+				"tilemap"
+			],
 			"problemMatcher": [
 				"$rustc"
 			],
@@ -34,12 +50,31 @@
 		{
 			"type": "cargo",
 			"command": "fix",
-			"args": ["--allow-dirty"],
+			"isBackground": false,
+			"args": [
+				"--allow-dirty"
+			],
 			"problemMatcher": [
 				"$rustc"
 			],
 			"group": "build",
 			"label": "Fix"
 		},
+		{
+			"type": "cargo",
+			"command": "run",
+			"isBackground": false,
+			"args": [
+				"--features",
+				"bevy/dynamic",
+				"--example",
+				"tilemap"
+			],
+			"problemMatcher": [
+				"$rustc"
+			],
+			"group": "build",
+			"label": "Tilemap Example"
+		}
 	]
 }
