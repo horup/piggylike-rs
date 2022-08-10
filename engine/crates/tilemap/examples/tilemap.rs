@@ -2,7 +2,7 @@ use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
     prelude::*,
 };
-use bevy::ecs as bevy_ecs;
+
 use smart_camera::*;
 use tilemap::TilemapPlugin;
 

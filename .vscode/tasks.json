@@ -31,5 +31,15 @@
 			"group": "build",
 			"label": "Tilemap Example"
 		},
+		{
+			"type": "cargo",
+			"command": "fix",
+			"args": ["--allow-dirty"],
+			"problemMatcher": [
+				"$rustc"
+			],
+			"group": "build",
+			"label": "Fix"
+		},
 	]
 }

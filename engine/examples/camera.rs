@@ -46,9 +46,9 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
 
-    let mat = materials.add(Color::rgb(0.3, 0.5, 0.3).into());
-    let mesh = meshes.add(Mesh::from(shape::Plane { size: 5.0 }));
-    let size = 256;
+    let _mat = materials.add(Color::rgb(0.3, 0.5, 0.3).into());
+    let _mesh = meshes.add(Mesh::from(shape::Plane { size: 5.0 }));
+    let _size = 256;
    
     // plane
    /*  commands.spawn_bundle(PbrBundle {
