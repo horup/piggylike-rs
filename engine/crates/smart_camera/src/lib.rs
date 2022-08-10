@@ -16,9 +16,9 @@ impl Default for SmartCamera {
     fn default() -> Self {
         Self {
             target: Vec3::default(),
-            distance: 5.0,
+            distance: 10.0,
             min_distance: 0.1,
-            max_distance: 10.0,
+            max_distance: 100.0,
         }
     }
 }
@@ -80,7 +80,7 @@ fn input(_time:Res<Time>, mut query: Query<(&mut Transform, &mut SmartCamera)>, 
 
                 let sign = transform.forward().y.signum();
                 let angle = transform.up().angle_between(Vec3::Y);
-                let max = PI / 2.0;
+                let max = PI / 2.0 - 0.01;
                 let _min = 0.0;
                 if angle > max {
                     transform.rotate_local_x(angle - max);

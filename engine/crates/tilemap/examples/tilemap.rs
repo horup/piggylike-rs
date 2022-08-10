@@ -3,7 +3,7 @@ use bevy::{
     prelude::*,
 };
 
-use metadata::{MetadataPlugin, Metadata, TileDef};
+use metadata::{MetadataPlugin, Metadata, TileDef, Id};
 use smart_camera::*;
 use tilemap::{TilemapPlugin, Tilemap, Tile};
 
@@ -15,13 +15,21 @@ fn main() {
         .add_plugin(TilemapPlugin)
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(LogDiagnosticsPlugin::default())
+        .insert_resource(Edit { id:0 })
         .add_system_to_stage(CoreStage::PreUpdate, move_target)
         .add_system(update_cursor)
         .add_startup_system(setup)
         .run();
 }
 
-fn update_cursor(mut query:Query<(&mut Transform, &Cursor3D)>, world_cursor:Res<WorldCursor>, mut tilemap:ResMut<Tilemap>, buttons:Res<Input<MouseButton>>) {
+fn update_cursor(keys:Res<Input<KeyCode>>, mut query:Query<(&mut Transform, &Cursor3D)>, world_cursor:Res<WorldCursor>, mut tilemap:ResMut<Tilemap>, buttons:Res<Input<MouseButton>>, mut edit:ResMut<Edit>) {
+    if keys.pressed(KeyCode::Key1) { edit.id = 1 }
+    if keys.pressed(KeyCode::Key2) { edit.id = 2 }
+    if keys.pressed(KeyCode::Key3) { edit.id = 3 }
+    if keys.pressed(KeyCode::Key4) { edit.id = 4 }
+    if keys.pressed(KeyCode::Key5) { edit.id = 5 }
+
+    
     query.for_each_mut(|(mut transform, _)| {
         transform.translation.y = 0.5;
         let p = world_cursor.position.clamp(Vec3::new(0.0, 0.0, 0.0), Vec3::new(tilemap.width as f32, 0.0, tilemap.height as f32)).floor();
@@ -30,7 +38,7 @@ fn update_cursor(mut query:Query<(&mut Transform, &Cursor3D)>, world_cursor:Res<
 
         if buttons.pressed(MouseButton::Left) {
             tilemap.set(p.x as i32, p.z as i32, Some(Tile {
-                tile_def:0,
+                tile_def:edit.id,
                 ..Default::default()
             }));
         } else if buttons.pressed(MouseButton::Right) {
@@ -76,8 +84,8 @@ fn move_target(
             let transform = transform.clone();
             query.p0().for_each_mut(|(mut t, _)| {
                 let v = transform.rotation * v;
-                t.translation += Vec3::new(v.x, 0.0, v.z) * speed * time.delta_seconds();
-                t.translation += up * speed * speed * time.delta_seconds();
+                t.translation += Vec3::new(v.x, 0.0, v.z).normalize_or_zero() * speed * time.delta_seconds();
+                t.translation += up * speed * time.delta_seconds();
             });
         }
         Err(_) => {}
@@ -87,6 +95,11 @@ fn move_target(
 #[derive(Component)]
 struct Cursor3D;
 
+#[derive(Default)]
+struct Edit {
+    pub id:Id
+}
+
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -95,18 +108,28 @@ fn setup(
 ) {
     let mut tilemap = Tilemap::new(16, 16);
 
-    tilemap.set(0, 0, Some(Tile {
-        solid: false,
-        tile_def: 0,
-        entity: None,
-    }));
-
     commands.insert_resource(tilemap);
 
 
     metadata.tiles.insert(0, TileDef {
         solid: false,
-        mesh: "../../../assets/test.glb#Scene0".into(),
+        mesh: "../../../assets/bush.glb#Scene0".into(),
+    });
+    metadata.tiles.insert(1, TileDef {
+        solid: false,
+        mesh: "../../../assets/grass.glb#Scene0".into(),
+    });
+    metadata.tiles.insert(2, TileDef {
+        solid: false,
+        mesh: "../../../assets/stone_wall.glb#Scene0".into(),
+    });
+    metadata.tiles.insert(3, TileDef {
+        solid: false,
+        mesh: "../../../assets/stone.glb#Scene0".into(),
+    });
+    metadata.tiles.insert(4, TileDef {
+        solid: false,
+        mesh: "../../../assets/stone.glb#Scene0".into(),
     });
 
 
