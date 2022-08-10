@@ -4,7 +4,8 @@ members = [
     "engine",
     "engine/crates/core",
     "engine/crates/smart_camera",
-    "engine/crates/tilemap"
+    "engine/crates/tilemap",
+    "engine/crates/metadata"
 ]
 
 resolver = "2" 
