@@ -106,7 +106,7 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut metadata: ResMut<Metadata>
 ) {
-    let mut tilemap = Tilemap::new(16, 16);
+    let tilemap = Tilemap::new(16, 16);
 
     commands.insert_resource(tilemap);
 
