@@ -1,11 +1,10 @@
-use core::bevy::ecs as bevy_ecs;
-use core::bevy::input::mouse::{MouseWheel, MouseMotion};
+use bevy::input::mouse::{MouseWheel, MouseMotion};
+use serde::*;
 
-use core::bevy::prelude::*;
-
+use bevy::prelude::*;
 use std::f32::consts::PI;
- 
-#[derive(Component, Clone, Copy)]
+
+#[derive(Component, Clone, Copy, Serialize, Deserialize)]
 pub struct SmartCamera {
     pub target: Vec3,
     pub distance: f32,

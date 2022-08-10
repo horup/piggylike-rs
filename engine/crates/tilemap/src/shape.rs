@@ -1,4 +1,4 @@
-use core::bevy::{prelude::*, render::render_resource::PrimitiveTopology};
+use bevy::{prelude::*, render::render_resource::PrimitiveTopology};
 
 pub struct Grid {
     pub size:usize

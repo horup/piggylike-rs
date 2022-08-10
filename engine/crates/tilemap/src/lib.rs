@@ -1,4 +1,3 @@
-use core::bevy as bevy;
 use bevy::prelude::*;
 
 mod shape;

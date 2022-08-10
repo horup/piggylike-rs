@@ -1,8 +1,8 @@
-use core::bevy::{
+use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
     prelude::*,
 };
-use core::bevy::ecs as bevy_ecs;
+use bevy::ecs as bevy_ecs;
 use smart_camera::*;
 use tilemap::TilemapPlugin;
 

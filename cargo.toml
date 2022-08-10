@@ -1,11 +1,17 @@
+[workspace.package]
+
 [workspace]
 members = [
     "piggylike",
     "engine",
-    "engine/crates/core",
     "engine/crates/smart_camera",
     "engine/crates/tilemap",
     "engine/crates/metadata"
 ]
 
 resolver = "2" 
+
+[workspace.dependencies]
+bevy = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.82"

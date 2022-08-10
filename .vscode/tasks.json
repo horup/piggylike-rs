@@ -8,37 +8,28 @@
 			"problemMatcher": [
 				"$rustc"
 			],
-			"group": {
-				"kind": "build",
-				"isDefault": false
-			},
-			"label": "run Piggylike"
+			"group": "build",
+			"label": "Piggylike"
 		},
 		{
 			"type": "cargo",
 			"command": "run",
-			"args": ["--features", "bevy/dynamic", "--example", "basic"],
+			"args": ["--features", "bevy/dynamic", "--example", "smart_camera"],
 			"problemMatcher": [
 				"$rustc"
 			],
-			"group": {
-				"kind": "build",
-				"isDefault": false
-			},
-			"label": "run engine_camera"
+			"group": "build",
+			"label": "Camera Example"
 		},
 		{
 			"type": "cargo",
 			"command": "run",
-			"args": ["--features", "bevy/dynamic", "--example", "camera"],
+			"args": ["--features", "bevy/dynamic", "--example", "tilemap"],
 			"problemMatcher": [
 				"$rustc"
 			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"label": "run engine_camera"
-		}
+			"group": "build",
+			"label": "Tilemap Example"
+		},
 	]
 }

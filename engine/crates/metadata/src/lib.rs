@@ -1,4 +1,4 @@
-use core::bevy::{self as bevy, prelude::Plugin};
+use bevy::{prelude::Plugin};
 use std::collections::HashMap;
 
 
