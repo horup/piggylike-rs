@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use smart_camera::*;
 
-fn setup(mut commands:Commands) {
+fn setup(_commands:Commands) {
     /*commands.spawn_bundle(Camera3dBundle {
         ..Default::default()
     });*/
