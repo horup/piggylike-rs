@@ -48,7 +48,7 @@ pub struct WorldCursor {
     pub position:Vec3
 }
 
-fn keyboard_input(keys:Res<Input<KeyCode>>, mut query:Query<(&SmartCamera, &mut Projection)>) {
+fn keyboard_input(_keys:Res<Input<KeyCode>>, _query:Query<(&SmartCamera, &mut Projection)>) {
   /*  match query.get_single_mut() {
         Ok((_, mut projection)) => {
             if keys.just_pressed(KeyCode::Numpad5) {
@@ -192,6 +192,25 @@ fn translate(mut cameras:Query<(&mut Transform, &SmartCamera)>) {
 }
 
 
+/// # Examples
+/// ```
+/// commands
+/// .spawn_bundle(Camera3dBundle {
+///     ..Default::default()
+/// })
+/// .insert(SmartCamera::default());
+/// 
+/// commands
+/// .spawn()
+/// .insert(Transform::default())
+/// .insert(CameraTarget::default())
+/// .insert(Controller::default());
+/// 
+/// commands.spawn_bundle(PbrBundle {
+/// mesh: meshes.add(Mesh::from(Grid { size: 16 })),
+/// ..Default::default()
+/// });
+///```
 pub struct SmartCameraPlugin;
 
 impl Plugin for SmartCameraPlugin {
