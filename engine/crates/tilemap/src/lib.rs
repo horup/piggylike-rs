@@ -24,6 +24,7 @@ pub struct Tilemap {
     pub tiles:Vec<Option<Tile>>
 }
 
+
 impl Tilemap {
     pub fn new(width:u32, height:u32) -> Self {
         let mut vec = Vec::with_capacity(width as usize * height as usize);
