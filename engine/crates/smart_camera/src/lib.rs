@@ -1,4 +1,4 @@
-use bevy::input::mouse::{MouseWheel, MouseMotion};
+use bevy::{input::mouse::{MouseWheel, MouseMotion}, render::camera::Projection};
 use serde::*;
 
 use bevy::prelude::*;
@@ -48,6 +48,30 @@ pub struct WorldCursor {
     pub position:Vec3
 }
 
+fn keyboard_input(keys:Res<Input<KeyCode>>, mut query:Query<(&SmartCamera, &mut Projection)>) {
+  /*  match query.get_single_mut() {
+        Ok((_, mut projection)) => {
+            if keys.just_pressed(KeyCode::Numpad5) {
+                match projection.clone() {
+                    Projection::Perspective(persp) => {
+                        *projection = OrthographicProjection {
+                            left:-100.0,
+                            right:100.0,
+                            top:100.0,
+                            bottom:100.0,
+                            ..Default::default()
+                        }.into()
+                    },
+                    Projection::Orthographic(ortho) => {
+                        *projection = PerspectiveProjection::default().into()
+                    },
+                }
+            }
+        },
+        Err(_) => {},
+    }*/
+
+}
 
 fn controller(mut query:ParamSet<(Query<(&mut Transform, &Controller)>, Query<(&Transform, &SmartCamera)>)>, input: Res<Input<KeyCode>>, time:Res<Time>) {
     match query.p1().get_single() {
@@ -120,7 +144,7 @@ fn cursor_position(query: Query<(&GlobalTransform, &Camera)>, mut cursor_evr: Ev
     });
 }
 
-fn input(_time:Res<Time>, mut query: Query<(&mut Transform, &mut SmartCamera)>, buttons: Res<Input<MouseButton>>, mut scroll_evr: EventReader<MouseWheel>, mut motion_evr: EventReader<MouseMotion>) {
+fn mouse_input(_time:Res<Time>, mut query: Query<(&mut Transform, &mut SmartCamera)>, buttons: Res<Input<MouseButton>>, mut scroll_evr: EventReader<MouseWheel>, mut motion_evr: EventReader<MouseMotion>) {
     let scroll_speed = 0.1;
     let rotate_speed = 0.01;
     query.for_each_mut(|(mut transform, mut camera)| {
@@ -175,8 +199,9 @@ impl Plugin for SmartCameraPlugin {
         app.insert_resource(WorldCursor::default());
         app.add_system(cursor_position);
         app.add_system(controller.before(translate));
+        app.add_system(keyboard_input.before(mouse_input));
         app.add_system(translate);
-        app.add_system(find_target.before(input));
-        app.add_system(input.before(translate));
+        app.add_system(find_target.before(mouse_input));
+        app.add_system(mouse_input.before(translate));
     }
 }
