@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 pub struct EditorPlugin;
 
-pub fn setup(mut commands:Commands) {
+pub fn setup(_commands:Commands) {
 
 }
 
