@@ -7,5 +7,6 @@ edition = "2021"
 
 [dependencies]
 bevy = { workspace = true }
-smart_camera = { path = "../smart_camera" } 
-tilemap = { path = "../tilemap" }
+smart_camera = { workspace = true } 
+tilemap = { workspace = true  }
+bevy_egui = { workspace = true }
