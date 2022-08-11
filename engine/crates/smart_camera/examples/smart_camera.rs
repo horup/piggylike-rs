@@ -7,36 +7,9 @@ fn main() {
         .add_plugin(SmartCameraPlugin)
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(LogDiagnosticsPlugin::default())
-        .add_system_to_stage(CoreStage::PreUpdate, move_target)
         .add_startup_system(setup)
         .run();
 } 
-
-fn move_target(mut query:ParamSet<(Query<(&mut Transform, &SmartCameraTarget)>, Query<(&Transform, &SmartCamera)>)>, input: Res<Input<KeyCode>>, time:Res<Time>) {
-    let mut v = Vec3::default();
-    let mut up = Vec3::default();
-    let speed = 2.0;
-    if input.pressed(KeyCode::A) {v.x -= 1.0}
-    if input.pressed(KeyCode::D) {v.x += 1.0}
-    if input.pressed(KeyCode::W) {v.z -= 1.0}
-    if input.pressed(KeyCode::S) {v.z += 1.0}
-    if input.pressed(KeyCode::Space) {up.y += 1.0}
-    if input.pressed(KeyCode::LShift) {up.y -= 1.0}
-
-    let v = v.normalize_or_zero();
-
-    match query.p1().get_single() {
-        Ok((transform, _)) => {
-            let transform = transform.clone();
-            query.p0().for_each_mut(|(mut t,_)| {
-                let v = transform.rotation * v;
-                t.translation += Vec3::new(v.x, 0.0, v.z) * speed * time.delta_seconds();
-                t.translation += up * speed * speed * time.delta_seconds();
-            });
-        },
-        Err(_) => {},
-    }
-}
 
 /// set up a simple 3D scene
 fn setup(
@@ -44,30 +17,16 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-
-    let mat = materials.add(Color::rgb(0.3, 0.5, 0.3).into());
-    let mesh = meshes.add(Mesh::from(shape::Plane { size: 5.0 }));
-    let size = 256;
-    for y in 0..size {
-        for x in 0..size {
-            let p = Vec3::new(x as f32, 0.0, y as f32);
-            commands.spawn_bundle(PbrBundle {
-                mesh: mesh.clone(),
-                material: mat.clone(),
-                transform:Transform {
-                    translation:p,
-                    ..Default::default()
-                },
-                ..default()
-            });
-        }
-    }
     // plane
-   /*  commands.spawn_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
+    commands.spawn_bundle(PbrBundle {
+        mesh: meshes.add(Mesh::from(shape::Plane { size: 16.0 })),
+        material:  materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
+        transform:Transform {
+            ..Default::default()
+        },
         ..default()
-    });*/
+    });
+   
     // cube
     commands.spawn_bundle(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
@@ -87,12 +46,9 @@ fn setup(
     });
 
     // center
-    commands.spawn_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Cube { size: 0.1 })),
-        material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
-        transform: Transform::from_xyz(0.0, 0.0, 0.0),
-        ..default()
-    }).insert(SmartCameraTarget::default());
+    commands.spawn().insert(Transform::default())
+    .insert(CameraTarget::default())
+    .insert(Controller::default());
 
 
     commands.spawn_bundle(Camera3dBundle{

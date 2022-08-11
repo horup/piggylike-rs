@@ -78,6 +78,22 @@
 		},
 		{
 			"type": "cargo",
+			"command": "run",
+			"isBackground": false,
+			"args": [
+				"--features",
+				"bevy/dynamic",
+				"--example",
+				"editor"
+			],
+			"problemMatcher": [
+				"$rustc"
+			],
+			"group": "build",
+			"label": "Editor Example"
+		},
+		{
+			"type": "cargo",
 			"command": "check",
 			"isBackground": false,
 			"problemMatcher": [

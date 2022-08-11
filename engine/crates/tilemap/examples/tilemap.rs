@@ -16,7 +16,6 @@ fn main() {
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(LogDiagnosticsPlugin::default())
         .insert_resource(Edit { id:0 })
-        .add_system_to_stage(CoreStage::PreUpdate, move_target)
         .add_system(update_cursor)
         .add_startup_system(setup)
         .run();
@@ -45,51 +44,6 @@ fn update_cursor(keys:Res<Input<KeyCode>>, mut query:Query<(&mut Transform, &Cur
             tilemap.set(p.x as i32, p.z as i32, None);
         }
     });
-}
-
-fn move_target(
-    mut query: ParamSet<(
-        Query<(&mut Transform, &SmartCameraTarget)>,
-        Query<(&Transform, &SmartCamera)>,
-    )>,
-    input: Res<Input<KeyCode>>,
-    time: Res<Time>,
-) {
-    match query.p1().get_single() {
-        Ok((transform, smart_camera)) => {
-            let mut v = Vec3::default();
-            let mut up = Vec3::default();
-            let speed = 2.0 * smart_camera.distance;
-            if input.pressed(KeyCode::A) {
-                v.x -= 1.0
-            }
-            if input.pressed(KeyCode::D) {
-                v.x += 1.0
-            }
-            if input.pressed(KeyCode::W) {
-                v.z -= 1.0
-            }
-            if input.pressed(KeyCode::S) {
-                v.z += 1.0
-            }
-            if input.pressed(KeyCode::Space) {
-                up.y += 1.0
-            }
-            if input.pressed(KeyCode::LShift) {
-                up.y -= 1.0
-            }
-
-            let v = v.normalize_or_zero();
-    
-            let transform = transform.clone();
-            query.p0().for_each_mut(|(mut t, _)| {
-                let v = transform.rotation * v;
-                t.translation += Vec3::new(v.x, 0.0, v.z).normalize_or_zero() * speed * time.delta_seconds();
-                t.translation += up * speed * time.delta_seconds();
-            });
-        }
-        Err(_) => {}
-    }
 }
 
 #[derive(Component)]
@@ -167,7 +121,8 @@ fn setup(
             transform: Transform::from_xyz(0.0, 0.0, 0.0),
             ..default()
         })
-        .insert(SmartCameraTarget::default());
+        .insert(CameraTarget::default())
+        .insert(Controller::default());
 
     commands
         .spawn_bundle(Camera3dBundle {

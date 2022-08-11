@@ -10,6 +10,8 @@ pub struct SmartCamera {
     pub distance: f32,
     pub min_distance: f32,
     pub max_distance: f32,
+    pub max_pitch: f32,
+    pub min_pitch: f32
 }
 
 impl Default for SmartCamera {
@@ -19,16 +21,71 @@ impl Default for SmartCamera {
             distance: 10.0,
             min_distance: 0.1,
             max_distance: 100.0,
+            max_pitch: PI / 2.0 - 0.01,
+            min_pitch: 0.0
         }
     }
 }
 
 #[derive(Component, Clone, Copy, Default)]
-pub struct SmartCameraTarget {}
+pub struct CameraTarget {}
+
+#[derive(Component, Clone, Copy)]
+pub struct Controller {
+    pub speed:f32
+}
+
+impl Default for Controller {
+    fn default() -> Self {
+        Self {  
+            speed:1.0
+        }
+    }
+}
 
 #[derive(Default, Clone, Copy)]
 pub struct WorldCursor {
     pub position:Vec3
+}
+
+
+fn controller(mut query:ParamSet<(Query<(&mut Transform, &Controller)>, Query<(&Transform, &SmartCamera)>)>, input: Res<Input<KeyCode>>, time:Res<Time>) {
+    match query.p1().get_single() {
+        Ok((transform, smart_camera)) => {
+            let mut v = Vec3::default();
+            let mut up = Vec3::default();
+            if input.pressed(KeyCode::A) {
+                v.x -= 1.0
+            }
+            if input.pressed(KeyCode::D) {
+                v.x += 1.0
+            }
+            if input.pressed(KeyCode::W) {
+                v.z -= 1.0
+            }
+            if input.pressed(KeyCode::S) {
+                v.z += 1.0
+            }
+            if input.pressed(KeyCode::Space) {
+                up.y += 1.0
+            }
+            if input.pressed(KeyCode::LShift) {
+                up.y -= 1.0
+            }
+
+            let v = v.normalize_or_zero();
+    
+            let transform = transform.clone();
+            let distance = smart_camera.distance;
+            query.p0().for_each_mut(|(mut t, controller)| {
+                let speed = controller.speed * distance;
+                let v = transform.rotation * v;
+                t.translation += Vec3::new(v.x, 0.0, v.z).normalize_or_zero() * speed * time.delta_seconds();
+                t.translation += up * speed * time.delta_seconds();
+            });
+        }
+        Err(_) => {}
+    }
 }
 
 fn cursor_position(query: Query<(&GlobalTransform, &Camera)>, mut cursor_evr: EventReader<CursorMoved>, windows:Res<Windows>, mut cursor_world_pos:ResMut<WorldCursor>) {
@@ -80,8 +137,8 @@ fn input(_time:Res<Time>, mut query: Query<(&mut Transform, &mut SmartCamera)>, 
 
                 let sign = transform.forward().y.signum();
                 let angle = transform.up().angle_between(Vec3::Y);
-                let max = PI / 2.0 - 0.01;
-                let _min = 0.0;
+                let max = camera.max_pitch;
+                let _min = camera.min_pitch;
                 if angle > max {
                     transform.rotate_local_x(angle - max);
                 }
@@ -95,7 +152,7 @@ fn input(_time:Res<Time>, mut query: Query<(&mut Transform, &mut SmartCamera)>, 
     
 }
 
-fn find_target(mut cameras:Query<&mut SmartCamera>, targets:Query<(&Transform, &SmartCameraTarget)>) {
+fn find_target(mut cameras:Query<&mut SmartCamera>, targets:Query<(&Transform, &CameraTarget)>) {
     cameras.for_each_mut(|mut camera| {
         targets.for_each(|(transform, _)| {
             camera.target = transform.translation;
@@ -117,6 +174,7 @@ impl Plugin for SmartCameraPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(WorldCursor::default());
         app.add_system(cursor_position);
+        app.add_system(controller.before(translate));
         app.add_system(translate);
         app.add_system(find_target.before(input));
         app.add_system(input.before(translate));
