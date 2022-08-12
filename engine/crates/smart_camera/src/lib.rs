@@ -43,7 +43,7 @@ impl Default for Controller {
     }
 }
 
-#[derive(Default, Clone, Copy)]
+#[derive(Default, Clone, Copy, Debug)]
 pub struct WorldCursor {
     pub position:Vec3
 }
