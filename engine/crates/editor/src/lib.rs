@@ -36,14 +36,18 @@ pub struct Editor {
 pub fn menu_ui(
     mut context: ResMut<EguiContext>,
     _editor_ui: ResMut<Editor>,
-    _editor: ResMut<Map>,
+    mut map: ResMut<Map>,
 ) {
     TopBottomPanel::top("top_0").show(context.ctx_mut(), |ui| {
         menu::bar(ui, |ui| {
             ui.menu_button("File", |ui| {
                 if ui.button("New").clicked() {}
-                if ui.button("Save").clicked() {}
-                if ui.button("Load").clicked() {}
+                if ui.button("Save").clicked() {
+                    map.save("somemap.json");
+                }
+                if ui.button("Load").clicked() {
+                    *map = Map::load("somemap.json").unwrap();
+                }
             });
         });
     });
