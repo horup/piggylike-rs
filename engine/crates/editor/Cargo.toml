@@ -10,3 +10,4 @@ bevy = { workspace = true }
 smart_camera = { workspace = true } 
 tilemap = { workspace = true  }
 bevy_egui = { workspace = true }
+metadata = { workspace = true }
