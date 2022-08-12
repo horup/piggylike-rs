@@ -6,6 +6,7 @@ pub type Id = u64;
 
 #[derive(Default, Clone)]
 pub struct TileDef {
+    pub name:String,
     pub solid:bool,
     pub mesh:String
 }

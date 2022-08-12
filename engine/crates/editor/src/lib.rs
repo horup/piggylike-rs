@@ -1,10 +1,13 @@
 use bevy::prelude::*;
-use bevy_egui::*;
-use egui::*;
-use tilemap::Tilemap;
+use bevy_egui::{egui::{self, TopBottomPanel, menu}, EguiContext};
+use metadata::{Metadata, Id};
+use tilemap::*;
 
-pub fn setup(_commands:Commands) {
-
+pub fn setup(mut commands:Commands, mut meshes: ResMut<Assets<Mesh>>) {
+    commands.spawn_bundle(PbrBundle {
+        mesh: meshes.add(Mesh::from(Grid { size: 16 })),
+        ..Default::default()
+    });
 }
 
 #[derive(Clone, PartialEq, Eq, Hash)]
@@ -21,7 +24,8 @@ impl Default for Tool {
 
 #[derive(Default, Clone)]
 pub struct EditorUI {
-    pub tool:Tool
+    pub tool:Tool,
+    pub tile:Id
 }
 
 #[derive(Default)]
@@ -55,9 +59,11 @@ pub fn tools_selection_ui(mut context: ResMut<EguiContext>, mut editor_ui:ResMut
     });
 }
 
-pub fn tiles_selection_ui(mut context: ResMut<EguiContext>) {
+pub fn tiles_selection_ui(mut context: ResMut<EguiContext>, metadata:Res<Metadata>, mut editor_ui:ResMut<EditorUI>) {
     egui::Window::new("Tiles").show(context.ctx_mut(), |ui| {
-
+        for (id, tile_def) in metadata.tiles.iter() {
+            ui.radio_value(&mut editor_ui.tile, *id, tile_def.name.clone());
+        }
     });
 }
 

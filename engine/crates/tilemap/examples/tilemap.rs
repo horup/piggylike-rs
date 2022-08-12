@@ -68,20 +68,25 @@ fn setup(
     metadata.tiles.insert(0, TileDef {
         solid: false,
         mesh: "../../../assets/bush.glb#Scene0".into(),
+        name: "".into(),
     });
     metadata.tiles.insert(1, TileDef {
+        name: "".into(),
         solid: false,
         mesh: "../../../assets/grass.glb#Scene0".into(),
     });
     metadata.tiles.insert(2, TileDef {
+        name: "".into(),
         solid: false,
         mesh: "../../../assets/stone_wall.glb#Scene0".into(),
     });
     metadata.tiles.insert(3, TileDef {
+        name: "".into(),
         solid: false,
         mesh: "../../../assets/stone.glb#Scene0".into(),
     });
     metadata.tiles.insert(4, TileDef {
+        name: "".into(),
         solid: false,
         mesh: "../../../assets/stone.glb#Scene0".into(),
     });
