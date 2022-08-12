@@ -19,7 +19,7 @@ pub fn main() {
  
 
 
-fn setup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut metadata:ResMut<Metadata>) {
+fn setup(mut commands: Commands, _meshes: ResMut<Assets<Mesh>>, mut metadata:ResMut<Metadata>) {
     metadata.tiles.insert(0, TileDef {
         name: "Bush Wall".into(),
         solid: false,

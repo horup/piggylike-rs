@@ -34,7 +34,7 @@ pub struct Editor {
     pub map_height:String
 }
 
-pub fn menu_ui(mut context: ResMut<EguiContext>, mut editor_ui:ResMut<EditorUI>, mut editor:ResMut<Editor>) {
+pub fn menu_ui(mut context: ResMut<EguiContext>, _editor_ui:ResMut<EditorUI>, _editor:ResMut<Editor>) {
     TopBottomPanel::top("top_0").show(context.ctx_mut(), |ui|{
         menu::bar(ui, |ui| {
             ui.menu_button("File", |ui| {
@@ -67,7 +67,7 @@ pub fn tiles_selection_ui(mut context: ResMut<EguiContext>, metadata:Res<Metadat
     });
 }
 
-pub fn properties_ui(mut context: ResMut<EguiContext>, mut tilemap:ResMut<Tilemap>, mut editor_ui:ResMut<EditorUI>, mut editor:ResMut<Editor>) {
+pub fn properties_ui(mut context: ResMut<EguiContext>, _tilemap:ResMut<Tilemap>, _editor_ui:ResMut<EditorUI>, mut editor:ResMut<Editor>) {
     egui::Window::new("Properties").show(context.ctx_mut(), |ui| {
         ui.horizontal(|ui| {
             ui.label("Width");
