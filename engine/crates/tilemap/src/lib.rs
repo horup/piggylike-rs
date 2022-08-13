@@ -90,9 +90,8 @@ struct TileEntity {
     pub tile_def:Id
 }
 
-fn spawn_tilemap_system(mut commands:Commands, _meshes:ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>,asset_server:Res<AssetServer>, mut tilemap:ResMut<Tilemap>, metadata:Res<Metadata>, _tile_sprites:Query<(Entity, &TileEntity)>) {
+fn tilemap_changed(mut commands:Commands, _meshes:ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>,asset_server:Res<AssetServer>, mut tilemap:ResMut<Tilemap>, metadata:Res<Metadata>, _tile_sprites:Query<(Entity, &TileEntity)>) {
     if tilemap.is_changed() {
-        let _mat = materials.add(Color::rgb(1.0, 1.0, 1.0).into());
         for y in 0..tilemap.height {
             for x in 0..tilemap.width {
                 if let Some(tile) = tilemap.get_mut(x as i32, y as i32) {
@@ -108,6 +107,7 @@ fn spawn_tilemap_system(mut commands:Commands, _meshes:ResMut<Assets<Mesh>>, mut
                         }).insert(TileEntity{x:x, y:y, tile_def:tile.tile_def});
 
                         tile.entity = Some(e.id());
+                        
                     }
                 }
             }
@@ -115,11 +115,23 @@ fn spawn_tilemap_system(mut commands:Commands, _meshes:ResMut<Assets<Mesh>>, mut
     }
 }
 
-fn update_tilemap_entities(mut commands:Commands, tilemap:Res<Tilemap>, tiles:Query<(Entity, &TileEntity, &Handle<Scene>)>) {
-    for (e, t, _handle) in tiles.iter() {
+fn update_tilemap_entities(asset_server:Res<AssetServer>, mut commands:Commands, tilemap:Res<Tilemap>, mut tiles:Query<(Entity, &TileEntity, &mut Handle<Scene>)>, metadata:Res<Metadata>) {
+    if tilemap.is_changed() == false {
+        return;
+    }
+
+    for (e, t, mut handle) in tiles.iter_mut() {
         let mut delete = false;
         if let Some(tile) = tilemap.get(t.x as i32, t.y as i32) {
-            if tile.tile_def != t.tile_def {
+            if let Some(tile_entity) = tile.entity {
+                if e != tile_entity {
+                    delete = true;
+                } else if tile.tile_def != t.tile_def {
+                    if let Some(tile_def) = metadata.tiles.get(&tile.tile_def) {
+                        *handle = asset_server.load(&tile_def.mesh);
+                    } 
+                }
+            } else {
                 delete = true;
             }
         } else {
@@ -137,7 +149,7 @@ pub struct TilemapPlugin;
 impl Plugin for TilemapPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(Tilemap::default());
-        app.add_system_to_stage(CoreStage::PostUpdate, update_tilemap_entities.after(spawn_tilemap_system));
-        app.add_system_to_stage(CoreStage::PostUpdate, spawn_tilemap_system);
+        app.add_system_to_stage(CoreStage::PostUpdate, update_tilemap_entities.after(tilemap_changed));
+        app.add_system_to_stage(CoreStage::PostUpdate, tilemap_changed);
     }
 }

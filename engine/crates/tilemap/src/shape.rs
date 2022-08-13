@@ -16,27 +16,28 @@ impl From<Grid> for Mesh {
         let x = 0.0;
         let z = 0.0;
         let c = [0.0, 0.0, 0.0, 1.0];
-        vertices.push([x + margin, 0.0, z + margin]);
+        let y = -0.01;
+        vertices.push([x + margin, y, z + margin]);
         normals.push([0.0, 1.0, 0.0]);
         colors.push(c);
     
-        vertices.push([x + margin, 0.0, z + size - margin]);
+        vertices.push([x + margin, y, z + size - margin]);
         normals.push([0.0, 1.0, 0.0]);
         colors.push(c);
     
-        vertices.push([x + size - margin, 0.0, z + size - margin]);
+        vertices.push([x + size - margin, y, z + size - margin]);
         normals.push([0.0, 1.0, 0.0]);
         colors.push(c);
     
-        vertices.push([x + margin, 0.0, z + margin]);
+        vertices.push([x + margin, y, z + margin]);
         normals.push([0.0, 1.0, 0.0]);
         colors.push(c);
     
-        vertices.push([x + size - margin, 0.0, z + size - margin]);
+        vertices.push([x + size - margin, y, z + size - margin]);
         normals.push([0.0, 1.0, 0.0]);
         colors.push(c);
     
-        vertices.push([x + size - margin, 0.0, z + margin]);
+        vertices.push([x + size - margin, y, z + margin]);
         normals.push([0.0, 1.0, 0.0]);
         colors.push(c);
         
@@ -45,7 +46,7 @@ impl From<Grid> for Mesh {
                 let margin = 0.05;
                 let x = x as f32;
                 let z = y as f32;
-                let y = 0.01;
+                let y = 0.00;
                 let c = [1.0, 1.0, 1.0, 1.0];
                 vertices.push([x + margin, y, z + margin]);
                 normals.push([0.0, 1.0, 0.0]);
