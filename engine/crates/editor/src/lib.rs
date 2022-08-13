@@ -87,7 +87,7 @@ pub fn map_ui(
     mut context: ResMut<EguiContext>,
     _tilemap: ResMut<Tilemap>,
     _editor_ui: ResMut<Editor>,
-    mut map: ResMut<Map>,
+    _map: ResMut<Map>,
 ) {
     egui::Window::new("Map").show(context.ctx_mut(), |ui| {
         ui.horizontal(|ui| {

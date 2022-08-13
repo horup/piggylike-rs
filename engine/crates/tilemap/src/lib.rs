@@ -90,7 +90,7 @@ struct TileEntity {
     pub tile_def:Id
 }
 
-fn tilemap_changed(mut commands:Commands, _meshes:ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>,asset_server:Res<AssetServer>, mut tilemap:ResMut<Tilemap>, metadata:Res<Metadata>, _tile_sprites:Query<(Entity, &TileEntity)>) {
+fn tilemap_changed(mut commands:Commands, _meshes:ResMut<Assets<Mesh>>, _materials: ResMut<Assets<StandardMaterial>>,asset_server:Res<AssetServer>, mut tilemap:ResMut<Tilemap>, metadata:Res<Metadata>, _tile_sprites:Query<(Entity, &TileEntity)>) {
     if tilemap.is_changed() {
         for y in 0..tilemap.height {
             for x in 0..tilemap.width {

@@ -1,6 +1,6 @@
 use bevy::{prelude::{Plugin, ResMut, DetectChanges, Color, Commands, AmbientLight}};
 use metadata::Id;
-use ndarray::{Array2, IndexLonger};
+use ndarray::{Array2};
 use serde::{Serialize, Deserialize};
 use tilemap::Tilemap;
 
@@ -52,7 +52,7 @@ impl Default for Map {
 }
 
 
-fn map_changed(mut commands:Commands, mut map:ResMut<Map>, mut tilemap:ResMut<Tilemap>) {
+fn map_changed(mut commands:Commands, map:ResMut<Map>, mut tilemap:ResMut<Tilemap>) {
     if map.is_changed() {
         if map.width != tilemap.width as usize || map.height != tilemap.height as usize {
             *tilemap = Tilemap::new(map.width as u32, map.height as u32);
