@@ -5,7 +5,7 @@ use ndarray::Array2;
 pub use shape::*;
 
 
-use bevy::{math::{Vec3, IVec3}, prelude::Entity};
+use bevy::{prelude::Entity};
 use serde::{Serialize, Deserialize};
 
 use metadata::{Id, Metadata};
@@ -72,7 +72,7 @@ fn tilemap_changed(mut commands:Commands, meshes:Res<Meshes>, mut materials: Res
     }
 }
 
-fn update_tilemap_entities(asset_server:Res<AssetServer>, mut commands:Commands, tilemap:Res<Tilemap>, mut tiles:Query<(Entity, &TileEntity, &mut Handle<Scene>)>, metadata:Res<Metadata>) {
+fn update_tilemap_entities(_asset_server:Res<AssetServer>, _commands:Commands, tilemap:Res<Tilemap>, _tiles:Query<(Entity, &TileEntity, &mut Handle<Scene>)>, _metadata:Res<Metadata>) {
     if tilemap.is_changed() == false {
         return;
     }

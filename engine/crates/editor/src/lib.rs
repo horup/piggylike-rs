@@ -8,7 +8,7 @@ use metadata::{Id, Metadata};
 use smart_camera::WorldCursor;
 use tilemap::*;
 
-pub fn setup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>) {
+pub fn setup(_commands: Commands, _meshes: ResMut<Assets<Mesh>>, _materials: ResMut<Assets<StandardMaterial>>) {
   /*  commands.spawn_bundle(PbrBundle {
         mesh: meshes.add(Mesh::from(Grid { size: 16 })),
         material: materials.add(StandardMaterial {
