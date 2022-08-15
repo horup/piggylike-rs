@@ -5,9 +5,10 @@ use serde::{Serialize, Deserialize};
 use tilemap::{Tilemap, Grid};
 
 
-#[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct Tile {
-    pub tile_def:Id
+    pub floor:Option<Id>,
+    pub walls:Option<Id>
 }
 
 #[derive(Clone, Serialize, Deserialize, PartialEq)]
@@ -15,7 +16,7 @@ pub struct Map {
     pub name: String,
     pub width: usize,
     pub height: usize,
-    pub tiles: Array2<Option<Tile>>,
+    pub tiles: Array2<Tile>,
     pub ambient_light:Color,
     pub ambient_brightness:f32
 }
@@ -61,7 +62,7 @@ fn map_changed(mut commands:Commands, map:ResMut<Map>, mut tilemap:ResMut<Tilema
             // extend or thrink, todo
         }
         if map.width != tilemap.width as usize || map.height != tilemap.height as usize {
-            *tilemap = Tilemap::new(map.width as u32, map.height as u32);
+            *tilemap = Tilemap::new(map.width, map.height);
 
             grids.for_each(|(e,_)| {commands.entity(e).despawn_recursive()});
             commands.spawn_bundle(PbrBundle {
@@ -78,18 +79,9 @@ fn map_changed(mut commands:Commands, map:ResMut<Map>, mut tilemap:ResMut<Tilema
         }
 
         for ((x,y), tile) in map.tiles.indexed_iter() {
-            match tile {
-                Some(tile) => {
-                    if let Some(t) = tilemap.get_mut(x as i32, y as i32) {
-                        t.tile_def = tile.tile_def;
-                    } else {
-                        tilemap.set(x as i32, y as i32, Some(tilemap::Tile {
-                            tile_def:tile.tile_def,
-                            ..Default::default()
-                        }))
-                    }
-                },
-                None => tilemap.set(x as i32, y as i32, None),
+            if let Some(tilemap_tile) = tilemap.tiles.get_mut((x, y)) {
+                tilemap_tile.floor = tile.floor;
+                tilemap_tile.walls = tile.walls;
             }
         }
 

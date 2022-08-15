@@ -20,7 +20,7 @@ pub fn main() {
 
 
 fn setup(mut commands: Commands, _meshes: ResMut<Assets<Mesh>>, mut metadata:ResMut<Metadata>) {
-    metadata.tiles.insert(0, TileDef {
+  /*  metadata.tiles.insert(0, TileDef {
         name: "Bush Wall".into(),
         solid: false,
         mesh: "../../../assets/bush.glb#Scene0".into(),
@@ -44,6 +44,27 @@ fn setup(mut commands: Commands, _meshes: ResMut<Assets<Mesh>>, mut metadata:Res
         name: ".".into(),
         solid: false,
         mesh: "../../../assets/stone.glb#Scene0".into(),
+    });*/
+
+    metadata.materials.insert(0, MaterialDef {
+        name:"Blue Bricks".into(),
+        base_color_texture: "../../../assets/blue.png".into(),
+        ..Default::default()
+    });
+    metadata.materials.insert(1, MaterialDef {
+        name:"Gray Bricks".into(),
+        base_color_texture: "../../../assets/brick.png".into(),
+        ..Default::default()
+    });
+    metadata.materials.insert(2, MaterialDef {
+        name:"Stone".into(),
+        base_color_texture: "../../../assets/stone.png".into(),
+        ..Default::default()
+    });
+    metadata.materials.insert(3, MaterialDef {
+        name:"Stone 2".into(),
+        base_color_texture: "../../../assets/stone2.png".into(),
+        ..Default::default()
     });
 
 

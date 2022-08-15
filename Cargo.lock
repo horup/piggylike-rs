@@ -3396,6 +3396,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "metadata",
+ "ndarray",
  "serde",
  "smart_camera",
 ]

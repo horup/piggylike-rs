@@ -1,7 +1,5 @@
-use bevy::{prelude::Plugin};
+use bevy::{prelude::{Plugin, Handle, StandardMaterial}};
 use std::collections::HashMap;
-
-
 pub type Id = u64;
 
 #[derive(Default, Clone)]
@@ -18,11 +16,19 @@ pub struct ThingDef {
     pub mesh:String
 }
 
+#[derive(Default, Clone)]
+pub struct MaterialDef {
+    pub name:String,
+    pub base_color_texture:String,
+    pub handle:Option<Handle<StandardMaterial>>
+}
+
 
 #[derive(Default, Clone)]
 pub struct Metadata {
     pub tiles:HashMap<Id, TileDef>,
     pub things:HashMap<Id, ThingDef>,
+    pub materials:HashMap<Id, MaterialDef>
 }
 
 pub struct MetadataPlugin;

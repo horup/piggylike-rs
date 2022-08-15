@@ -10,3 +10,4 @@ bevy =  { workspace = true }
 serde = { workspace = true }
 smart_camera = { path = "../smart_camera" }
 metadata = { path = "../metadata" }
+ndarray = { workspace = true }

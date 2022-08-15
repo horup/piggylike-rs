@@ -37,7 +37,7 @@ impl Default for Tool {
 #[derive(Default, Clone)]
 pub struct Editor {
     pub tool: Tool,
-    pub tile: Id,
+    pub floor: Id,
     pub ambient_brightness:f32,
     pub width:usize,
     pub height:usize
@@ -66,14 +66,14 @@ pub fn tools_selection_ui(mut context: ResMut<EguiContext>, mut editor: ResMut<E
     });
 }
 
-pub fn tiles_selection_ui(
+pub fn material_selection_ui(
     mut context: ResMut<EguiContext>,
     metadata: Res<Metadata>,
     mut editor_ui: ResMut<Editor>,
 ) {
-    egui::Window::new("Tiles").show(context.ctx_mut(), |ui| {
-        for (id, tile_def) in metadata.tiles.iter() {
-            ui.radio_value(&mut editor_ui.tile, *id, tile_def.name.clone());
+    egui::Window::new("Materials").show(context.ctx_mut(), |ui| {
+        for (id, material_def) in metadata.materials.iter() {
+            ui.radio_value(&mut editor_ui.floor, *id, material_def.name.clone());
         }
     });
 }
@@ -141,11 +141,12 @@ pub fn cursor(
             let mut map_clone = map.clone();
             if let Some(cell) = map_clone.tiles.get_mut((x as usize, y as usize)) {
                 if place {
-                    *cell = Some(map::Tile {
-                        tile_def: editor.tile,
-                    });
+                    *cell = map::Tile {
+                        floor: Some(editor.floor),
+                        walls: None
+                    };
                 } else if remove {
-                    *cell = None;
+                    *cell = map::Tile::default();
                 }
             }
 
@@ -162,9 +163,9 @@ impl Plugin for EditorPlugin {
         app.add_plugin(MapPlugin);
         app.insert_resource(Editor::default());
         app.add_startup_system(setup);
-        app.add_system(tiles_selection_ui.after(tools_selection_ui));
+        app.add_system(material_selection_ui.after(tools_selection_ui));
         app.add_system(tools_selection_ui);
-        app.add_system(map_ui.after(tiles_selection_ui));
+        app.add_system(map_ui.after(material_selection_ui));
         app.add_system(menu_ui.before(tools_selection_ui));
         app.add_system(cursor.after(tools_selection_ui));
     }
