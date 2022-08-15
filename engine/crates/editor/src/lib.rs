@@ -24,13 +24,14 @@ pub fn setup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut mater
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub enum Tool {
-    PlaceTile,
+    Floor,
+    Walls,
     PlaceThing,
 }
 
 impl Default for Tool {
     fn default() -> Self {
-        Tool::PlaceTile
+        Tool::Floor
     }
 }
 
@@ -61,7 +62,8 @@ pub fn menu_ui(mut context: ResMut<EguiContext>, _editor_ui: ResMut<Editor>, mut
 
 pub fn tools_selection_ui(mut context: ResMut<EguiContext>, mut editor: ResMut<Editor>) {
     egui::Window::new("Tools").show(context.ctx_mut(), |ui| {
-        ui.radio_value(&mut editor.tool, Tool::PlaceTile, "Place Tile");
+        ui.radio_value(&mut editor.tool, Tool::Floor, "Floor");
+        ui.radio_value(&mut editor.tool, Tool::Walls, "Walls");
         ui.radio_value(&mut editor.tool, Tool::PlaceThing, "Place Thing");
     });
 }
