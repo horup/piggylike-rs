@@ -9,7 +9,7 @@ use smart_camera::WorldCursor;
 use tilemap::*;
 
 pub fn setup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>) {
-    commands.spawn_bundle(PbrBundle {
+  /*  commands.spawn_bundle(PbrBundle {
         mesh: meshes.add(Mesh::from(Grid { size: 16 })),
         material: materials.add(StandardMaterial {
             base_color:Color::WHITE,
@@ -19,7 +19,7 @@ pub fn setup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut mater
         }),
         transform:Transform::from_xyz(0.0, -0.01, 0.0),
         ..Default::default()
-    });
+    });*/
 }
 
 #[derive(Clone, PartialEq, Eq, Hash)]
@@ -38,6 +38,9 @@ impl Default for Tool {
 pub struct Editor {
     pub tool: Tool,
     pub tile: Id,
+    pub ambient_brightness:f32,
+    pub width:usize,
+    pub height:usize
 }
 
 pub fn menu_ui(mut context: ResMut<EguiContext>, _editor_ui: ResMut<Editor>, mut map: ResMut<Map>) {
@@ -83,27 +86,40 @@ fn usize_edit_single(ui: &mut Ui, value: &mut usize) {
     }
 }
 
+fn f32_edit_single(ui: &mut Ui, value: &mut f32) {
+    let mut s = value.to_string();
+    ui.text_edit_singleline(&mut s);
+    if let Ok(v) = s.parse::<f32>() {
+        *value = v;
+    }
+}
+
 pub fn map_ui(
     mut context: ResMut<EguiContext>,
     _tilemap: ResMut<Tilemap>,
-    _editor_ui: ResMut<Editor>,
-    _map: ResMut<Map>,
+    mut editor: ResMut<Editor>,
+    mut map: ResMut<Map>,
 ) {
     egui::Window::new("Map").show(context.ctx_mut(), |ui| {
         ui.horizontal(|ui| {
             ui.label("Name");
-            //ui.text_edit_singleline(&mut map_clone.name);
         });
         ui.horizontal(|ui| {
             ui.label("Width");
-           // usize_edit_single(ui, &mut map_clone.width);
+            usize_edit_single(ui, &mut editor.width);
         });
         ui.horizontal(|ui| {
             ui.label("Height");
-           // usize_edit_single(ui, &mut map_clone.height);
+            usize_edit_single(ui, &mut editor.height);
+        });
+        ui.horizontal(|ui| {
+            ui.label("Ambient");
+            f32_edit_single(ui, &mut editor.ambient_brightness);
         });
         if ui.button("Save Changes").clicked() {
-            
+            map.ambient_brightness = editor.ambient_brightness;
+            map.width = editor.width;
+            map.height = editor.height;
         }
     });
 

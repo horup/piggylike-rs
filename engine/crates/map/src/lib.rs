@@ -1,8 +1,8 @@
-use bevy::{prelude::{Plugin, ResMut, DetectChanges, Color, Commands, AmbientLight}};
+use bevy::prelude::*;
 use metadata::Id;
 use ndarray::{Array2};
 use serde::{Serialize, Deserialize};
-use tilemap::Tilemap;
+use tilemap::{Tilemap, Grid};
 
 
 #[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Debug)]
@@ -52,10 +52,29 @@ impl Default for Map {
 }
 
 
-fn map_changed(mut commands:Commands, map:ResMut<Map>, mut tilemap:ResMut<Tilemap>) {
+#[derive(Component)]
+struct GridEntity;
+
+fn map_changed(mut commands:Commands, map:ResMut<Map>, mut tilemap:ResMut<Tilemap>,  mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>, grids:Query<(Entity, &GridEntity)>) {
     if map.is_changed() {
+        if map.width * map.height != tilemap.tiles.len() {
+            // extend or thrink, todo
+        }
         if map.width != tilemap.width as usize || map.height != tilemap.height as usize {
             *tilemap = Tilemap::new(map.width as u32, map.height as u32);
+
+            grids.for_each(|(e,_)| {commands.entity(e).despawn_recursive()});
+            commands.spawn_bundle(PbrBundle {
+                mesh: meshes.add(Mesh::from(Grid { width: map.width, height: map.height })),
+                material: materials.add(StandardMaterial {
+                    base_color:Color::WHITE,
+                    depth_bias:1000.0,
+                    unlit:true,
+                    ..Default::default()
+                }),
+                transform:Transform::from_xyz(0.0, -0.01, 0.0),
+                ..Default::default()
+            }).insert(GridEntity);
         }
 
         for ((x,y), tile) in map.tiles.indexed_iter() {

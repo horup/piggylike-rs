@@ -1,7 +1,8 @@
 use bevy::{prelude::*, render::render_resource::PrimitiveTopology};
 
 pub struct Grid {
-    pub size:usize
+    pub width:usize,
+    pub height:usize
 }
 
 impl From<Grid> for Mesh {
@@ -11,7 +12,8 @@ impl From<Grid> for Mesh {
         let mut colors = Vec::new();
 
         let margin = 0.00;
-        let size = grid.size as f32;
+        let width = grid.width as f32;
+        let height = grid.height as f32;
 
         let x = 0.0;
         let z = 0.0;
@@ -21,11 +23,11 @@ impl From<Grid> for Mesh {
         normals.push([0.0, 1.0, 0.0]);
         colors.push(c);
     
-        vertices.push([x + margin, y, z + size - margin]);
+        vertices.push([x + margin, y, z + height - margin]);
         normals.push([0.0, 1.0, 0.0]);
         colors.push(c);
     
-        vertices.push([x + size - margin, y, z + size - margin]);
+        vertices.push([x + width - margin, y, z + height - margin]);
         normals.push([0.0, 1.0, 0.0]);
         colors.push(c);
     
@@ -33,16 +35,16 @@ impl From<Grid> for Mesh {
         normals.push([0.0, 1.0, 0.0]);
         colors.push(c);
     
-        vertices.push([x + size - margin, y, z + size - margin]);
+        vertices.push([x + width - margin, y, z + height - margin]);
         normals.push([0.0, 1.0, 0.0]);
         colors.push(c);
     
-        vertices.push([x + size - margin, y, z + margin]);
+        vertices.push([x + width - margin, y, z + margin]);
         normals.push([0.0, 1.0, 0.0]);
         colors.push(c);
         
-        for y in 0..grid.size {
-            for x in 0..grid.size {
+        for y in 0..grid.height {
+            for x in 0..grid.width {
                 let margin = 0.05;
                 let x = x as f32;
                 let z = y as f32;
