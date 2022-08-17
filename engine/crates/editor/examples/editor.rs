@@ -66,6 +66,11 @@ fn setup(mut commands: Commands, _meshes: ResMut<Assets<Mesh>>, mut metadata:Res
         base_color_texture: "../../../assets/stone2.png".into(),
         ..Default::default()
     });
+    metadata.materials.insert(4, MaterialDef {
+        name:"Black".into(),
+        base_color_texture: "../../../assets/black.png".into(),
+        ..Default::default()
+    });
 
 
     commands

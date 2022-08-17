@@ -39,6 +39,7 @@ impl Default for Tool {
 pub struct Editor {
     pub tool: Tool,
     pub floor: Id,
+    pub walls: Id,
     pub ambient_brightness:f32,
     pub width:usize,
     pub height:usize
@@ -68,14 +69,26 @@ pub fn tools_selection_ui(mut context: ResMut<EguiContext>, mut editor: ResMut<E
     });
 }
 
-pub fn material_selection_ui(
+pub fn floor_selection_ui(
     mut context: ResMut<EguiContext>,
     metadata: Res<Metadata>,
     mut editor_ui: ResMut<Editor>,
 ) {
-    egui::Window::new("Materials").show(context.ctx_mut(), |ui| {
+    egui::Window::new("Floor").show(context.ctx_mut(), |ui| {
         for (id, material_def) in metadata.materials.iter() {
             ui.radio_value(&mut editor_ui.floor, *id, material_def.name.clone());
+        }
+    });
+}
+
+pub fn walls_selection_ui(
+    mut context: ResMut<EguiContext>,
+    metadata: Res<Metadata>,
+    mut editor_ui: ResMut<Editor>,
+) {
+    egui::Window::new("Walls").show(context.ctx_mut(), |ui| {
+        for (id, material_def) in metadata.materials.iter() {
+            ui.radio_value(&mut editor_ui.walls, *id, material_def.name.clone());
         }
     });
 }
@@ -120,8 +133,7 @@ pub fn map_ui(
         });
         if ui.button("Save Changes").clicked() {
             map.ambient_brightness = editor.ambient_brightness;
-            map.width = editor.width;
-            map.height = editor.height;
+            map.resize(editor.width, editor.height);
         }
     });
 
@@ -145,7 +157,7 @@ pub fn cursor(
                 if place {
                     *cell = map::Tile {
                         floor: Some(editor.floor),
-                        walls: None
+                        walls: Some(editor.walls)
                     };
                 } else if remove {
                     *cell = map::Tile::default();
@@ -165,9 +177,10 @@ impl Plugin for EditorPlugin {
         app.add_plugin(MapPlugin);
         app.insert_resource(Editor::default());
         app.add_startup_system(setup);
-        app.add_system(material_selection_ui.after(tools_selection_ui));
+        app.add_system(floor_selection_ui.after(tools_selection_ui));
+        app.add_system(walls_selection_ui.after(tools_selection_ui));
         app.add_system(tools_selection_ui);
-        app.add_system(map_ui.after(material_selection_ui));
+        app.add_system(map_ui.after(floor_selection_ui));
         app.add_system(menu_ui.before(tools_selection_ui));
         app.add_system(cursor.after(tools_selection_ui));
     }

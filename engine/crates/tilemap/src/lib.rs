@@ -21,15 +21,21 @@ pub struct Tile {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Tilemap {
-    pub width:usize,
-    pub height:usize,
     pub tiles:Array2<Tile>
 }
 
 
 impl Tilemap {
     pub fn new(width:usize, height:usize) -> Self {
-        Self { width, height, tiles: Array2::default((width, height)), }
+        Self { tiles: Array2::default((width, height)), }
+    }
+
+    pub fn width(&self) -> usize {
+        self.tiles.dim().0
+    }
+
+    pub fn height(&self) -> usize {
+        self.tiles.dim().1
     }
 }
 
@@ -57,79 +63,81 @@ fn tilemap_changed(mut commands:Commands,asset_server:Res<AssetServer>, mut tile
                 }).id());
             }
 
-            let mut entity = commands.entity(tile.entity.unwrap());
-            if let Some(floor) = tile.floor {
-                entity
-                .insert(TileEntity {
-                    x,
-                    y,
-                    floor: tile.floor,
-                    walls: tile.walls,
-                })
-                .insert_bundle(PbrBundle {
-                    transform: Transform::from_xyz(x as f32, 0.0, y as f32), 
-                    ..Default::default()
-                });
-               /* if let Some(material_def) = metadata.materials.get_mut(&floor) {
-                   /* if material_def.handle == None {
-                        let material = StandardMaterial {
-                            base_color_texture:Some(asset_server.load(&material_def.base_color_texture)),
-                            metallic:0.0,
-                            reflectance:0.0,
-                            perceptual_roughness:1.0,
-                            ..Default::default()
-                        };
-                        material_def.handle = Some(materials.add(material));
-                    }
-                    entity.insert_bundle(PbrBundle {
-                        mesh:meshes.floor.clone(),
-                        material:material_def.handle.clone().unwrap(),
-                        transform:Transform::from_xyz(x as f32 + 0.5, 0.0, y as f32 + 0.5),
-                        ..Default::default()
-                    });*/
-
-
-                    commands.spawn()
-                }*/
-            }
+            commands.entity(tile.entity.unwrap())
+            .insert(TileEntity {
+                x,
+                y,
+                floor: tile.floor,
+                walls: tile.walls,
+            })
+            .insert_bundle(PbrBundle {
+                transform: Transform::from_xyz(x as f32, 0.0, y as f32), 
+                ..Default::default()
+            });
         }
     }
 }
 
-fn update_tilemap_entities(meshes:Res<Meshes>, mut materials: ResMut<Assets<StandardMaterial>>,_asset_server:Res<AssetServer>, mut commands:Commands, tilemap:Res<Tilemap>, tiles:Query<(Entity, &TileEntity, &Children)>, mut metadata:ResMut<Metadata>) {
+fn update_tilemap_entities(meshes:Res<Meshes>, mut materials: ResMut<Assets<StandardMaterial>>,asset_server:Res<AssetServer>, mut commands:Commands, tilemap:Res<Tilemap>, tiles:Query<(Entity, &TileEntity, &Children)>, mut metadata:ResMut<Metadata>) {
     if tilemap.is_changed() == false {
         return;
     }
 
-    fn get_material(id:Option<Id>, metadata:&mut Metadata) -> Handle<StandardMaterial> {
+    let mut get_material = |id:Option<Id>| -> Handle<StandardMaterial> {
+        if let Some(id) = id {
+            if let Some(def) = metadata.materials.get_mut(&id) {
+                if def.handle == None {
+                    let material = StandardMaterial {
+                        base_color_texture:Some(asset_server.load(&def.base_color_texture)),
+                        metallic:0.0,
+                        reflectance:0.0,
+                        perceptual_roughness:1.0,
+                        ..Default::default()
+                    };
+
+                    def.handle = Some(materials.add(material));
+                }
+
+                return def.handle.clone().unwrap();
+            }
+        }
+    
         Handle::default()
-    }
+    };
 
     tiles.for_each(|(entity, tile, children)| {
+        let mut delete = false;
         if let Some(tile2) = tilemap.tiles.get((tile.x, tile.y)) {
             if Some(entity) != tile2.entity {
-                commands.entity(entity).despawn_recursive();
+                delete = true;
             } else {
                 if let (Some(floor), Some(walls)) = (children.get(0), children.get(1)) {
                     let mut floor = commands.entity(*floor);
+                    let y = if tile.walls == None {0.0} else {1.0};
                     floor.insert_bundle(PbrBundle {
                         mesh:meshes.floor.clone(),
                         visibility:Visibility { is_visible: tile2.floor != None },
-                        material:get_material(tile.floor, &mut metadata),
-                        transform:Transform::from_xyz( 0.5, 0.0, 0.5),
+                        material:get_material(tile.floor),
+                        transform:Transform::from_xyz( 0.5, y, 0.5),
                         ..Default::default()
                     });
 
                     let mut walls = commands.entity(*walls);
                     walls.insert_bundle(PbrBundle {
                         mesh:meshes.walls.clone(),
-                        material:get_material(tile.walls, &mut metadata),
+                        material:get_material(tile.walls),
                         visibility:Visibility { is_visible: tile2.walls != None },
-                        transform:Transform::from_xyz( 0.5, 0.0, 0.5),
+                        transform:Transform::from_xyz( 0.5, 0.5, 0.5),
                         ..Default::default()
                     });
                 }
             }
+        } else {
+            delete = true;
+        }
+
+        if delete {
+            commands.entity(entity).despawn_recursive();
         }
     });
 }

@@ -14,8 +14,6 @@ pub struct Tile {
 #[derive(Clone, Serialize, Deserialize, PartialEq)]
 pub struct Map {
     pub name: String,
-    pub width: usize,
-    pub height: usize,
     pub tiles: Array2<Tile>,
     pub ambient_light:Color,
     pub ambient_brightness:f32
@@ -36,6 +34,27 @@ impl Map {
         
         None
     }
+
+    pub fn width(&self) -> usize {
+        self.tiles.dim().0
+    }
+
+    pub fn height(&self) -> usize {
+        self.tiles.dim().1
+    }
+
+    pub fn resize(&mut self, w:usize, h:usize) {
+        let mut tiles:Array2<Tile> = Array2::default((w, h));
+        for y in 0..tiles.dim().1 {
+            for x in 0..tiles.dim().0 {
+                if let Some(tile) = self.tiles.get((x, y)) {
+                    tiles[(x, y)] = tile.clone();
+                }
+            }
+        }
+
+        self.tiles = tiles;
+    }
 }
 
 impl Default for Map {
@@ -43,8 +62,6 @@ impl Default for Map {
         let size = 16;
         Self {
             name: String::from("Untitled"),
-            width: size,
-            height: size,
             tiles: Array2::default((size, size)),
             ambient_light:Color::WHITE,
             ambient_brightness:1.0
@@ -58,15 +75,13 @@ struct GridEntity;
 
 fn map_changed(mut commands:Commands, map:ResMut<Map>, mut tilemap:ResMut<Tilemap>,  mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>, grids:Query<(Entity, &GridEntity)>) {
     if map.is_changed() {
-        if map.width * map.height != tilemap.tiles.len() {
-            // extend or thrink, todo
-        }
-        if map.width != tilemap.width as usize || map.height != tilemap.height as usize {
-            *tilemap = Tilemap::new(map.width, map.height);
+   
+        if map.width() != tilemap.width() || map.height() != tilemap.height() {
+            *tilemap = Tilemap::new(map.width(), map.height());
 
             grids.for_each(|(e,_)| {commands.entity(e).despawn_recursive()});
             commands.spawn_bundle(PbrBundle {
-                mesh: meshes.add(Mesh::from(Grid { width: map.width, height: map.height })),
+                mesh: meshes.add(Mesh::from(Grid { width: map.width(), height: map.height() })),
                 material: materials.add(StandardMaterial {
                     base_color:Color::WHITE,
                     depth_bias:1000.0,
