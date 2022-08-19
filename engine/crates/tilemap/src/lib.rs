@@ -1,4 +1,4 @@
-use bevy::{prelude::{*, shape::{Cube, Plane}}, utils::HashMap, render::texture::ImageSettings};
+use bevy::{prelude::{*, shape::{Cube, Plane}}, utils::HashMap};
 
 mod create_mesh;
 use create_mesh::*;

@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use metadata::Id;
 use ndarray::Array2;
 use serde::{Deserialize, Serialize};
-use tilemap::{Grid, Tilemap};
+use tilemap::{Tilemap};
 
 #[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct Tile {
@@ -118,9 +118,9 @@ fn map_changed(
     mut commands: Commands,
     map: ResMut<Map>,
     mut tilemaps: Query<&mut Tilemap>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    grids: Query<(Entity, &GridEntity)>,
+    _meshes: ResMut<Assets<Mesh>>,
+    _materials: ResMut<Assets<StandardMaterial>>,
+    _grids: Query<(Entity, &GridEntity)>,
 ) {
     if map.is_changed() {
         for mut tilemap in tilemaps.iter_mut() {

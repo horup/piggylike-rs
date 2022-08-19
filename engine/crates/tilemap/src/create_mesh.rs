@@ -1,4 +1,4 @@
-use bevy::{prelude::{Mesh, Vec3, Vec4, Vec2}, render::render_resource::PrimitiveTopology};
+use bevy::{prelude::{Mesh, Vec3}, render::render_resource::PrimitiveTopology};
 use metadata::Id;
 use ndarray::Array2;
 
@@ -108,7 +108,7 @@ pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
     for ((x, y), tile) in tiles.indexed_iter() {
         let x = x as f32;
         let z = y as f32;
-        let y = tile.top;
+        let _y = tile.top;
 
         if tile.walls == material {
             let mut wall = Quad::new_front();
@@ -131,7 +131,7 @@ pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
     for ((x, y), tile) in tiles.indexed_iter() {
         let x = x as f32;
         let z = y as f32;
-        let y = tile.top;
+        let _y = tile.top;
 
         if tile.walls == material {
             let mut wall = Quad::new_back();
@@ -154,7 +154,7 @@ pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
     for ((x, y), tile) in tiles.indexed_iter() {
         let x = x as f32;
         let z = y as f32;
-        let y = tile.top;
+        let _y = tile.top;
 
         if tile.walls == material {
             let mut wall = Quad::new_left();
@@ -177,7 +177,7 @@ pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
     for ((x, y), tile) in tiles.indexed_iter() {
         let x = x as f32;
         let z = y as f32;
-        let y = tile.top;
+        let _y = tile.top;
 
         if tile.walls == material {
             let mut wall = Quad::new_right();
