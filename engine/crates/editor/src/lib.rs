@@ -111,7 +111,6 @@ fn f32_edit_single(ui: &mut Ui, value: &mut f32) {
 
 pub fn map_ui(
     mut context: ResMut<EguiContext>,
-    _tilemap: ResMut<Tilemap>,
     mut editor: ResMut<Editor>,
     mut map: ResMut<Map>,
 ) {

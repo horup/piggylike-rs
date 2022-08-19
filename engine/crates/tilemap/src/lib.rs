@@ -1,4 +1,4 @@
-use bevy::prelude::{*, shape::{Cube, Plane}};
+use bevy::{prelude::{*, shape::{Cube, Plane}}, utils::HashMap, render::render_resource::PrimitiveTopology};
 
 mod shape;
 use ndarray::Array2;
@@ -14,15 +14,21 @@ use metadata::{Id, Metadata};
 pub struct Tile {
     pub floor:Id,
     pub walls:Id,
+    pub cealing:Id,
     pub top:f32,
     pub bottom:f32,
     #[serde(skip_serializing)]
     pub entity:Option<Entity>
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Component, Default)]
+pub struct TilemapMeshes {
+    pub entities:Vec<Entity>
+}
+
+#[derive(Component, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Tilemap {
-    pub tiles:Array2<Tile>
+    pub tiles:Array2<Tile>,
 }
 
 
@@ -53,9 +59,128 @@ struct TileIndex {
     pub y:usize
 }
 
-fn tilemap_changed(mut commands:Commands,asset_server:Res<AssetServer>, mut tilemap:ResMut<Tilemap>, mut metadata:ResMut<Metadata>) {
-    if tilemap.is_changed() {
-        for ((x, y), tile) in tilemap.tiles.indexed_iter_mut() {
+fn create_mesh(tiles:&Array2<Tile>, material:Id) -> Mesh {
+    let mut normals = Vec::new();
+    let mut vertices = Vec::new();
+    let mut colors = Vec::new();
+    let mut uvs = Vec::new();
+    for ((x, y), tile) in tiles.indexed_iter() {
+        let x = x as f32;
+        let z = y as f32;
+        let y = tile.bottom;
+
+        let w = 1.0;
+        let h = 1.0;
+        let c = [1.0, 1.0, 1.0, 1.0];
+        if tile.floor == material {
+            vertices.push([x, y, z]);
+            normals.push([0.0, 1.0, 0.0]);
+            colors.push(c);
+            uvs.push([0.0, 0.0]);
+        
+            vertices.push([x, y, z + w]);
+            normals.push([0.0, 1.0, 0.0]);
+            colors.push(c);
+            uvs.push([0.0, 1.0]);
+        
+            vertices.push([x + h, y, z + w]);
+            normals.push([0.0, 1.0, 0.0]);
+            colors.push(c);
+            uvs.push([1.0, 1.0]);
+        
+            vertices.push([x, y, z]);
+            normals.push([0.0, 1.0, 0.0]);
+            colors.push(c);
+            uvs.push([0.0, 0.0]);
+        
+            vertices.push([x + h, y, z + w]);
+            normals.push([0.0, 1.0, 0.0]);
+            colors.push(c);
+            uvs.push([1.0, 1.0]);
+        
+            vertices.push([x + h, y, z]);
+            normals.push([0.0, 1.0, 0.0]);
+            colors.push(c);
+            uvs.push([1.0, 0.0]);
+        }
+    }
+
+    let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
+    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, vertices);
+    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
+    mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, colors);
+    mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
+
+    return mesh;
+}
+
+fn collect_material_ids(tiles:&Array2<Tile>) -> Vec<Id> {
+    let mut materials = HashMap::new();
+    for tile in tiles.iter() {
+        materials.insert(tile.floor.clone(), true);
+        materials.insert(tile.walls.clone(), true);
+        materials.insert(tile.cealing.clone(), true);
+    }
+
+    let keys = materials.into_iter().map(|(id, _)| id).collect();
+    return keys;
+}
+
+fn tilemap_changed(mut commands:Commands, mut materials:ResMut<Assets<StandardMaterial>>, mut meshes:ResMut<Assets<Mesh>>, asset_server:Res<AssetServer>, mut tilemaps:Query<(&mut Tilemap, &mut TilemapMeshes)>, mut metadata:ResMut<Metadata>) {
+    for (tilemap, mut tile_meshes) in tilemaps.iter_mut() {
+        if tilemap.is_changed() { 
+            for mesh in tile_meshes.entities.iter() {
+                commands.entity(*mesh).despawn_recursive();
+            }
+            tile_meshes.entities.clear();
+
+            let mut get_material = |id| -> Handle<StandardMaterial> {
+                if let Some(def) = metadata.materials.get_mut(&id) {
+                    if def.handle == None {
+                        let material = StandardMaterial {
+                            base_color_texture:Some(asset_server.load(&def.base_color_texture)),
+                            metallic:0.0,
+                            reflectance:0.0,
+                            perceptual_roughness:1.0,
+                            ..Default::default()
+                        };
+    
+                        def.handle = Some(materials.add(material));
+                    }
+    
+                    return def.handle.clone().unwrap();
+                }
+        
+                Handle::default()
+            };
+            let material_ids = collect_material_ids(&tilemap.tiles);
+
+            for material in material_ids.into_iter() {
+                let mesh = create_mesh(&tilemap.tiles, material);
+                let e = commands.spawn_bundle(PbrBundle {
+                    mesh:meshes.add(mesh),
+                    material:get_material(material),
+                    ..Default::default()
+                });
+            }
+
+
+
+
+            /*let e = commands.spawn_bundle(PbrBundle {
+                mesh:meshes.add(mesh),
+                ..Default::default()
+            });*/
+            
+        }
+    }
+    /*if tilemap.is_changed() {
+        if tilemaps.iter().count() == 0 {
+            commands.spawn_bundle(PbrBundle {
+                ..Default::default()
+            }).insert(tilemap.clone());
+        }
+        /*for ((x, y), tile) in tilemap.tiles.indexed_iter_mut() {
             if tile.entity == None {
                 tile.entity = Some(commands.spawn().with_children(|f|{
                     f.spawn().insert(Top);
@@ -70,10 +195,10 @@ fn tilemap_changed(mut commands:Commands,asset_server:Res<AssetServer>, mut tile
                 transform: Transform::from_xyz(x as f32, 0.0, y as f32), 
                 ..Default::default()
             });
-        }
-    }
+        }*/
+    }*/
 }
-
+/*
 fn update_tilemap_entities(meshes:Res<Meshes>, mut materials: ResMut<Assets<StandardMaterial>>,asset_server:Res<AssetServer>, mut commands:Commands, tilemap:Res<Tilemap>, tiles:Query<(Entity, &Tile,&TileIndex, &Children)>, mut metadata:ResMut<Metadata>) {
     if tilemap.is_changed() == false {
         return;
@@ -146,7 +271,7 @@ fn update_tilemap_entities(meshes:Res<Meshes>, mut materials: ResMut<Assets<Stan
             commands.entity(entity).despawn_recursive();
         }
     });
-}
+}*/
 
 pub struct TilemapPlugin;
 
@@ -163,13 +288,14 @@ pub fn setup(mut commands:Commands, mut meshes:ResMut<Assets<Mesh>>) {
         walls:meshes.add(walls)
     };
     commands.insert_resource(meshes);
+
+    commands.spawn().insert(Tilemap::default()).insert(TilemapMeshes::default());
 }
 
 impl Plugin for TilemapPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(Tilemap::default());
         app.add_startup_system(setup);
-        app.add_system_to_stage(CoreStage::Update, update_tilemap_entities.after(tilemap_changed));
+      //  app.add_system_to_stage(CoreStage::Update, update_tilemap_entities.after(tilemap_changed));
         app.add_system_to_stage(CoreStage::PreUpdate, tilemap_changed);
     }
 }

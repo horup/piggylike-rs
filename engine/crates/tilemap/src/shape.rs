@@ -1,5 +1,11 @@
 use bevy::{prelude::*, render::render_resource::PrimitiveTopology};
 
+
+pub struct Floor {
+    
+}
+
+
 pub struct Grid {
     pub width:usize,
     pub height:usize

@@ -84,7 +84,5 @@ fn setup(mut commands: Commands, _meshes: ResMut<Assets<Mesh>>, mut metadata:Res
         .spawn()
         .insert(Transform::from_xyz(8.0, 0.0, 8.0))
         .insert(CameraTarget::default())
-        .insert(Controller::default());
-
-   
+        .insert(Controller::default());   
 }
