@@ -30,7 +30,7 @@ impl Map {
             }
         }
 
-        tiles[(size / 2, size / 2)].top = 5.0;
+        tiles[(size / 2, size / 2)].top = 0.0;
         Self {
             name: "Test Map".into(),
             tiles,
