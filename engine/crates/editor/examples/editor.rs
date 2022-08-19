@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, render::{texture::ImageSettings, render_resource::{AddressMode, SamplerDescriptor}}};
 use bevy_egui::EguiPlugin;
 use editor::*;
 use smart_camera::*;
@@ -7,7 +7,16 @@ use metadata::*;
 
 pub fn main() {
     App::new()
+        .insert_resource(ImageSettings {
+            default_sampler:SamplerDescriptor {
+                address_mode_u:AddressMode::Repeat,
+                address_mode_v:AddressMode::Repeat,
+                address_mode_w:AddressMode::Repeat,
+                ..Default::default()
+            }
+        })
         .add_plugins(DefaultPlugins)
+
         .add_plugin(MetadataPlugin)
         .add_plugin(TilemapPlugin)
         .add_plugin(EguiPlugin)

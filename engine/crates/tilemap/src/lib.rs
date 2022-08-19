@@ -1,4 +1,4 @@
-use bevy::{prelude::{*, shape::{Cube, Plane}}, utils::HashMap};
+use bevy::{prelude::{*, shape::{Cube, Plane}}, utils::HashMap, render::texture::ImageSettings};
 
 mod create_mesh;
 use create_mesh::*;
@@ -242,8 +242,10 @@ pub fn setup(mut commands:Commands, mut meshes:ResMut<Assets<Mesh>>) {
     commands.spawn().insert(Tilemap::default()).insert(TilemapMeshes::default());
 }
 
+
 impl Plugin for TilemapPlugin {
     fn build(&self, app: &mut App) {
+       
         app.add_startup_system(setup);
       //  app.add_system_to_stage(CoreStage::Update, update_tilemap_entities.after(tilemap_changed));
         app.add_system_to_stage(CoreStage::PreUpdate, tilemap_changed);
