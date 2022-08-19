@@ -6,7 +6,7 @@ use bevy_egui::{
 use map::{Map, MapPlugin};
 use metadata::{Id, Metadata};
 use smart_camera::WorldCursor;
-use tilemap::*;
+
 
 pub fn setup(_commands: Commands, _meshes: ResMut<Assets<Mesh>>, _materials: ResMut<Assets<StandardMaterial>>) {
   /*  commands.spawn_bundle(PbrBundle {
@@ -142,7 +142,7 @@ pub fn cursor(
     world_cursor: Res<WorldCursor>,
     mut map: ResMut<Map>,
     mouse_buttons: Res<Input<MouseButton>>,
-    editor: Res<Editor>,
+    _editor: Res<Editor>,
 ) {
     let place = mouse_buttons.pressed(MouseButton::Left);
     let remove = mouse_buttons.pressed(MouseButton::Right);

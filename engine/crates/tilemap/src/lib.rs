@@ -1,4 +1,4 @@
-use bevy::{prelude::{*, shape::{Cube, Plane}}, utils::HashMap, render::render_resource::PrimitiveTopology};
+use bevy::{prelude::{*, shape::{Cube, Plane}}, utils::HashMap};
 
 mod create_mesh;
 use create_mesh::*;
@@ -105,7 +105,7 @@ fn tilemap_changed(mut commands:Commands, mut materials:ResMut<Assets<StandardMa
 
             for material in material_ids.into_iter() {
                 let mesh = create_mesh(&tilemap.tiles, material);
-                let e = commands.spawn_bundle(PbrBundle {
+                let _e = commands.spawn_bundle(PbrBundle {
                     mesh:meshes.add(mesh),
                     material:get_material(material),
                     ..Default::default()

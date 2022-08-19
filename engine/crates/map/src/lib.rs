@@ -94,13 +94,13 @@ struct GridEntity;
 fn map_changed(
     mut commands: Commands,
     map: ResMut<Map>,
-    mut tilemaps: Query<(&mut Tilemap)>,
+    mut tilemaps: Query<&mut Tilemap>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     grids: Query<(Entity, &GridEntity)>,
 ) {
     if map.is_changed() {
-        for (mut tilemap) in tilemaps.iter_mut() {
+        for mut tilemap in tilemaps.iter_mut() {
             if map.width() != tilemap.width() || map.height() != tilemap.height() {
                 *tilemap = Tilemap::new(map.width(), map.height());
 
