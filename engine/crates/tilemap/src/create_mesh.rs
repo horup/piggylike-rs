@@ -127,7 +127,7 @@ pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
         }
     }
 
-    // backwall wall
+    // back wall
     for ((x, y), tile) in tiles.indexed_iter() {
         let x = x as f32;
         let z = y as f32;
@@ -145,6 +145,52 @@ pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
             wall.set_bottom(tile.top);
             wall.set_top(max_top);
             wall.translate(Vec3::new(0.5, 0.0, 0.0));
+            wall.translate(Vec3::new(x, 0.0, z));
+            wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
+        }
+    }
+
+    // left wall
+    for ((x, y), tile) in tiles.indexed_iter() {
+        let x = x as f32;
+        let z = y as f32;
+        let y = tile.top;
+
+        if tile.walls == material {
+            let mut wall = Quad::new_left();
+            wall.set_bottom(min_bottom);
+            wall.set_top(tile.bottom);
+            wall.translate(Vec3::new(0.0, 0.0, 0.5));
+            wall.translate(Vec3::new(x, 0.0, z));
+            wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
+
+            let mut wall = Quad::new_left();
+            wall.set_bottom(tile.top);
+            wall.set_top(max_top);
+            wall.translate(Vec3::new(0.0, 0.0, 0.5));
+            wall.translate(Vec3::new(x, 0.0, z));
+            wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
+        }
+    }
+
+    // right wall
+    for ((x, y), tile) in tiles.indexed_iter() {
+        let x = x as f32;
+        let z = y as f32;
+        let y = tile.top;
+
+        if tile.walls == material {
+            let mut wall = Quad::new_right();
+            wall.set_bottom(min_bottom);
+            wall.set_top(tile.bottom);
+            wall.translate(Vec3::new(1.0, 0.0, 0.5));
+            wall.translate(Vec3::new(x, 0.0, z));
+            wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
+
+            let mut wall = Quad::new_right();
+            wall.set_bottom(tile.top);
+            wall.set_top(max_top);
+            wall.translate(Vec3::new(1.0, 0.0, 0.5));
             wall.translate(Vec3::new(x, 0.0, z));
             wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
         }
