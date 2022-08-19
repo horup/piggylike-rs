@@ -5,6 +5,8 @@ use create_mesh::*;
 mod shape;
 use ndarray::Array2;
 pub use shape::*;
+mod quad;
+pub use quad::*;
 
 
 use bevy::{prelude::Entity};

@@ -1,26 +1,26 @@
-use bevy::{prelude::Mesh, render::render_resource::PrimitiveTopology};
+use bevy::{prelude::{Mesh, Vec3, Vec4, Vec2}, render::render_resource::PrimitiveTopology};
 use metadata::Id;
 use ndarray::Array2;
 
-use crate::Tile;
+use crate::{Tile, Quad};
 
-pub fn create_mesh(tiles:&Array2<Tile>, material:Id) -> Mesh {
+pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
     let mut normals = Vec::new();
     let mut vertices = Vec::new();
     let mut colors = Vec::new();
     let mut uvs = Vec::new();
-    let mut bottom = 0.0;
-    let mut top = 0.0;
-    tiles.for_each(|t|{
-        if t.bottom < bottom {
-            bottom = t.bottom;
+    let mut min_bottom = 0.0;
+    let mut max_top = 0.0;
+    tiles.for_each(|t| {
+        if t.bottom < min_bottom {
+            min_bottom = t.bottom;
         }
-        if t.top > top {
-            top = t.top;
+        if t.top > max_top {
+            max_top = t.top;
         }
     });
 
-    // floors
+    // floor
     for ((x, y), tile) in tiles.indexed_iter() {
         let x = x as f32;
         let z = y as f32;
@@ -34,27 +34,27 @@ pub fn create_mesh(tiles:&Array2<Tile>, material:Id) -> Mesh {
             normals.push([0.0, 1.0, 0.0]);
             colors.push(c);
             uvs.push([0.0, 0.0]);
-        
+
             vertices.push([x, y, z + w]);
             normals.push([0.0, 1.0, 0.0]);
             colors.push(c);
             uvs.push([0.0, 1.0]);
-        
+
             vertices.push([x + h, y, z + w]);
             normals.push([0.0, 1.0, 0.0]);
             colors.push(c);
             uvs.push([1.0, 1.0]);
-        
+
             vertices.push([x, y, z]);
             normals.push([0.0, 1.0, 0.0]);
             colors.push(c);
             uvs.push([0.0, 0.0]);
-        
+
             vertices.push([x + h, y, z + w]);
             normals.push([0.0, 1.0, 0.0]);
             colors.push(c);
             uvs.push([1.0, 1.0]);
-        
+
             vertices.push([x + h, y, z]);
             normals.push([0.0, 1.0, 0.0]);
             colors.push(c);
@@ -72,68 +72,85 @@ pub fn create_mesh(tiles:&Array2<Tile>, material:Id) -> Mesh {
         let h = 1.0;
         let c = [1.0, 1.0, 1.0, 1.0];
         if tile.cealing == material {
-           
-        
-           
-        
-          
-        
-           
-        
-           
-        
             vertices.push([x + h, y, z]);
             normals.push([0.0, 1.0, 0.0]);
             colors.push(c);
             uvs.push([1.0, 0.0]);
 
-
-
- vertices.push([x + h, y, z + w]);
+            vertices.push([x + h, y, z + w]);
             normals.push([0.0, 1.0, 0.0]);
             colors.push(c);
             uvs.push([1.0, 1.0]);
 
-
-
-
-
-
- vertices.push([x, y, z]);
+            vertices.push([x, y, z]);
             normals.push([0.0, 1.0, 0.0]);
             colors.push(c);
             uvs.push([0.0, 0.0]);
 
-
-
-
-
-  vertices.push([x + h, y, z + w]);
+            vertices.push([x + h, y, z + w]);
             normals.push([0.0, 1.0, 0.0]);
             colors.push(c);
             uvs.push([1.0, 1.0]);
 
-
-
-
-
-
-
-
-
- vertices.push([x, y, z + w]);
+            vertices.push([x, y, z + w]);
             normals.push([0.0, 1.0, 0.0]);
             colors.push(c);
             uvs.push([0.0, 1.0]);
 
- vertices.push([x, y, z]);
+            vertices.push([x, y, z]);
             normals.push([0.0, 1.0, 0.0]);
             colors.push(c);
             uvs.push([0.0, 0.0]);
+        }
+    } 
 
+    // front wall
+    for ((x, y), tile) in tiles.indexed_iter() {
+        let x = x as f32;
+        let z = y as f32;
+        let y = tile.top;
 
+        if tile.walls == material {
+            let mut wall = Quad::new_front();
+            wall.set_bottom(min_bottom);
+            wall.set_top(tile.bottom);
+            wall.translate(Vec3::new(0.5, 0.0, 1.0));
+            wall.translate(Vec3::new(x, 0.0, z));
+            wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
+
+            let mut wall = Quad::new_front();
+            wall.set_bottom(tile.top);
+            wall.set_top(max_top);
+            wall.translate(Vec3::new(0.5, 0.0, 1.0));
+            wall.translate(Vec3::new(x, 0.0, z));
+            wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
         }
     }
+
+    // backwall wall
+    for ((x, y), tile) in tiles.indexed_iter() {
+        let x = x as f32;
+        let z = y as f32;
+        let y = tile.top;
+
+        if tile.walls == material {
+            let mut wall = Quad::new_back();
+            wall.set_bottom(min_bottom);
+            wall.set_top(tile.bottom);
+            wall.translate(Vec3::new(0.5, 0.0, 0.0));
+            wall.translate(Vec3::new(x, 0.0, z));
+            wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
+
+            let mut wall = Quad::new_back();
+            wall.set_bottom(tile.top);
+            wall.set_top(max_top);
+            wall.translate(Vec3::new(0.5, 0.0, 0.0));
+            wall.translate(Vec3::new(x, 0.0, z));
+            wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
+        }
+    }
+    
+    
 
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
     mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, vertices);
