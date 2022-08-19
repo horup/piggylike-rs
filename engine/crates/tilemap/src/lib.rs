@@ -10,11 +10,12 @@ use serde::{Serialize, Deserialize};
 
 use metadata::{Id, Metadata};
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, Default, Component)]
 pub struct Tile {
-    pub solid:bool,
-    pub floor:Option<Id>,
-    pub walls:Option<Id>,
+    pub floor:Id,
+    pub walls:Id,
+    pub top:f32,
+    pub bottom:f32,
     #[serde(skip_serializing)]
     pub entity:Option<Entity>
 }
@@ -40,36 +41,31 @@ impl Tilemap {
 }
 
 #[derive(Component)]
-struct TileEntity {
+struct Top;
+
+
+#[derive(Component)]
+struct Bottom;
+
+#[derive(Component)]
+struct TileIndex {
     pub x:usize,
-    pub y:usize,
-    pub floor:Option<Id>,
-    pub walls:Option<Id>
+    pub y:usize
 }
 
-#[derive(Component)]
-struct Floor;
-
-#[derive(Component)]
-struct Walls;
-
-fn tilemap_changed(mut commands:Commands,asset_server:Res<AssetServer>, mut tilemap:ResMut<Tilemap>, mut metadata:ResMut<Metadata>, _tile_sprites:Query<(Entity, &TileEntity)>) {
+fn tilemap_changed(mut commands:Commands,asset_server:Res<AssetServer>, mut tilemap:ResMut<Tilemap>, mut metadata:ResMut<Metadata>) {
     if tilemap.is_changed() {
         for ((x, y), tile) in tilemap.tiles.indexed_iter_mut() {
             if tile.entity == None {
                 tile.entity = Some(commands.spawn().with_children(|f|{
-                    f.spawn().insert(Floor);
-                    f.spawn().insert(Walls);
+                    f.spawn().insert(Top);
+                    f.spawn().insert(Bottom);
                 }).id());
             }
 
             commands.entity(tile.entity.unwrap())
-            .insert(TileEntity {
-                x,
-                y,
-                floor: tile.floor,
-                walls: tile.walls,
-            })
+            .insert(tile.clone())
+            .insert(TileIndex {x, y})
             .insert_bundle(PbrBundle {
                 transform: Transform::from_xyz(x as f32, 0.0, y as f32), 
                 ..Default::default()
@@ -78,7 +74,7 @@ fn tilemap_changed(mut commands:Commands,asset_server:Res<AssetServer>, mut tile
     }
 }
 
-fn update_tilemap_entities(meshes:Res<Meshes>, mut materials: ResMut<Assets<StandardMaterial>>,asset_server:Res<AssetServer>, mut commands:Commands, tilemap:Res<Tilemap>, tiles:Query<(Entity, &TileEntity, &Children)>, mut metadata:ResMut<Metadata>) {
+fn update_tilemap_entities(meshes:Res<Meshes>, mut materials: ResMut<Assets<StandardMaterial>>,asset_server:Res<AssetServer>, mut commands:Commands, tilemap:Res<Tilemap>, tiles:Query<(Entity, &Tile,&TileIndex, &Children)>, mut metadata:ResMut<Metadata>) {
     if tilemap.is_changed() == false {
         return;
     }
@@ -105,15 +101,25 @@ fn update_tilemap_entities(meshes:Res<Meshes>, mut materials: ResMut<Assets<Stan
         Handle::default()
     };
 
-    tiles.for_each(|(entity, tile, children)| {
+    tiles.for_each(|(entity, tile, index, children)| {
         let mut delete = false;
-        if let Some(tile2) = tilemap.tiles.get((tile.x, tile.y)) {
+        if let Some(tile2) = tilemap.tiles.get((index.x, index.y)) {
             if Some(entity) != tile2.entity {
                 delete = true;
             } else {
                 if let (Some(floor), Some(walls)) = (children.get(0), children.get(1)) {
-                    let mut floor = commands.entity(*floor);
-                    let y = if tile.walls == None {0.0} else {1.0};
+                    let mut bottom = commands.entity(*floor);
+                    bottom.insert_bundle(PbrBundle {
+                        mesh:meshes.walls.clone(),
+                        material:get_material(Some(tile.walls)),
+                        transform:Transform::from_xyz( 0.5, tile.top, 0.5),
+                        ..Default::default()
+                    });
+
+                    dbg!(tile.top);
+
+
+              /*      let y = if tile.walls == None {0.0} else {1.0};
                     floor.insert_bundle(PbrBundle {
                         mesh:meshes.floor.clone(),
                         visibility:Visibility { is_visible: tile2.floor != None },
@@ -129,7 +135,7 @@ fn update_tilemap_entities(meshes:Res<Meshes>, mut materials: ResMut<Assets<Stan
                         visibility:Visibility { is_visible: tile2.walls != None },
                         transform:Transform::from_xyz( 0.5, 0.5, 0.5),
                         ..Default::default()
-                    });
+                    });*/
                 }
             }
         } else {

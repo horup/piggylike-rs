@@ -7,8 +7,10 @@ use tilemap::{Tilemap, Grid};
 
 #[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct Tile {
-    pub floor:Option<Id>,
-    pub walls:Option<Id>
+    pub top:f32,
+    pub bottom:f32,
+    pub floor:Id,
+    pub walls:Id
 }
 
 #[derive(Clone, Serialize, Deserialize, PartialEq)]
@@ -20,6 +22,24 @@ pub struct Map {
 }
 
 impl Map {
+    pub fn test_8x8() -> Self {
+        let size = 8;
+        let mut tiles:Array2<Tile> = Array2::default((size, size));
+        for y in 1..size-1 {
+            for x in 1..size-1 {
+                tiles[(x,y)].top = 1.0;
+            }
+        }
+
+        tiles[(size / 2, size / 2)].top = 5.0;
+        Self { 
+            name:"Test Map".into(),
+            tiles,
+            ambient_light:Color::WHITE,
+            ambient_brightness:1.0
+        }
+    }
+
     pub fn save(&self, path:&str) {
         let json = serde_json::to_string(self).unwrap();
         std::fs::write(&path, json).unwrap();
@@ -67,6 +87,7 @@ impl Default for Map {
             ambient_brightness:1.0
         }
     }
+
 }
 
 
@@ -95,8 +116,10 @@ fn map_changed(mut commands:Commands, map:ResMut<Map>, mut tilemap:ResMut<Tilema
 
         for ((x,y), tile) in map.tiles.indexed_iter() {
             if let Some(tilemap_tile) = tilemap.tiles.get_mut((x, y)) {
-                tilemap_tile.floor = tile.floor;
-                tilemap_tile.walls = tile.walls;
+               tilemap_tile.bottom = tile.bottom;
+               tilemap_tile.top = tile.top;
+               tilemap_tile.floor = tile.floor;
+               tilemap_tile.walls = tile.walls;
             }
         }
 
@@ -112,7 +135,7 @@ pub struct MapPlugin;
 
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.insert_resource(Map::default());
+        app.insert_resource(Map::test_8x8());
         app.add_system(map_changed);
     }
 }

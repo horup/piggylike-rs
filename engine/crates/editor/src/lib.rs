@@ -155,10 +155,10 @@ pub fn cursor(
             let mut map_clone = map.clone();
             if let Some(cell) = map_clone.tiles.get_mut((x as usize, y as usize)) {
                 if place {
-                    *cell = map::Tile {
+                  /*  *cell = map::Tile {
                         floor: Some(editor.floor),
                         walls: Some(editor.walls)
-                    };
+                    };*/
                 } else if remove {
                     *cell = map::Tile::default();
                 }
