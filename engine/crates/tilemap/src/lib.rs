@@ -1,5 +1,7 @@
 use bevy::{prelude::{*, shape::{Cube, Plane}}, utils::HashMap, render::render_resource::PrimitiveTopology};
 
+mod create_mesh;
+use create_mesh::*;
 mod shape;
 use ndarray::Array2;
 pub use shape::*;
@@ -59,60 +61,6 @@ struct TileIndex {
     pub y:usize
 }
 
-fn create_mesh(tiles:&Array2<Tile>, material:Id) -> Mesh {
-    let mut normals = Vec::new();
-    let mut vertices = Vec::new();
-    let mut colors = Vec::new();
-    let mut uvs = Vec::new();
-    for ((x, y), tile) in tiles.indexed_iter() {
-        let x = x as f32;
-        let z = y as f32;
-        let y = tile.bottom;
-
-        let w = 1.0;
-        let h = 1.0;
-        let c = [1.0, 1.0, 1.0, 1.0];
-        if tile.floor == material {
-            vertices.push([x, y, z]);
-            normals.push([0.0, 1.0, 0.0]);
-            colors.push(c);
-            uvs.push([0.0, 0.0]);
-        
-            vertices.push([x, y, z + w]);
-            normals.push([0.0, 1.0, 0.0]);
-            colors.push(c);
-            uvs.push([0.0, 1.0]);
-        
-            vertices.push([x + h, y, z + w]);
-            normals.push([0.0, 1.0, 0.0]);
-            colors.push(c);
-            uvs.push([1.0, 1.0]);
-        
-            vertices.push([x, y, z]);
-            normals.push([0.0, 1.0, 0.0]);
-            colors.push(c);
-            uvs.push([0.0, 0.0]);
-        
-            vertices.push([x + h, y, z + w]);
-            normals.push([0.0, 1.0, 0.0]);
-            colors.push(c);
-            uvs.push([1.0, 1.0]);
-        
-            vertices.push([x + h, y, z]);
-            normals.push([0.0, 1.0, 0.0]);
-            colors.push(c);
-            uvs.push([1.0, 0.0]);
-        }
-    }
-
-    let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, vertices);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, colors);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
-
-    return mesh;
-}
 
 fn collect_material_ids(tiles:&Array2<Tile>) -> Vec<Id> {
     let mut materials = HashMap::new();
