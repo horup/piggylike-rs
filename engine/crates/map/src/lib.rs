@@ -8,8 +8,9 @@ use tilemap::{Grid, Tilemap};
 pub struct Tile {
     pub top: f32,
     pub bottom: f32,
-    pub floor: Id,
-    pub walls: Id,
+    pub floor_material: Id,
+    pub wall_material: Id,
+    pub cealing_material:Id
 }
 
 #[derive(Clone, Serialize, Deserialize, PartialEq)]
@@ -47,6 +48,8 @@ impl Map {
             for x in 1..size - 1 {
                 tiles[(x, y)].top = 1.0 + rand::random::<f32>() / 2.0;
                 tiles[(x, y)].bottom = 0.0 - rand::random::<f32>() / 2.0;
+                tiles[(x, y)].floor_material = 2;
+                tiles[(x, y)].cealing_material = 3;
             }
         }
 
@@ -147,8 +150,9 @@ fn map_changed(
                 if let Some(tilemap_tile) = tilemap.tiles.get_mut((x, y)) {
                     tilemap_tile.bottom = tile.bottom;
                     tilemap_tile.top = tile.top;
-                    tilemap_tile.floor = tile.floor;
-                    tilemap_tile.walls = tile.walls;
+                    tilemap_tile.floor = tile.floor_material;
+                    tilemap_tile.walls = tile.wall_material;
+                    tilemap_tile.cealing = tile.cealing_material;
                 }
             }
 
