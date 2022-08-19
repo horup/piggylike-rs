@@ -39,6 +39,26 @@ impl Map {
         }
     }
 
+    pub fn test_16x16() -> Self {
+        let size = 8;
+        let mut tiles: Array2<Tile> = Array2::default((size, size));
+        
+        for y in 1..size - 1 {
+            for x in 1..size - 1 {
+                tiles[(x, y)].top = 1.0 + rand::random::<f32>() / 2.0;
+                tiles[(x, y)].bottom = 0.0 - rand::random::<f32>() / 2.0;
+            }
+        }
+
+        tiles[(size / 2, size / 2)].top = 0.0;
+        Self {
+            name: "Test Map".into(),
+            tiles,
+            ambient_light: Color::WHITE,
+            ambient_brightness: 1.0,
+        }
+    }
+
     pub fn save(&self, path: &str) {
         let json = serde_json::to_string(self).unwrap();
         std::fs::write(&path, json).unwrap();
@@ -104,7 +124,7 @@ fn map_changed(
             if map.width() != tilemap.width() || map.height() != tilemap.height() {
                 *tilemap = Tilemap::new(map.width(), map.height());
 
-                grids.for_each(|(e, _)| commands.entity(e).despawn_recursive());
+             /*   grids.for_each(|(e, _)| commands.entity(e).despawn_recursive());
                 commands
                     .spawn_bundle(PbrBundle {
                         mesh: meshes.add(Mesh::from(Grid {
@@ -120,7 +140,7 @@ fn map_changed(
                         transform: Transform::from_xyz(0.0, -0.01, 0.0),
                         ..Default::default()
                     })
-                    .insert(GridEntity);
+                    .insert(GridEntity);*/
             }
 
             for ((x, y), tile) in map.tiles.indexed_iter() {
@@ -144,7 +164,7 @@ pub struct MapPlugin;
 
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.insert_resource(Map::test_8x8());
+        app.insert_resource(Map::test_16x16());
         app.add_system(map_changed);
     }
 }

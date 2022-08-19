@@ -12,3 +12,4 @@ serde_json = { workspace = true }
 ndarray = { workspace = true }
 metadata = { workspace = true }
 tilemap = { workspace = true }
+rand = { workspace = true }
