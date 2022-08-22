@@ -31,6 +31,17 @@ pub struct Metadata {
     pub materials:HashMap<Id, MaterialDef>
 }
 
+impl Metadata {
+    pub fn material(&self, id:&Id) -> MaterialDef {
+        if let Some(material) = self.materials.get(id) {
+            return material.clone();
+        }
+        
+        return MaterialDef::default();
+    }
+
+}
+
 pub struct MetadataPlugin;
 
 impl Plugin for MetadataPlugin {

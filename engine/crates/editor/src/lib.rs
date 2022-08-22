@@ -7,9 +7,12 @@ use map::{Map, MapPlugin};
 use metadata::{Id, Metadata};
 use smart_camera::WorldCursor;
 
-
-pub fn setup(_commands: Commands, _meshes: ResMut<Assets<Mesh>>, _materials: ResMut<Assets<StandardMaterial>>) {
-  /*  commands.spawn_bundle(PbrBundle {
+pub fn setup(
+    _commands: Commands,
+    _meshes: ResMut<Assets<Mesh>>,
+    _materials: ResMut<Assets<StandardMaterial>>,
+) {
+    /*  commands.spawn_bundle(PbrBundle {
         mesh: meshes.add(Mesh::from(Grid { size: 16 })),
         material: materials.add(StandardMaterial {
             base_color:Color::WHITE,
@@ -24,25 +27,125 @@ pub fn setup(_commands: Commands, _meshes: ResMut<Assets<Mesh>>, _materials: Res
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub enum Tool {
-    Floor,
-    Walls,
-    PlaceThing,
+    TileEditing,
+    ThingEditing,
+}
+
+impl ToString for Tool {
+    fn to_string(&self) -> String {
+        match self {
+            Tool::TileEditing => "Tile".into(),
+            Tool::ThingEditing => "Thing".into(),
+        }
+    }
 }
 
 impl Default for Tool {
     fn default() -> Self {
-        Tool::Floor
+        Tool::TileEditing
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Copy)]
+pub struct Tile {
+    pub floor: Id,
+    pub ceiling: Id,
+    pub walls: Id,
+    pub height: f32,
+}
+
+#[derive(Clone)]
 pub struct Editor {
     pub tool: Tool,
-    pub floor: Id,
-    pub walls: Id,
-    pub ambient_brightness:f32,
-    pub width:usize,
-    pub height:usize
+    pub ambient_brightness: f32,
+    pub width: usize,
+    pub height: usize,
+    pub tiles: Vec<Tile>,
+    pub tile_index: usize,
+}
+
+impl Default for Editor {
+    fn default() -> Self {
+        let mut tiles = Vec::new();
+        for _ in 0..8 {
+            tiles.push(Tile::default())
+        }
+        Self {
+            tool: Default::default(),
+            ambient_brightness: Default::default(),
+            width: Default::default(),
+            height: Default::default(),
+            tiles: tiles,
+            tile_index: Default::default(),
+        }
+    }
+}
+
+pub fn toolbox_ui(
+    mut context: ResMut<EguiContext>,
+    mut editor: ResMut<Editor>,
+    map: ResMut<Map>,
+    metadata: Res<Metadata>,
+) {
+    egui::SidePanel::left("my_left_panel").show(context.ctx_mut(), |ui| {
+        ui.label("Tool selection");
+        egui::ComboBox::from_label("Tool")
+            .selected_text(editor.tool.to_string())
+            .show_ui(ui, |ui| {
+                ui.selectable_value(
+                    &mut editor.tool,
+                    Tool::ThingEditing,
+                    Tool::ThingEditing.to_string(),
+                );
+                ui.selectable_value(
+                    &mut editor.tool,
+                    Tool::TileEditing,
+                    Tool::TileEditing.to_string(),
+                );
+            });
+
+        ui.separator();
+        ui.label("Tile editing");
+        egui::ComboBox::from_label("Tile")
+            .selected_text(editor.tile_index.to_string())
+            .show_ui(ui, |ui| {
+                for index in 0..editor.tiles.len() {
+                    ui.selectable_value(&mut editor.tile_index, index, index.to_string());
+                }
+            });
+        let index = editor.tile_index;
+        if let Some(tile) = editor.tiles.get_mut(index) {
+            egui::ComboBox::from_label("Ceiling")
+                .selected_text(metadata.material(&tile.ceiling).name)
+                .show_ui(ui, |ui| {
+                    for (id, material) in metadata.materials.iter() {
+                        ui.selectable_value(&mut tile.ceiling, *id, material.name.clone());
+                    }
+                });
+            egui::ComboBox::from_label("Walls")
+                .selected_text(metadata.material(&tile.walls).name)
+                .show_ui(ui, |ui| {
+                    for (id, material) in metadata.materials.iter() {
+                        ui.selectable_value(&mut tile.walls, *id, material.name.clone());
+                    }
+                });
+            egui::ComboBox::from_label("Floor")
+                .selected_text(metadata.material(&tile.floor).name)
+                .show_ui(ui, |ui| {
+                    for (id, material) in metadata.materials.iter() {
+                        ui.selectable_value(&mut tile.floor, *id, material.name.clone());
+                    }
+                });
+
+            egui::ComboBox::from_label("Height")
+                .selected_text(format!("{:?}", tile.height))
+                .show_ui(ui, |ui| {
+                    ui.selectable_value(&mut tile.height, 0.0, "0.0");
+                    ui.selectable_value(&mut tile.height, 1.0, "1.0");
+                    ui.selectable_value(&mut tile.height, 2.0, "2.0");
+                });
+        }
+    });
 }
 
 pub fn menu_ui(mut context: ResMut<EguiContext>, _editor_ui: ResMut<Editor>, mut map: ResMut<Map>) {
@@ -63,33 +166,8 @@ pub fn menu_ui(mut context: ResMut<EguiContext>, _editor_ui: ResMut<Editor>, mut
 
 pub fn tools_selection_ui(mut context: ResMut<EguiContext>, mut editor: ResMut<Editor>) {
     egui::Window::new("Tools").show(context.ctx_mut(), |ui| {
-        ui.radio_value(&mut editor.tool, Tool::Floor, "Floor");
-        ui.radio_value(&mut editor.tool, Tool::Walls, "Walls");
-        ui.radio_value(&mut editor.tool, Tool::PlaceThing, "Place Thing");
-    });
-}
-
-pub fn floor_selection_ui(
-    mut context: ResMut<EguiContext>,
-    metadata: Res<Metadata>,
-    mut editor_ui: ResMut<Editor>,
-) {
-    egui::Window::new("Floor").show(context.ctx_mut(), |ui| {
-        for (id, material_def) in metadata.materials.iter() {
-            ui.radio_value(&mut editor_ui.floor, *id, material_def.name.clone());
-        }
-    });
-}
-
-pub fn walls_selection_ui(
-    mut context: ResMut<EguiContext>,
-    metadata: Res<Metadata>,
-    mut editor_ui: ResMut<Editor>,
-) {
-    egui::Window::new("Walls").show(context.ctx_mut(), |ui| {
-        for (id, material_def) in metadata.materials.iter() {
-            ui.radio_value(&mut editor_ui.walls, *id, material_def.name.clone());
-        }
+        ui.radio_value(&mut editor.tool, Tool::TileEditing, "Tile");
+        ui.radio_value(&mut editor.tool, Tool::ThingEditing, "Thing");
     });
 }
 
@@ -109,11 +187,7 @@ fn f32_edit_single(ui: &mut Ui, value: &mut f32) {
     }
 }
 
-pub fn map_ui(
-    mut context: ResMut<EguiContext>,
-    mut editor: ResMut<Editor>,
-    mut map: ResMut<Map>,
-) {
+pub fn map_ui(mut context: ResMut<EguiContext>, mut editor: ResMut<Editor>, mut map: ResMut<Map>) {
     egui::Window::new("Map").show(context.ctx_mut(), |ui| {
         ui.horizontal(|ui| {
             ui.label("Name");
@@ -135,7 +209,6 @@ pub fn map_ui(
             map.resize(editor.width, editor.height);
         }
     });
-
 }
 
 pub fn cursor(
@@ -154,7 +227,7 @@ pub fn cursor(
             let mut map_clone = map.clone();
             if let Some(cell) = map_clone.tiles.get_mut((x as usize, y as usize)) {
                 if place {
-                  /*  *cell = map::Tile {
+                    /*  *cell = map::Tile {
                         floor: Some(editor.floor),
                         walls: Some(editor.walls)
                     };*/
@@ -176,11 +249,11 @@ impl Plugin for EditorPlugin {
         app.add_plugin(MapPlugin);
         app.insert_resource(Editor::default());
         app.add_startup_system(setup);
-        app.add_system(floor_selection_ui.after(tools_selection_ui));
-        app.add_system(walls_selection_ui.after(tools_selection_ui));
-        app.add_system(tools_selection_ui);
-        app.add_system(map_ui.after(floor_selection_ui));
-        app.add_system(menu_ui.before(tools_selection_ui));
-        app.add_system(cursor.after(tools_selection_ui));
+
+        app.add_system(cursor);
+        app.add_system(menu_ui.after(cursor));
+
+        app.add_system(toolbox_ui.after(menu_ui));
+        app.add_system(map_ui.after(toolbox_ui));
     }
 }
