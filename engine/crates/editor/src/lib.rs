@@ -84,7 +84,7 @@ impl Default for Editor {
 pub fn toolbox_ui(
     mut context: ResMut<EguiContext>,
     mut editor: ResMut<Editor>,
-    map: ResMut<Map>,
+    _map: ResMut<Map>,
     metadata: Res<Metadata>,
 ) {
     egui::SidePanel::left("my_left_panel").show(context.ctx_mut(), |ui| {
