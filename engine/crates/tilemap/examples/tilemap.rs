@@ -45,6 +45,5 @@ pub fn main() {
     app.add_plugin(FrameTimeDiagnosticsPlugin::default());
     let render_app = app.get_sub_app_mut(RenderApp).unwrap();
 
-    render_app.
     app.run();
 }
