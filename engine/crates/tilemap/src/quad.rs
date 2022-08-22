@@ -64,6 +64,20 @@ impl Quad {
         }
     }
 
+    pub fn recompute_uvs(&mut self) {
+        let uvs = &mut self.uvs;
+        let top = self.vertices[0].y;
+        let bottom = self.vertices[1].y;
+
+        for i in [0, 3, 5] {
+            uvs[i].y = -top.abs();
+        }
+
+        for i in [1, 2, 4] {
+            uvs[i].y = bottom.abs();
+        }
+    }
+
     pub fn copy_to(self, vertices:&mut Vec<[f32;3]>, normals:&mut Vec<[f32;3]>, colors:&mut Vec<[f32;4]>, uvs:&mut Vec<[f32;2]>) {
         self.vertices.into_iter().for_each(|v|vertices.push(v.into()));
         self.normals.into_iter().for_each(|v|normals.push(v.into()));

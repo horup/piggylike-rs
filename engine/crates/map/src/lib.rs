@@ -40,6 +40,27 @@ impl Map {
         }
     }
 
+    pub fn test_3x3() -> Self {
+        let size = 3;
+        let mut tiles: Array2<Tile> = Array2::default((size, size));
+
+        for y in 1..size - 1 {
+            for x in 1..size - 1 {
+                tiles[(x, y)].top = 3.0;
+                tiles[(x, y)].bottom = -3.0;
+                tiles[(x, y)].floor_material = 2;
+                tiles[(x, y)].cealing_material = 3;
+            }
+        }
+
+        Self {
+            name: "Test Map".into(),
+            tiles,
+            ambient_light: Color::WHITE,
+            ambient_brightness: 1.0,
+        }
+    }
+
     pub fn test_16x16() -> Self {
         let size = 8;
         let mut tiles: Array2<Tile> = Array2::default((size, size));
@@ -168,7 +189,7 @@ pub struct MapPlugin;
 
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.insert_resource(Map::test_16x16());
+        app.insert_resource(Map::test_3x3());
         app.add_system(map_changed);
     }
 }

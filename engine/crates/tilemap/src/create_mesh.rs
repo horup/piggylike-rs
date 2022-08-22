@@ -116,6 +116,7 @@ pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
             wall.set_top(tile.bottom);
             wall.translate(Vec3::new(0.5, 0.0, 1.0));
             wall.translate(Vec3::new(x, 0.0, z));
+            wall.recompute_uvs();
             wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
 
             let mut wall = Quad::new_front();
@@ -123,6 +124,7 @@ pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
             wall.set_top(max_top);
             wall.translate(Vec3::new(0.5, 0.0, 1.0));
             wall.translate(Vec3::new(x, 0.0, z));
+            wall.recompute_uvs();
             wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
         }
     }
@@ -139,6 +141,7 @@ pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
             wall.set_top(tile.bottom);
             wall.translate(Vec3::new(0.5, 0.0, 0.0));
             wall.translate(Vec3::new(x, 0.0, z));
+            wall.recompute_uvs();
             wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
 
             let mut wall = Quad::new_back();
@@ -146,6 +149,7 @@ pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
             wall.set_top(max_top);
             wall.translate(Vec3::new(0.5, 0.0, 0.0));
             wall.translate(Vec3::new(x, 0.0, z));
+            wall.recompute_uvs();
             wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
         }
     }
@@ -162,6 +166,7 @@ pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
             wall.set_top(tile.bottom);
             wall.translate(Vec3::new(0.0, 0.0, 0.5));
             wall.translate(Vec3::new(x, 0.0, z));
+            wall.recompute_uvs();
             wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
 
             let mut wall = Quad::new_left();
@@ -169,6 +174,7 @@ pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
             wall.set_top(max_top);
             wall.translate(Vec3::new(0.0, 0.0, 0.5));
             wall.translate(Vec3::new(x, 0.0, z));
+            wall.recompute_uvs();
             wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
         }
     }
@@ -185,6 +191,7 @@ pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
             wall.set_top(tile.bottom);
             wall.translate(Vec3::new(1.0, 0.0, 0.5));
             wall.translate(Vec3::new(x, 0.0, z));
+            wall.recompute_uvs();
             wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
 
             let mut wall = Quad::new_right();
@@ -192,6 +199,7 @@ pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
             wall.set_top(max_top);
             wall.translate(Vec3::new(1.0, 0.0, 0.5));
             wall.translate(Vec3::new(x, 0.0, z));
+            wall.recompute_uvs();
             wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
         }
     }
