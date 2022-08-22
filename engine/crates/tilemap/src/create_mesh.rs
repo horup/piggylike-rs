@@ -14,6 +14,7 @@ fn test() {
     dbg!(diff.as_millis());
 }
 
+#[inline(always)]
 pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
 
     let size = tiles.dim().0 *  tiles.dim().1 * 6 * 6 * 4;

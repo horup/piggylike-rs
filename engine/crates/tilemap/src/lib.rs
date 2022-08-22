@@ -120,7 +120,7 @@ fn tilemap_changed(mut commands:Commands, mut materials:ResMut<Assets<StandardMa
                 let vs = mesh.attribute_mut(Mesh::ATTRIBUTE_POSITION).unwrap();
                 match vs {
                     bevy::render::mesh::VertexAttributeValues::Float32x3(v) => {
-                        dbg!(v.len());
+                        
                     },
                     _ => {}
                 }
