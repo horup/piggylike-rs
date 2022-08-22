@@ -107,11 +107,13 @@ fn tilemap_changed(mut commands:Commands, mut materials:ResMut<Assets<StandardMa
 
             for material in material_ids.into_iter() {
                 let mesh = create_mesh(&tilemap.tiles, material);
-                let _e = commands.spawn_bundle(PbrBundle {
+                let e = commands.spawn_bundle(PbrBundle {
                     mesh:meshes.add(mesh),
                     material:get_material(material),
                     ..Default::default()
                 });
+
+                tile_meshes.entities.push(e.id());
             }
 
 

@@ -215,11 +215,11 @@ pub fn cursor(
     world_cursor: Res<WorldCursor>,
     mut map: ResMut<Map>,
     mouse_buttons: Res<Input<MouseButton>>,
-    _editor: Res<Editor>,
+    editor: Res<Editor>,
+    time: Res<Time>
 ) {
     let place = mouse_buttons.pressed(MouseButton::Left);
     let remove = mouse_buttons.pressed(MouseButton::Right);
-
     if place || remove {
         let x = world_cursor.position.x as i32;
         let y = world_cursor.position.z as i32;
@@ -227,10 +227,15 @@ pub fn cursor(
             let mut map_clone = map.clone();
             if let Some(cell) = map_clone.tiles.get_mut((x as usize, y as usize)) {
                 if place {
-                    /*  *cell = map::Tile {
-                        floor: Some(editor.floor),
-                        walls: Some(editor.walls)
-                    };*/
+                    if let Some(tile) = editor.tiles.get(editor.tile_index) {
+                        *cell = map::Tile {
+                            top: tile.height,
+                            bottom: 0.0,
+                            floor_material: tile.floor,
+                            wall_material: tile.walls,
+                            ceiling_material: tile.ceiling,
+                        }
+                    }
                 } else if remove {
                     *cell = map::Tile::default();
                 }

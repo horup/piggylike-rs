@@ -10,7 +10,7 @@ pub struct Tile {
     pub bottom: f32,
     pub floor_material: Id,
     pub wall_material: Id,
-    pub cealing_material:Id
+    pub ceiling_material:Id
 }
 
 #[derive(Clone, Serialize, Deserialize, PartialEq)]
@@ -49,7 +49,7 @@ impl Map {
                 tiles[(x, y)].top = 3.0;
                 tiles[(x, y)].bottom = -3.0;
                 tiles[(x, y)].floor_material = 2;
-                tiles[(x, y)].cealing_material = 3;
+                tiles[(x, y)].ceiling_material = 3;
             }
         }
 
@@ -70,7 +70,7 @@ impl Map {
                 tiles[(x, y)].top = 1.0 + rand::random::<f32>() / 2.0;
                 tiles[(x, y)].bottom = 0.0 - rand::random::<f32>() / 2.0;
                 tiles[(x, y)].floor_material = 2;
-                tiles[(x, y)].cealing_material = 3;
+                tiles[(x, y)].ceiling_material = 3;
             }
         }
 
@@ -173,7 +173,7 @@ fn map_changed(
                     tilemap_tile.top = tile.top;
                     tilemap_tile.floor = tile.floor_material;
                     tilemap_tile.walls = tile.wall_material;
-                    tilemap_tile.cealing = tile.cealing_material;
+                    tilemap_tile.cealing = tile.ceiling_material;
                 }
             }
 
@@ -189,7 +189,7 @@ pub struct MapPlugin;
 
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.insert_resource(Map::test_3x3());
+        app.insert_resource(Map::default());
         app.add_system(map_changed);
     }
 }

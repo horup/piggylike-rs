@@ -5,10 +5,12 @@ use ndarray::Array2;
 use crate::{Tile, Quad};
 
 pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
-    let mut normals = Vec::new();
-    let mut vertices = Vec::new();
-    let mut colors = Vec::new();
-    let mut uvs = Vec::new();
+
+    let size = tiles.dim().0 *  tiles.dim().1 * 6 * 6 * 4;
+    let mut normals = Vec::with_capacity(size);
+    let mut vertices = Vec::with_capacity(size);
+    let mut colors = Vec::with_capacity(size);
+    let mut uvs = Vec::with_capacity(size);
     let mut min_bottom = 0.0;
     let mut max_top = 0.0;
     tiles.for_each(|t| {
@@ -203,8 +205,8 @@ pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
             wall.copy_to(&mut vertices, &mut normals, &mut colors, &mut uvs);
         }
     }
-    
-    
+
+   
 
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
     mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, vertices);

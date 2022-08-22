@@ -55,11 +55,7 @@ fn setup(mut commands: Commands, _meshes: ResMut<Assets<Mesh>>, mut metadata:Res
         mesh: "../../../assets/stone.glb#Scene0".into(),
     });*/
 
-    metadata.materials.insert(0, MaterialDef {
-        name:"Blue Bricks".into(),
-        base_color_texture: "../../../assets/blue.png".into(),
-        ..Default::default()
-    });
+   
     metadata.materials.insert(1, MaterialDef {
         name:"Gray Bricks".into(),
         base_color_texture: "../../../assets/brick.png".into(),
@@ -75,9 +71,14 @@ fn setup(mut commands: Commands, _meshes: ResMut<Assets<Mesh>>, mut metadata:Res
         base_color_texture: "../../../assets/stone2.png".into(),
         ..Default::default()
     });
-    metadata.materials.insert(4, MaterialDef {
+    metadata.materials.insert(0, MaterialDef {
         name:"Black".into(),
         base_color_texture: "../../../assets/black.png".into(),
+        ..Default::default()
+    });
+    metadata.materials.insert(4, MaterialDef {
+        name:"Blue Bricks".into(),
+        base_color_texture: "../../../assets/blue.png".into(),
         ..Default::default()
     });
 
