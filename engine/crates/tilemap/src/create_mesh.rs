@@ -4,6 +4,16 @@ use ndarray::Array2;
 
 use crate::{Tile, Quad};
 
+#[test]
+fn test() {
+    let now = std::time::Instant::now();
+    let tiles:Array2<Tile> = Array2::default((256, 256));
+    let mesh = create_mesh(&tiles, 0);
+    let diff = std::time::Instant::now() - now;
+
+    dbg!(diff.as_millis());
+}
+
 pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
 
     let size = tiles.dim().0 *  tiles.dim().1 * 6 * 6 * 4;
