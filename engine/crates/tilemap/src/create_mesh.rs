@@ -6,7 +6,6 @@ use crate::{Tile, Quad};
 
 #[inline(always)]
 pub fn create_mesh(tiles: &ArrayView2<Tile>, material: Id, min_bottom:f32, max_top:f32) -> Mesh {
-
     let size = tiles.dim().0 *  tiles.dim().1 * 6 * 6 * 4;
     let mut normals = Vec::with_capacity(size);
     let mut vertices = Vec::with_capacity(size);

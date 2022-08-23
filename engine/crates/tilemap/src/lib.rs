@@ -3,7 +3,7 @@ use bevy::{prelude::{*, shape::{Cube, Plane}}, utils::HashMap};
 mod create_mesh;
 use create_mesh::*;
 mod shape;
-use ndarray::{Array2, s, ArrayView2};
+use ndarray::{Array2, s, ArrayView2, Ix1};
 pub use shape::*;
 mod quad;
 pub use quad::*;
@@ -14,15 +14,13 @@ use serde::{Serialize, Deserialize};
 
 use metadata::{Id, Metadata};
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, Default, Component)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, Default, Component, PartialEq)]
 pub struct Tile {
     pub floor:Id,
     pub walls:Id,
     pub cealing:Id,
     pub top:f32,
     pub bottom:f32,
-    #[serde(skip_serializing)]
-    pub entity:Option<Entity>
 }
 
 #[derive(Component, Default)]
@@ -34,12 +32,14 @@ pub struct TilemapMeshes {
 #[derive(Component, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Tilemap {
     pub tiles:Array2<Tile>,
+    pub top:f32,
+    pub bottom:f32
 }
 
 
 impl Tilemap {
     pub fn new(width:usize, height:usize) -> Self {
-        Self { tiles: Array2::default((width, height)), }
+        Self { tiles: Array2::default((width, height)), top:0.0, bottom:0.0 }
     }
 
     pub fn width(&self) -> usize {
@@ -81,9 +81,25 @@ struct Top;
 struct Bottom;
 
 #[derive(Component)]
-struct TileIndex {
-    pub x:usize,
-    pub y:usize
+struct Chunk {
+    pub tiles:Array2<Tile>
+}
+
+impl Chunk {
+    pub fn changed(&self, tiles:&ArrayView2<Tile>) -> bool {
+        if self.tiles.dim().0 != tiles.dim().0 || self.tiles.dim().1 != tiles.dim().1 {
+            return true;
+        }
+
+        for (p, tile) in self.tiles.indexed_iter() {
+           
+            if tile.ne(&tiles[p]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
 
 
@@ -99,20 +115,35 @@ fn collect_material_ids(tiles:&ArrayView2<Tile>) -> Vec<Id> {
     return keys;
 }
 
-fn tilemap_changed(mut commands:Commands, mut materials:ResMut<Assets<StandardMaterial>>, mut meshes:ResMut<Assets<Mesh>>, asset_server:Res<AssetServer>, mut tilemaps:Query<(&mut Tilemap, &mut TilemapMeshes)>, mut metadata:ResMut<Metadata>) {
-    for (tilemap, mut tile_meshes) in tilemaps.iter_mut() {
+fn tilemap_changed(mut commands:Commands, mut materials:ResMut<Assets<StandardMaterial>>, mut meshes:ResMut<Assets<Mesh>>, asset_server:Res<AssetServer>, mut tilemaps:Query<(&mut Tilemap, &mut TilemapMeshes)>, mut metadata:ResMut<Metadata>, chunks:Query<&Chunk>) {
+    for (mut tilemap, mut tile_meshes) in tilemaps.iter_mut() {
         if tilemap.is_changed() { 
-            let chunk_size = 32;
+            if tilemap.width() == 0 || tilemap.height() == 0 {
+                return;
+            }
+
+
+            let chunk_size = 32.min(tilemap.width().min(tilemap.height()));
             let min_bottom = tilemap.min_bottom();
             let max_top = tilemap.max_top();
+            let global_update = min_bottom != tilemap.bottom || max_top != tilemap.top;
             for cy in 0..tilemap.width() / chunk_size {
                 for cx in 0..tilemap.height() / chunk_size {
                     let x = cx * chunk_size;
                     let y = cy * chunk_size;
+                    let tiles = &tilemap.tiles.slice(s![x.. x + chunk_size, y..y + chunk_size]);
                     let mut update = false;
-                    if tile_meshes.chunks.contains_key(&(cx,cy)) == false {
-                        update = true;
+                    if let Some(chunk) = tile_meshes.chunks.get(&(cx, cy)) {
+                        if let Ok(chunk) = chunks.get(*chunk) {
+                            if chunk.changed(tiles) {
+                                update = true;
+                            }
+                        }
+                    } else {
+                        update = true
                     }
+
+                    update |= global_update;
 
                     if update {
                         if let Some(e) = tile_meshes.chunks.get(&(cx,cy)) {
@@ -138,69 +169,33 @@ fn tilemap_changed(mut commands:Commands, mut materials:ResMut<Assets<StandardMa
                     
                             Handle::default()
                         };
-                        let tiles = &tilemap.tiles.slice(s![x.. x + chunk_size, y..y + chunk_size]);
                         let material_ids = collect_material_ids(tiles);
+
+                        let parent = commands.spawn_bundle(PbrBundle {
+                            transform:Transform::from_xyz(x as f32, 0.0, y as f32),
+                            ..Default::default()
+                        }).insert(Chunk {
+                            tiles:tiles.to_owned()
+                        }).id();
 
                         for material in material_ids.into_iter() {
                             let mesh = create_mesh(tiles, material, min_bottom, max_top);
                             let e = commands.spawn_bundle(PbrBundle {
                                 mesh:meshes.add(mesh),
                                 material:get_material(material),
-                                transform:Transform::from_xyz(x as f32, 0.0, y as f32),
                                 ..Default::default()
-                            });
-            
-                            tile_meshes.chunks.insert((cx,cy), e.id());
+                            }).id();
+                            commands.entity(parent).add_child(e);
                         }
+
+                        tile_meshes.chunks.insert((cx,cy), parent);
+
                     }
                 }
             }
-            /*for mesh in tile_meshes.entities.iter() {
-                commands.entity(*mesh).despawn_recursive();
-            }
-            tile_meshes.entities.clear();
 
-            let mut get_material = |id| -> Handle<StandardMaterial> {
-                if let Some(def) = metadata.materials.get_mut(&id) {
-                    if def.handle == None {
-                        let material = StandardMaterial {
-                            base_color_texture:Some(asset_server.load(&def.base_color_texture)),
-                            metallic:0.0,
-                            reflectance:0.0,
-                            perceptual_roughness:1.0,
-                            ..Default::default()
-                        };
-    
-                        def.handle = Some(materials.add(material));
-                    }
-    
-                    return def.handle.clone().unwrap();
-                }
-        
-                Handle::default()
-            };
-            let material_ids = collect_material_ids(&tilemap.tiles);
-
-            for material in material_ids.into_iter() {
-                let mesh = create_mesh(&tilemap.tiles, material);
-                let e = commands.spawn_bundle(PbrBundle {
-                    mesh:meshes.add(mesh),
-                    material:get_material(material),
-                    ..Default::default()
-                });
-
-                tile_meshes.entities.push(e.id());
-            }
-            
-            for (handle, mesh) in meshes.iter_mut() {
-                let vs = mesh.attribute_mut(Mesh::ATTRIBUTE_POSITION).unwrap();
-                match vs {
-                    bevy::render::mesh::VertexAttributeValues::Float32x3(v) => {
-                        
-                    },
-                    _ => {}
-                }
-            }*/
+            tilemap.bottom = min_bottom;
+            tilemap.top = max_top;
         }
     }
 

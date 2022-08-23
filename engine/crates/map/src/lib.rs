@@ -149,7 +149,7 @@ impl Map {
 
 impl Default for Map {
     fn default() -> Self {
-        let size = 16;
+        let size = 64;
         Self {
             name: String::from("Untitled"),
             tiles: Array2::default((size, size)),
@@ -174,24 +174,6 @@ fn map_changed(
         for mut tilemap in tilemaps.iter_mut() {
             if map.width() != tilemap.width() || map.height() != tilemap.height() {
                 *tilemap = Tilemap::new(map.width(), map.height());
-
-             /*   grids.for_each(|(e, _)| commands.entity(e).despawn_recursive());
-                commands
-                    .spawn_bundle(PbrBundle {
-                        mesh: meshes.add(Mesh::from(Grid {
-                            width: map.width(),
-                            height: map.height(),
-                        })),
-                        material: materials.add(StandardMaterial {
-                            base_color: Color::WHITE,
-                            depth_bias: 1000.0,
-                            unlit: true,
-                            ..Default::default()
-                        }),
-                        transform: Transform::from_xyz(0.0, -0.01, 0.0),
-                        ..Default::default()
-                    })
-                    .insert(GridEntity);*/
             }
 
             for ((x, y), tile) in map.tiles.indexed_iter() {
@@ -216,7 +198,7 @@ pub struct MapPlugin;
 
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.insert_resource(Map::test_256x256());
+        app.insert_resource(Map::default());
         app.add_system(map_changed);
     }
 }
