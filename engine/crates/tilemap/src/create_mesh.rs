@@ -1,6 +1,6 @@
 use bevy::{prelude::{Mesh, Vec3}, render::render_resource::PrimitiveTopology};
 use metadata::Id;
-use ndarray::Array2;
+use ndarray::{Array2, ArrayView2};
 
 use crate::{Tile, Quad};
 
@@ -8,30 +8,20 @@ use crate::{Tile, Quad};
 fn test() {
     let now = std::time::Instant::now();
     let tiles:Array2<Tile> = Array2::default((256, 256));
-    let mesh = create_mesh(&tiles, 0);
+    let mesh = create_mesh(&tiles, 0, 0.0, 1.0);
     let diff = std::time::Instant::now() - now;
 
     dbg!(diff.as_millis());
 }
 
 #[inline(always)]
-pub fn create_mesh(tiles: &Array2<Tile>, material: Id) -> Mesh {
+pub fn create_mesh(tiles: &ArrayView2<Tile>, material: Id, min_bottom:f32, max_top:f32) -> Mesh {
 
     let size = tiles.dim().0 *  tiles.dim().1 * 6 * 6 * 4;
     let mut normals = Vec::with_capacity(size);
     let mut vertices = Vec::with_capacity(size);
     let mut colors = Vec::with_capacity(size);
     let mut uvs = Vec::with_capacity(size);
-    let mut min_bottom = 0.0;
-    let mut max_top = 0.0;
-    tiles.for_each(|t| {
-        if t.bottom < min_bottom {
-            min_bottom = t.bottom;
-        }
-        if t.top > max_top {
-            max_top = t.top;
-        }
-    });
 
     // floor
     for ((x, y), tile) in tiles.indexed_iter() {

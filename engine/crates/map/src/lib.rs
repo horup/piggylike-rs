@@ -22,6 +22,33 @@ pub struct Map {
 }
 
 impl Map {
+    pub fn test_256x256() -> Self {
+        let size = 256;
+        let mut tiles: Array2<Tile> = Array2::default((size, size));
+        for y in 0..size {
+            for x in 0..size {
+                //tiles[(x, y)].top = 1.0 + x as f32 * size as f32 / size as f32;
+                tiles[(x, y)].floor_material = 1;
+                tiles[(x, y)].wall_material = 1;
+                tiles[(x, y)].ceiling_material = 2;
+            }
+        }
+        for y in 1..size - 1 {
+            for x in 1..size - 1 {
+                tiles[(x, y)].top = 1.0 + x as f32 * size as f32 / size as f32;
+                tiles[(x, y)].floor_material = 1;
+                tiles[(x, y)].ceiling_material = 2;
+            }
+        }
+
+        tiles[(size / 2, size / 2)].top = 0.0;
+        Self {
+            name: "Test Map".into(),
+            tiles,
+            ambient_light: Color::WHITE,
+            ambient_brightness: 1.0,
+        }
+    }
     pub fn test_8x8() -> Self {
         let size = 8;
         let mut tiles: Array2<Tile> = Array2::default((size, size));
@@ -189,7 +216,7 @@ pub struct MapPlugin;
 
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.insert_resource(Map::default());
+        app.insert_resource(Map::test_256x256());
         app.add_system(map_changed);
     }
 }
