@@ -3,7 +3,7 @@ use bevy::{prelude::{*, shape::{Cube, Plane}}, utils::HashMap};
 mod create_mesh;
 use create_mesh::*;
 mod shape;
-use ndarray::{Array2, s, ArrayView2, Ix1};
+use ndarray::{Array2, s, ArrayView2};
 pub use shape::*;
 mod quad;
 pub use quad::*;
