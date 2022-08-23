@@ -216,7 +216,7 @@ pub fn cursor(
     mut map: ResMut<Map>,
     mouse_buttons: Res<Input<MouseButton>>,
     editor: Res<Editor>,
-    time: Res<Time>
+    _time: Res<Time>
 ) {
     let place = mouse_buttons.pressed(MouseButton::Left);
     let remove = mouse_buttons.pressed(MouseButton::Right);

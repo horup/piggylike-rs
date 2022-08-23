@@ -1,18 +1,8 @@
-use bevy::{prelude::{Mesh, Vec3}, render::render_resource::PrimitiveTopology};
+use bevy::{prelude::{Mesh}, render::render_resource::PrimitiveTopology};
 use metadata::Id;
-use ndarray::{Array2, ArrayView2};
+use ndarray::{ArrayView2};
 
 use crate::{Tile, Quad};
-
-#[test]
-fn test() {
-    let now = std::time::Instant::now();
-    let tiles:Array2<Tile> = Array2::default((256, 256));
-    let mesh = create_mesh(&tiles, 0, 0.0, 1.0);
-    let diff = std::time::Instant::now() - now;
-
-    dbg!(diff.as_millis());
-}
 
 #[inline(always)]
 pub fn create_mesh(tiles: &ArrayView2<Tile>, material: Id, min_bottom:f32, max_top:f32) -> Mesh {

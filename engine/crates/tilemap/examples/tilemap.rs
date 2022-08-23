@@ -1,4 +1,4 @@
-use bevy::{prelude::{*, shape::Cube}, diagnostic::{DiagnosticsPlugin, LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}, render::{render_resource::PrimitiveTopology, RenderApp}};
+use bevy::{prelude::{*}, diagnostic::{DiagnosticsPlugin, LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}, render::{render_resource::PrimitiveTopology, RenderApp}};
 
 pub fn setup(mut commands:Commands, mut meshes:ResMut<Assets<Mesh>>) {
     let a = 10.0;
@@ -30,7 +30,7 @@ fn generate_mesh(size:usize) -> Mesh {
 pub fn tick(mut meshes:ResMut<Assets<Mesh>>) {
    /* */ for (_, mesh) in meshes.iter_mut() {
         let pos = mesh.attribute_mut(Mesh::ATTRIBUTE_POSITION).unwrap();
-        if let bevy::render::mesh::VertexAttributeValues::Float32x3(pos) = pos {
+        if let bevy::render::mesh::VertexAttributeValues::Float32x3(_pos) = pos {
             //pos[0][0] += 0.01;
         }
        
@@ -43,7 +43,7 @@ pub fn main() {
     app.add_plugin(DiagnosticsPlugin::default());
     app.add_plugin(LogDiagnosticsPlugin::default());
     app.add_plugin(FrameTimeDiagnosticsPlugin::default());
-    let render_app = app.get_sub_app_mut(RenderApp).unwrap();
+    let _render_app = app.get_sub_app_mut(RenderApp).unwrap();
 
     app.run();
 }
